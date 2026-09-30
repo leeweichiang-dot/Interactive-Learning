@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Counting in Binary</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f6f4;
+      --surface: #ffffff;
+      --text: #1c1c1e;
+      --muted: #5d6167;
+      --border: #dadad6;
+      --accent: #2553b8;
+      --accent-soft: #e7edfa;
+      --on-accent: #ffffff;
+      --success: #1e7a3c;
+      --radius: 10px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141517;
+        --surface: #1d1f23;
+        --text: #ececee;
+        --muted: #a2a6ad;
+        --border: #34373d;
+        --accent: #93b1ff;
+        --accent-soft: #1f2940;
+        --on-accent: #10131a;
+        --success: #7fd69a;
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.6;
+    }
+    a { color: var(--accent); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+    main { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
+    .back { display: inline-block; margin-bottom: 16px; font-size: 0.95rem; }
+    h1 { margin: 0 0 4px; font-size: clamp(1.5rem, 4vw, 2rem); line-height: 1.2; }
+    h2 { margin: 0 0 12px; font-size: 1.25rem; }
+    .progress { margin: 0 0 20px; color: var(--muted); font-size: 0.9rem; }
+
+    /* Steps */
+    .step {
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .step p:last-child { margin-bottom: 0; }
+    .nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; }
+    button {
+      padding: 10px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font: inherit;
+      cursor: pointer;
+    }
+    button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    button:disabled { opacity: 0.4; cursor: default; }
+
+    /* Place-value table and bit toggles */
+    .bits {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 6px;
+      margin: 16px 0;
+      text-align: center;
+    }
+    .bits .place { color: var(--muted); font-size: 0.8rem; }
+    .bit {
+      padding: 10px 0;
+      font: 700 1.2rem ui-monospace, "SF Mono", Consolas, monospace;
+    }
+    .bit[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .total { font-size: 1.1rem; }
+    .total strong { font-size: 1.4rem; }
+    .goal { padding: 10px 12px; background: var(--accent-soft); border-radius: 8px; }
+    .goal.done { color: var(--success); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="../../../module.html?m=sample">&larr; Sample Module</a>
+    <h1>Counting in Binary</h1>
+    <p class="progress" id="progress" aria-live="polite"></p>
+
+    <section class="step" aria-labelledby="s1">
+      <h2 id="s1">Two digits are enough</h2>
+      <p>We normally count in <strong>decimal</strong>, using ten digits (0–9). Computers store everything as tiny switches that are either off or on, so they count in <strong>binary</strong>, using just two digits: 0 and 1.</p>
+      <p>Each binary digit is called a <strong>bit</strong>.</p>
+    </section>
+
+    <section class="step" aria-labelledby="s2" hidden>
+      <h2 id="s2">Every place is worth double</h2>
+      <p>In decimal, each place is worth ten times the one to its right: ones, tens, hundreds. In binary, each place is worth <strong>two</strong> times the one to its right:</p>
+      <div class="bits" aria-hidden="true">
+        <span class="place">128</span><span class="place">64</span><span class="place">32</span><span class="place">16</span>
+        <span class="place">8</span><span class="place">4</span><span class="place">2</span><span class="place">1</span>
+      </div>
+      <p>To read a binary number, add up the places that hold a 1. For example, <code>101</code> is 4 + 1 = <strong>5</strong>.</p>
+    </section>
+
+    <section class="step" aria-labelledby="s3" hidden>
+      <h2 id="s3">Try it yourself</h2>
+      <p>Tap a bit to switch it between 0 and 1. The total updates as you go.</p>
+      <div class="bits" id="bits"></div>
+      <p class="total" aria-live="polite">Total: <strong id="total">0</strong></p>
+      <p class="goal" id="goal">Challenge: make the number <strong>42</strong>.</p>
+    </section>
+
+    <section class="step" aria-labelledby="s4" hidden>
+      <h2 id="s4">Recap</h2>
+      <ul>
+        <li>Binary uses only the digits 0 and 1; each one is a bit.</li>
+        <li>Each place is worth double the place to its right: 1, 2, 4, 8, 16…</li>
+        <li>Add the places holding a 1 to get the decimal value.</li>
+        <li>Eight bits can make any number from 0 to 255.</li>
+      </ul>
+      <p>Head back to the module to test yourself with the quiz.</p>
+    </section>
+
+    <div class="nav">
+      <button type="button" id="prev">&larr; Back</button>
+      <button type="button" class="primary" id="next">Next &rarr;</button>
+    </div>
+  </main>
+
+  <script>
+    "use strict";
+
+    // Step navigation
+    const steps = Array.from(document.querySelectorAll(".step"));
+    const prev = document.getElementById("prev");
+    const next = document.getElementById("next");
+    const progress = document.getElementById("progress");
+    let current = 0;
+
+    function show(index) {
+      current = index;
+      steps.forEach(function (step, i) { step.hidden = i !== current; });
+      progress.textContent = "Step " + (current + 1) + " of " + steps.length;
+      prev.disabled = current === 0;
+      next.disabled = current === steps.length - 1;
+    }
+
+    prev.addEventListener("click", function () { show(current - 1); });
+    next.addEventListener("click", function () { show(current + 1); });
+    show(0);
+
+    // Bit toggles (step 3)
+    const TARGET = 42;
+    const bitsEl = document.getElementById("bits");
+    const totalEl = document.getElementById("total");
+    const goalEl = document.getElementById("goal");
+    const places = [128, 64, 32, 16, 8, 4, 2, 1];
+    const buttons = [];
+
+    places.forEach(function (place) {
+      const label = document.createElement("span");
+      label.className = "place";
+      label.textContent = place;
+      bitsEl.append(label);
+    });
+
+    places.forEach(function (place) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "bit";
+      button.textContent = "0";
+      button.dataset.place = place;
+      button.setAttribute("aria-pressed", "false");
+      button.setAttribute("aria-label", "Bit worth " + place);
+      button.addEventListener("click", function () {
+        const on = button.getAttribute("aria-pressed") !== "true";
+        button.setAttribute("aria-pressed", String(on));
+        button.textContent = on ? "1" : "0";
+        updateTotal();
+      });
+      buttons.push(button);
+      bitsEl.append(button);
+    });
+
+    function updateTotal() {
+      const total = buttons.reduce(function (sum, b) {
+        return b.getAttribute("aria-pressed") === "true" ? sum + Number(b.dataset.place) : sum;
+      }, 0);
+      totalEl.textContent = total;
+      const solved = total === TARGET;
+      goalEl.classList.toggle("done", solved);
+      goalEl.textContent = solved
+        ? "You made 42: that's 32 + 8 + 2, or 00101010 in binary."
+        : "Challenge: make the number " + TARGET + ".";
+    }
+  </script>
+</body>
+</html>

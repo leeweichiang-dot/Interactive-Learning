@@ -44,6 +44,14 @@
       --wake: #475569;             /* turbulent airflow lines */
       --ghost: #8b9098;            /* grey "clean aircraft" arrows */
 
+      /* Helicopter mode */
+      --antitorque: #7c3aed;       /* tail rotor anti-torque arrow */
+      --rotor: #4b5563;            /* rotor blades, skids and lines drawn on the sky */
+      --ground: #a9bf8c;           /* grass under the hover */
+      --ok: #15803d;               /* gauge levels: green / amber / red */
+      --caution: #b45309;
+      --danger: #b91c1c;
+
       --radius: 12px;
     }
 
@@ -77,6 +85,13 @@
         --on-defect: #1a0b0a;
         --wake: #dbe4f0;
         --ghost: #9aa0a8;
+
+        --antitorque: #b794ff;
+        --rotor: #c9ced6;
+        --ground: #3e4d36;
+        --ok: #5fd38a;
+        --caution: #fbbf24;
+        --danger: #ff7b72;
       }
     }
 
@@ -435,6 +450,97 @@
     .report .engine { color: var(--thrust); }
     .report-note { margin: 10px 0 0; color: var(--muted); font-size: 0.85rem; }
 
+    /* =====================================================================
+       AIRCRAFT SELECTOR (Fixed-wing / Helicopter)
+       ===================================================================== */
+    .aircraft-switch {
+      display: inline-grid;
+      grid-template-columns: 1fr 1fr;
+      margin: 10px 0 14px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .aircraft-switch button { min-width: 140px; border: 0; border-radius: 0; }
+    .aircraft-switch button + button { border-left: 2px solid var(--border); }
+    .aircraft-switch button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); }
+
+    /* =====================================================================
+       HELICOPTER MODE
+       ===================================================================== */
+    .rotor-disc { fill: var(--rotor); opacity: 0.16; }
+    .rotor-blade { stroke: var(--rotor); stroke-width: 3; stroke-linecap: round; }
+    .rotor-ghost { fill: none; stroke: var(--defect); stroke-width: 2; stroke-dasharray: 6 5; }
+    .skid { fill: none; stroke: var(--rotor); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    .defect-speck { fill: var(--defect); }
+    .ground-fill { fill: var(--ground); }
+    .ground-edge { stroke: var(--rotor); stroke-width: 2; opacity: 0.5; }
+    .pad { fill: var(--rotor); opacity: 0.35; }
+    .ige-band { fill: var(--accent); opacity: 0.1; }
+    .ige-line { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 8 6; opacity: 0.7; }
+    .band-text { fill: var(--accent); font: 600 15px system-ui, sans-serif; }
+    .tick { stroke: var(--rotor); stroke-width: 2; opacity: 0.45; }
+    .tick-text { fill: var(--text); opacity: 0.7; font: 13px system-ui, sans-serif; }
+    .antitorque { color: var(--antitorque); }
+    .arrow.thin line { stroke-width: 6; }
+    .arrow-label.small { font-size: 19px; }
+    .topview-bg { fill: var(--surface); opacity: 0.9; stroke: var(--border); stroke-width: 1.5; }
+    .topview-text { fill: var(--muted); font: 600 12px system-ui, sans-serif; }
+    .topview-text.antitorque { fill: currentColor; }
+    .topview-line { fill: none; stroke: var(--rotor); stroke-width: 2; stroke-linecap: round; }
+    .topview-disc { fill: var(--rotor); opacity: 0.1; stroke: var(--rotor); stroke-dasharray: 4 4; }
+    .torque-arc { fill: none; stroke: var(--muted); stroke-width: 2.5; }
+    .torque-head { fill: var(--muted); }
+
+    .ge-badge {
+      display: inline-block;
+      margin: 0 0 10px;
+      padding: 4px 12px;
+      border: 2px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+    .ge-badge.ige { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+    .h-modes { display: grid; gap: 8px; }
+    .h-modes button { text-align: left; }
+    .h-modes button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    #h-power { accent-color: var(--accent); }
+    input[type="range"]:disabled { opacity: 0.55; }
+
+    /* Bar gauges: power required vs available, height, vibration, pedal margin */
+    .h-gauges {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+    }
+    .h-gauge { text-align: center; }
+    .bars { display: flex; justify-content: center; gap: 14px; margin: 8px 0 4px; }
+    .bar { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--muted); font-size: 0.8rem; }
+    .bar-track {
+      position: relative;
+      width: 46px; height: 150px;
+      overflow: hidden;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .bar-zone { position: absolute; left: 0; right: 0; opacity: 0.16; }
+    .bar-zone-label { position: absolute; left: 0; right: 0; color: var(--text); font-size: 0.7rem; font-weight: 700; opacity: 0.75; }
+    .bar-fill { position: absolute; left: 6px; right: 6px; bottom: 0; border-radius: 4px 4px 0 0; transition: height 0.1s linear; }
+    .bar-fill.available { background: var(--ghost); }
+    .lvl-ok { background: var(--ok); }
+    .lvl-caution { background: var(--caution); }
+    .lvl-danger { background: var(--danger); }
+    .h-read { margin: 4px 0 0; font-variant-numeric: tabular-nums; }
+    .h-read strong { font-size: 1.3rem; }
+    .h-status { margin: 2px 0 0; font-size: 0.95rem; font-weight: 700; }
+    .txt-ok { color: var(--ok); }
+    .txt-caution { color: var(--caution); }
+    .txt-danger { color: var(--danger); }
+
     .sr-only {
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
       overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
@@ -448,7 +554,7 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .energy-track div { transition: none; }
+      .energy-track div, .bar-fill { transition: none; }
       #scene.running .wake path, .mini-scene.running .wake path { animation: none; }
     }
   </style>
@@ -457,6 +563,13 @@
   <main>
     <a class="back" href="../../../module.html?m=flight">&larr; Principles of Flight</a>
     <h1>Cut the Thrust: Clean vs Defective Aircraft</h1>
+    <div class="aircraft-switch" role="group" aria-label="Aircraft">
+      <button type="button" data-aircraft="fixed" aria-pressed="true">Fixed-wing</button>
+      <button type="button" data-aircraft="heli" aria-pressed="false">Helicopter</button>
+    </div>
+
+    <!-- ===================== FIXED-WING MODE (unchanged) ===================== -->
+    <div id="fw-mode">
     <p class="subtitle">Set the aircraft's <a href="#hangar-title">Hangar Condition</a> (clean, or with defects), reduce the thrust, choose how the aircraft responds, and watch what happens. Turn on <strong>Compare mode</strong> to fly a clean aircraft beside the defective one.</p>
 
     <div class="layout">
@@ -650,6 +763,258 @@
         </ul>
       </div>
     </section>
+    </div>
+
+    <!-- =========================== HELICOPTER MODE =========================== -->
+    <div id="heli-mode" hidden>
+    <p class="subtitle">Set the helicopter's <a href="#h-hangar-title">Hangar Condition</a> (clean, or with defects), use the collective and power sliders, and see whether it can hold a hover. Turn on <strong>Compare mode</strong> to fly a clean helicopter beside the defective one.</p>
+
+    <div class="layout">
+      <!-- ========================= HELICOPTER VIEW ========================= -->
+      <section class="panel view" aria-labelledby="h-view-title">
+        <h2 id="h-view-title">Forces in the hover</h2>
+        <p class="ge-badge" id="h-ge" aria-live="polite"></p>
+
+        <svg id="h-scene" viewBox="0 0 760 440" role="img"
+             aria-label="Side view of the helicopter with arrows for rotor thrust, weight, drag and the tail rotor's anti-torque push. Arrow lengths show the size of each force. The ground moves closer as the helicopter descends.">
+          <defs>
+            <linearGradient id="h-sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" class="sky-top"></stop>
+              <stop offset="1" class="sky-bottom"></stop>
+            </linearGradient>
+          </defs>
+          <rect width="760" height="440" fill="url(#h-sky)"></rect>
+          <ellipse class="cloud" cx="90" cy="60" rx="52" ry="14"></ellipse>
+          <ellipse class="cloud" cx="330" cy="34" rx="40" ry="11"></ellipse>
+          <ellipse class="cloud" cx="560" cy="80" rx="34" ry="10"></ellipse>
+
+          <!-- Ground, ground-effect zone and height scale. JavaScript moves it up and down. -->
+          <g id="h-ground"></g>
+          <text id="h-ground-below" class="tick-text" x="16" y="430"></text>
+
+          <!-- Helicopter drawn nose-right, centred on (0,0) = centre of gravity -->
+          <g id="h-heli" transform="translate(400 215)">
+            <g id="h-body">
+              <!-- Tail boom, fins and tail rotor -->
+              <path class="plane-body" d="M-56 -18 L-200 -30 L-200 -22 L-56 2 Z"></path>
+              <path class="plane-body" d="M-140 -24 L-162 -28 L-162 -17 L-140 -16 Z"></path>
+              <path class="plane-body" d="M-192 -28 L-212 -68 L-200 -68 L-184 -28 Z"></path>
+              <path class="plane-body" d="M-196 -22 L-206 -4 L-197 -4 L-189 -22 Z"></path>
+              <circle class="rotor-disc" cx="-206" cy="-44" r="20"></circle>
+              <line class="rotor-blade" x1="-206" y1="-64" x2="-206" y2="-24"></line>
+              <circle class="plane-detail" cx="-206" cy="-44" r="3.5"></circle>
+              <!-- Cabin, engine cowling, mast and window -->
+              <path class="plane-body" d="M-58 -28 C-30 -38 34 -38 58 -24 C80 -12 86 8 72 20 C62 28 -44 28 -58 18 Z"></path>
+              <path class="plane-body" d="M-42 -31 C-32 -43 18 -43 30 -33 Z"></path>
+              <rect class="plane-body" x="-4" y="-50" width="8" height="12"></rect>
+              <path class="plane-detail" d="M42 -25 C60 -19 72 -8 75 4 L50 4 C48 -8 45 -17 38 -25 Z"></path>
+              <!-- Skids -->
+              <path class="skid" d="M-28 24 L-34 50 M30 24 L36 50 M-74 50 L66 50 Q78 50 82 42"></path>
+              <!-- Main rotor disc (side view). Ghost discs show the wobble of an out-of-track rotor. -->
+              <g id="h-rotor-ghosts"></g>
+              <g id="h-rotor" class="rotor-wobble">
+                <ellipse class="rotor-disc" cx="0" cy="-50" rx="160" ry="6"></ellipse>
+                <line class="rotor-blade" x1="-160" y1="-50" x2="160" y2="-50"></line>
+              </g>
+              <circle class="plane-detail" cx="0" cy="-50" r="6"></circle>
+              <!-- Defect drawings and numbered markers. JavaScript fills this in. -->
+              <g id="h-defect-layer"></g>
+            </g>
+          </g>
+
+          <!-- Force arrows. JavaScript sets their direction and length. -->
+          <g id="h-arrow-thrust" class="arrow lift"><line></line><polygon></polygon></g>
+          <g id="h-arrow-weight" class="arrow weight"><line></line><polygon></polygon></g>
+          <g id="h-arrow-drag"   class="arrow drag"><line></line><polygon></polygon></g>
+          <g id="h-arrow-tail"   class="arrow thin antitorque"><line></line><polygon></polygon></g>
+
+          <text id="h-label-thrust" class="arrow-label lift"   fill="currentColor" text-anchor="start">Rotor thrust</text>
+          <text id="h-label-weight" class="arrow-label weight" fill="currentColor" text-anchor="start">Weight</text>
+          <text id="h-label-drag"   class="arrow-label drag"   fill="currentColor" text-anchor="end">Drag</text>
+          <text id="h-label-tail"   class="arrow-label small antitorque" fill="currentColor" text-anchor="start"><tspan>Tail rotor</tspan><tspan>anti-torque</tspan></text>
+
+          <!-- Small top view: why the tail rotor pushes sideways -->
+          <g transform="translate(596 12)">
+            <rect class="topview-bg" width="152" height="122" rx="8"></rect>
+            <text class="topview-text" x="76" y="16" text-anchor="middle">Seen from above</text>
+            <circle class="topview-disc" cx="98" cy="64" r="36"></circle>
+            <path class="torque-arc" d="M118 40 A28 28 0 0 1 124 80"></path>
+            <polygon class="torque-head" points="124,90 117,78 130,79"></polygon>
+            <text class="topview-text" x="126" y="33" text-anchor="middle">torque</text>
+            <text class="topview-text antitorque" x="38" y="106" fill="currentColor">anti-torque</text>
+            <line class="topview-line" x1="82" y1="64" x2="30" y2="64"></line>
+            <ellipse class="plane-body" cx="98" cy="64" rx="17" ry="9"></ellipse>
+            <line class="topview-line" x1="22" y1="68" x2="38" y2="68"></line>
+            <g id="h-top-tail" class="arrow thin antitorque"><line></line><polygon></polygon></g>
+          </g>
+        </svg>
+        <p class="arrow-note">The drag arrow is the air resistance the spinning blades must push through (rotor drag); it is drawn larger so changes are easy to see.
+          The tail rotor pushes <strong>sideways</strong> (out of the page) to stop the main rotor's torque turning the helicopter: see the top view.
+          Height is not drawn to scale.
+          <span id="h-marker-note" hidden>Numbered red markers are the defects switched on in the Hangar Condition panel.</span></p>
+
+        <div class="forces">
+          <div class="compare">
+            <span class="lift">Rotor thrust <strong id="h-val-thrust">50</strong> kN</span>
+            <span class="sign" id="h-sign-tw">=</span>
+            <span class="weight">Weight <strong id="h-val-weight">50</strong> kN</span>
+          </div>
+          <div class="compare">
+            <span class="drag">Drag <strong id="h-val-drag">3.0</strong> kN</span>
+            <span class="antitorque">Anti-torque up to <strong id="h-val-tail">5.0</strong> kN</span>
+          </div>
+        </div>
+        <p class="angles" id="h-angles"></p>
+
+        <div class="explain" id="h-explain" aria-live="polite"></div>
+      </section>
+
+      <!-- ======================= HELICOPTER CONTROLS ======================= -->
+      <section class="panel controls" aria-label="Helicopter controls">
+        <div>
+          <div class="thrust-head">
+            <h2 style="margin:0"><label for="h-collective">Collective</label></h2>
+            <span class="thrust-value" id="h-collective-value">60%</span>
+          </div>
+          <input type="range" id="h-collective" min="0" max="100" step="1" value="60">
+          <p class="hint" id="h-collective-hint"></p>
+        </div>
+
+        <div>
+          <div class="thrust-head">
+            <h2 style="margin:0"><label for="h-power">Power available</label></h2>
+            <span class="thrust-value" id="h-power-value">80%</span>
+          </div>
+          <input type="range" id="h-power" min="0" max="100" step="1" value="80">
+          <p class="hint" id="h-power-hint"></p>
+        </div>
+
+        <div>
+          <h2>Who moves the collective?</h2>
+          <div class="h-modes" role="group" aria-label="Who moves the collective">
+            <button type="button" data-hmode="manual" aria-pressed="true">You fly the collective
+              <span class="mode-hint">The slider sets the rotor thrust.</span></button>
+            <button type="button" data-hmode="hold" aria-pressed="false">Pilot holds the height
+              <span class="mode-hint">The pilot moves the collective to stay at the same height.</span></button>
+          </div>
+        </div>
+
+        <div>
+          <h2>Simulation</h2>
+          <div class="playback">
+            <button type="button" class="play" id="h-play">Play</button>
+            <button type="button" id="h-pause">Pause</button>
+            <button type="button" id="h-reset">Reset</button>
+          </div>
+          <p class="clock" id="h-clock"></p>
+        </div>
+
+        <div>
+          <h2>Compare</h2>
+          <button type="button" class="compare-toggle" id="h-compare" aria-pressed="false" aria-controls="h-compare-panel">Compare mode: <span id="h-compare-state">Off</span>
+            <span class="mode-hint">Fly a clean helicopter beside the defective one, with the same collective and power.</span></button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ======================= HELICOPTER COMPARE MODE ======================= -->
+    <section class="panel comparison" id="h-compare-panel" aria-labelledby="h-compare-title" hidden>
+      <h2 id="h-compare-title">Compare: clean vs defective</h2>
+      <p class="hint">Both helicopters get exactly the same inputs (collective, power available and who moves the collective) and use the same physics.
+        The only difference is the Hangar Condition. Height is shown by how high each helicopter sits in its picture; the shaded strip is the ground-effect zone.
+        Tip: choose <strong>Pilot holds the height</strong> to compare how well each one can hover. With <strong>You fly the collective</strong> both get the same collective, so the lighter, cleaner one may climb.</p>
+
+      <div class="twin">
+        <figure class="mini" id="h-mini-clean">
+          <figcaption><span class="tag tag-clean">CLEAN</span> No defects</figcaption>
+        </figure>
+        <figure class="mini defective" id="h-mini-defective">
+          <figcaption><span class="tag tag-defective">DEFECTIVE</span> <span id="h-mini-defect-count"></span></figcaption>
+        </figure>
+      </div>
+
+      <h3 id="h-results-title">Results</h3>
+      <div class="results-wrap">
+        <table class="results" aria-labelledby="h-results-title">
+          <thead>
+            <tr><th scope="col">Measure</th><th scope="col">Clean</th><th scope="col"><span class="long">Defective</span><abbr class="short" title="Defective">Defect.</abbr></th><th scope="col"><span class="long">Difference</span><abbr class="short" title="Difference">Diff.</abbr></th></tr>
+          </thead>
+          <tbody id="h-results-body"></tbody>
+        </table>
+      </div>
+      <p class="results-note">Red means the defective helicopter is worse. Power available is the same for both: the engine is fine,
+        but the defective helicopter needs more of that power just to hover.</p>
+
+      <h3 id="h-report-title">Pilot Report</h3>
+      <div class="report" aria-labelledby="h-report-title">
+        <ul id="h-report-list" aria-live="polite"></ul>
+        <p class="report-note" id="h-report-note"></p>
+      </div>
+    </section>
+
+    <!-- ===================== HELICOPTER HANGAR CONDITION ===================== -->
+    <section class="panel hangar" aria-labelledby="h-hangar-title">
+      <div class="hangar-head">
+        <h2 id="h-hangar-title">Hangar Condition</h2>
+        <button type="button" id="h-all-clean">Make all clean</button>
+      </div>
+      <p class="hint">Switch on any defects found during inspection and choose how bad each one is.
+        Before you press Play, the collective is re-set for a hover with the new condition.
+        After that, press Reset to start again with the new condition.</p>
+      <div class="defects" id="h-defects"></div>
+    </section>
+
+    <!-- ======================= HELICOPTER INSTRUMENTS ======================= -->
+    <section class="panel instruments" aria-labelledby="h-inst-title">
+      <h2 id="h-inst-title">Instruments</h2>
+      <div class="h-gauges">
+        <div class="h-gauge">
+          <p class="gauge-name">Power to hover here</p>
+          <div class="bars" aria-hidden="true">
+            <div class="bar"><div class="bar-track"><div class="bar-fill" id="h-preq-bar"></div></div>Required</div>
+            <div class="bar"><div class="bar-track"><div class="bar-fill available" id="h-pavail-bar"></div></div>Available</div>
+          </div>
+          <p class="h-read"><strong id="h-preq">0</strong> / <strong id="h-pavail">0</strong><span class="gauge-unit">kW required / available</span></p>
+          <p class="h-status" id="h-power-status"></p>
+        </div>
+
+        <div class="h-gauge">
+          <p class="gauge-name">Height</p>
+          <div class="bars" aria-hidden="true">
+            <div class="bar"><div class="bar-track">
+              <div class="bar-zone" id="h-ige-zone" style="bottom:0; background: var(--accent)"></div>
+              <div class="bar-fill" id="h-height-bar"></div>
+              <div class="bar-zone-label" id="h-ige-zone-label">IGE</div>
+            </div>0 to 200 ft</div>
+          </div>
+          <p class="h-read"><strong id="h-height">0</strong><span class="gauge-unit">feet</span></p>
+          <p class="h-status" id="h-height-status"></p>
+        </div>
+
+        <div class="h-gauge">
+          <p class="gauge-name">Vibration level</p>
+          <div class="bars" aria-hidden="true">
+            <div class="bar"><div class="bar-track" id="h-vib-track">
+              <div class="bar-fill" id="h-vib-bar"></div>
+            </div>0 to 10</div>
+          </div>
+          <p class="h-read"><strong id="h-vib">0</strong><span class="gauge-unit">out of 10</span></p>
+          <p class="h-status" id="h-vib-status"></p>
+        </div>
+
+        <div class="h-gauge">
+          <p class="gauge-name">Pedal (anti-torque) margin</p>
+          <div class="bars" aria-hidden="true">
+            <div class="bar"><div class="bar-track" id="h-pedal-track">
+              <div class="bar-fill" id="h-pedal-bar"></div>
+            </div>Pedal left</div>
+          </div>
+          <p class="h-read"><strong id="h-pedal">0</strong><span class="gauge-unit">% of pedal travel left</span></p>
+          <p class="h-status" id="h-pedal-status"></p>
+        </div>
+      </div>
+    </section>
+    </div>
 
     <p class="disclaimer">Illustrative values – not aircraft data. Simple teaching formulas are used, and time runs faster than real life.</p>
   </main>
@@ -1971,6 +2336,1007 @@
     buildHangar();
     hangarChanged();
     requestAnimationFrame(frame);
+  </script>
+  <script>
+    /* =======================================================================
+       HELICOPTER MODE
+       Kept apart from the fixed-wing code above (everything is inside this
+       function), so the fixed-wing simulator works exactly as before.
+       ======================================================================= */
+    (function () {
+      "use strict";
+
+      /* ---------------------------------------------------------------------
+         H1. SETTINGS YOU CAN CHANGE
+         All numbers are made-up teaching values, not real helicopter data.
+         --------------------------------------------------------------------- */
+
+      // The clean helicopter. Defects change these (see H_DEFECTS below).
+      const HELI = {
+        weightKN: 50,                // weight of the clean helicopter
+        hoverCollectivePercent: 60,  // collective where the clean rotor's thrust = weight
+        inducedPowerKW: 480,         // power to push air down and make hover thrust (out of ground effect); grows with thrust^1.5
+        profilePowerKW: 140,         // power to spin the blades through the air (rotor drag)
+        tailPowerShare: 0.10,        // the tail rotor takes this share of the main rotor's power
+        enginePowerKW: 1000,         // power available at 100% on the Power slider
+        rotorDragKN: 3,              // rotor drag drawn as the Drag arrow
+        tailThrustKN: 5,             // most anti-torque push the clean tail rotor can make
+        pedalAtHoverPercent: 60,     // pedal travel used to hover the clean helicopter out of ground effect
+        baseVibration: 1,            // vibration level of the clean helicopter (0 to 10)
+        verticalDampingKN: 4         // air resistance to climbing / sinking, per m/s
+      };
+
+      // Ground effect: close to the ground the downwash is blocked, so less power is needed.
+      const GROUND_EFFECT = {
+        heightFt: 40,                // ground effect ends at about one rotor diameter
+        saving: 0.25                 // share of the induced power saved right at the ground
+      };
+
+      const H_SETTINGS = {
+        startHeightFt: 80,           // height at the start / after Reset (out of ground effect)
+        topHeightFt: 200,            // top of the practice area
+        defaultPowerPercent: 80
+      };
+
+      // Gauge colour limits: green below "caution", amber up to "danger", red beyond.
+      const LEVELS = {
+        powerCaution: 0.9,           // power required ÷ power available
+        vibrationCaution: 3.5, vibrationDanger: 6,
+        pedalCaution: 25, pedalDanger: 10   // % pedal left (lower is worse)
+      };
+      const POWER_GAUGE_MAX_KW = 1200;
+
+      // How the "Pilot holds the height" pilot moves the collective.
+      const HOLD = { heightGain: 0.4, maxClimb: 1.5, speedGain: 1.5 };
+
+      // Hangar defects. Every effect has three values: [Light, Moderate, Severe].
+      //   profile     extra rotor drag (and the power to overcome it), as a fraction of the clean value
+      //   thrustLoss  share of rotor thrust lost at the same collective
+      //   vibration   extra vibration (0 to 10 scale)
+      //   wobbleDeg   how far the out-of-track rotor disc wobbles each way
+      //   tailLoss    share of tail rotor anti-torque lost
+      //   weight      extra weight, as a fraction of the clean weight
+      //   where       marker position on the drawing (0,0 = centre of gravity)
+      const H_DEFECTS = [
+        {
+          id: "erosion", name: "Blade erosion or dirt on blades", effect: "Rotor drag up, rotor thrust down, power required up",
+          profile: [0.15, 0.30, 0.50], thrustLoss: [0.02, 0.04, 0.07],
+          where: { x: 132, y: -50 }
+        },
+        {
+          id: "patch", name: "Blade repair patch / surface damage", effect: "Vibration up (small power increase)",
+          profile: [0.02, 0.04, 0.07], vibration: [1, 2, 3],
+          where: { x: -78, y: -50 }
+        },
+        {
+          id: "tracking", name: "Blade tracking error / rotor imbalance", effect: "Vibration up a lot; the rotor disc wobbles",
+          profile: [0.01, 0.02, 0.04], vibration: [2.5, 4.5, 7], wobbleDeg: [1.5, 3, 5],
+          where: { x: 24, y: -50 }
+        },
+        {
+          id: "tail", name: "Tail rotor blade damage", effect: "Less anti-torque, so the pedal margin shrinks",
+          tailLoss: [0.12, 0.25, 0.40], vibration: [0.3, 0.6, 1],
+          where: { x: -206, y: -44 }
+        },
+        {
+          id: "weight", name: "Extra weight (cargo, equipment)", effect: "Weight up, power required up; at Severe it may only hover in ground effect",
+          weight: [0.06, 0.14, 0.25],
+          where: { x: 0, y: 36 }
+        }
+      ];
+      const SEVERITY = ["Light", "Moderate", "Severe"];
+
+      // Arrow drawing scale (pixels per kN)
+      const H_ARROW = { thrustWeight: 1.8, drag: 20, tail: 18, maxLength: 130 };
+
+      /* ---------------------------------------------------------------------
+         H2. THE TEACHING FORMULAS
+           Rotor thrust     = max thrust × collective % (less if blades are eroded)
+           Power required   = (induced power × (thrust ÷ clean weight)^1.5 × ground effect
+                               + profile power) × (1 + tail rotor share) + thrust × climb rate
+           If the power required is more than the power available, the rotor can
+           only make the thrust that the available power allows.
+           Height change    = g × (thrust − weight − damping × climb rate) ÷ weight
+         --------------------------------------------------------------------- */
+
+      const G = 9.81;
+      const FT = 0.3048;
+      const MAX_THRUST = HELI.weightKN / (HELI.hoverCollectivePercent / 100);
+      const CLEAN_MAIN_HOVER_KW = HELI.inducedPowerKW + HELI.profilePowerKW;   // clean, out of ground effect
+      const IGE_FT = GROUND_EFFECT.heightFt;
+
+      function condition(active) {
+        const a = { weight: HELI.weightKN, profile: 1, thrustEff: 1, tailEff: 1, vibration: HELI.baseVibration, wobbleDeg: 0 };
+        active.forEach(function (x) {
+          const d = x.defect, i = x.severity - 1;
+          if (d.profile) a.profile += d.profile[i];
+          if (d.thrustLoss) a.thrustEff *= 1 - d.thrustLoss[i];
+          if (d.tailLoss) a.tailEff *= 1 - d.tailLoss[i];
+          if (d.vibration) a.vibration += d.vibration[i];
+          if (d.wobbleDeg) a.wobbleDeg += d.wobbleDeg[i];
+          if (d.weight) a.weight += HELI.weightKN * d.weight[i];
+        });
+        a.vibration = Math.min(10, a.vibration);
+        return a;
+      }
+
+      const H_CLEAN = condition([]);
+      let hac = H_CLEAN;   // the current helicopter; changed by the Hangar Condition panel
+
+      function groundEffectFactor(heightFt) {
+        return 1 - GROUND_EFFECT.saving * Math.max(0, 1 - heightFt / IGE_FT);
+      }
+      function mainRotorPower(a, thrust, heightFt, climb) {
+        return HELI.inducedPowerKW * Math.pow(thrust / HELI.weightKN, 1.5) * groundEffectFactor(heightFt) +
+               HELI.profilePowerKW * a.profile + thrust * Math.max(0, climb);   // kN × m/s = kW
+      }
+      function powerRequired(a, thrust, heightFt, climb) {
+        return mainRotorPower(a, thrust, heightFt, climb) * (1 + HELI.tailPowerShare);
+      }
+      function hoverPower(a, heightFt) { return powerRequired(a, a.weight, heightFt, 0); }
+      function powerAvailable(percent) { return HELI.enginePowerKW * percent / 100; }
+      function thrustFromCollective(a, collective) { return MAX_THRUST * a.thrustEff * collective / 100; }
+      function hoverCollective(a) { return a.weight / (MAX_THRUST * a.thrustEff) * 100; }
+
+      // The most thrust the available power can make (power rises with thrust, so halve the gap until it fits).
+      function thrustAvailable(a, availableKW, heightFt, climb) {
+        if (powerRequired(a, 0, heightFt, climb) > availableKW) return 0;
+        let lo = 0, hi = 3 * HELI.weightKN;
+        if (powerRequired(a, hi, heightFt, climb) <= availableKW) return hi;
+        for (let k = 0; k < 40; k++) {
+          const mid = (lo + hi) / 2;
+          if (powerRequired(a, mid, heightFt, climb) <= availableKW) lo = mid; else hi = mid;
+        }
+        return lo;
+      }
+
+      // Highest height it can hover at: Infinity (out of ground effect is fine),
+      // a height inside the ground-effect zone, or −1 (can't hover at all).
+      function hoverCeiling(a, availableKW) {
+        if (hoverPower(a, IGE_FT) <= availableKW) return Infinity;
+        if (hoverPower(a, 0) > availableKW) return -1;
+        let lo = 0, hi = IGE_FT;
+        for (let k = 0; k < 30; k++) {
+          const mid = (lo + hi) / 2;
+          if (hoverPower(a, mid) <= availableKW) lo = mid; else hi = mid;
+        }
+        return lo;
+      }
+
+      // Pedal travel left. The tail rotor must balance the main rotor's torque,
+      // which grows with the main rotor's power; a damaged tail rotor needs more pedal.
+      function pedalMargin(a, mainPowerKW) {
+        return 100 - HELI.pedalAtHoverPercent * mainPowerKW / CLEAN_MAIN_HOVER_KW / a.tailEff;
+      }
+      // Pedal left in a hover out of ground effect (or as close as the power allows).
+      function hoverPedalMargin(a, availableKW) {
+        const main = Math.min(mainRotorPower(a, a.weight, IGE_FT, 0), availableKW / (1 + HELI.tailPowerShare));
+        return pedalMargin(a, main);
+      }
+
+      /* ---------------------------------------------------------------------
+         H3. SIMULATION STATE
+         `hs` is the helicopter in the Hangar Condition; in Compare mode `hc` is
+         an always-clean helicopter that gets exactly the same inputs.
+         --------------------------------------------------------------------- */
+
+      let hs, hc;
+      let powerPercent = H_SETTINGS.defaultPowerPercent;   // shared input
+      let mode = "manual";                                  // "manual" or "hold"
+      let running = false;
+      let compareOn = false;
+      let animTime = 0;                                     // for the vibration shake and rotor wobble
+
+      function makeState() {
+        return {
+          time: 0,
+          height: H_SETTINGS.startHeightFt * FT,     // m (skids above the ground)
+          climb: 0,                                  // m/s (up +, down −)
+          collective: 60,                            // %
+          targetHeight: H_SETTINGS.startHeightFt * FT
+        };
+      }
+
+      // Before Play (and after Reset) the collective is set for a hover. With
+      // "You fly the collective" both helicopters share one collective: the one
+      // the Hangar Condition helicopter needs.
+      function trimCollective() {
+        if (mode === "hold") {
+          hs.collective = hoverCollective(hac);
+          hc.collective = hoverCollective(H_CLEAN);
+        } else {
+          hs.collective = hc.collective = hoverCollective(hac);
+        }
+      }
+
+      function resetHeli() {
+        hs = makeState();
+        hc = makeState();
+        running = false;
+        trimCollective();
+        lastExplain = "";
+      }
+
+      function evaluate(s, a) {
+        const heightFt = s.height / FT;
+        const available = powerAvailable(powerPercent);
+        const commanded = thrustFromCollective(a, s.collective);
+        const limit = thrustAvailable(a, available, heightFt, s.climb);
+        const thrust = Math.min(commanded, limit);
+        const main = mainRotorPower(a, thrust, heightFt, s.climb);
+        return {
+          heightFt: heightFt,
+          available: available,
+          commanded: commanded,
+          thrust: thrust,
+          powerLimited: commanded > limit + 0.05,
+          hoverPower: hoverPower(a, heightFt),
+          hoverPowerOGE: hoverPower(a, IGE_FT),
+          ige: heightFt < IGE_FT,
+          onGround: s.height <= 0.001,
+          atTop: heightFt >= H_SETTINGS.topHeightFt - 0.01,
+          pedal: pedalMargin(a, main),
+          drag: HELI.rotorDragKN * a.profile,
+          tailThrust: HELI.tailThrustKN * a.tailEff
+        };
+      }
+
+      function stepHeli(s, a, dt) {
+        if (mode === "hold") {
+          // Aim for a gentle climb or descent back to the target height.
+          const wantClimb = clamp(HOLD.heightGain * (s.targetHeight - s.height), -HOLD.maxClimb, HOLD.maxClimb);
+          const wantThrust = a.weight + HELI.verticalDampingKN * wantClimb + a.weight / G * HOLD.speedGain * (wantClimb - s.climb);
+          s.collective = clamp(wantThrust / (MAX_THRUST * a.thrustEff) * 100, 0, 100);
+        }
+        const e = evaluate(s, a);
+        const accel = G * (e.thrust - a.weight - HELI.verticalDampingKN * s.climb) / a.weight;
+        s.climb += accel * dt;
+        s.height += s.climb * dt;
+        if (s.height <= 0) { s.height = 0; if (s.climb < 0) s.climb = 0; }
+        const top = H_SETTINGS.topHeightFt * FT;
+        if (s.height >= top) { s.height = top; if (s.climb > 0) s.climb = 0; }
+        s.time += dt;
+      }
+
+      /* ---------------------------------------------------------------------
+         H4. PLAIN-ENGLISH EXPLANATION
+         --------------------------------------------------------------------- */
+
+      function describe(s, e) {
+        const lines = [];
+        const kW = function (n) { return Math.round(n).toLocaleString() + " kW"; };
+        const ceiling = hoverCeiling(hac, e.available);
+        const powerShort = e.hoverPower > e.available;
+
+        if (powerShort) {
+          lines.push({ warn: true, text: "Not enough power to hover: hovering here needs " + kW(e.hoverPower) +
+            " but only " + kW(e.available) + " is available. " +
+            (e.onGround ? "The helicopter can't lift off." : "The helicopter can't hold the hover and starts to sink.") });
+        }
+        if (e.pedal <= 0) {
+          lines.push({ warn: true, text: "Out of pedal: the tail rotor can't balance the main rotor's torque, so the helicopter would start to turn (yaw) on its own." });
+        }
+
+        if (e.ige) {
+          lines.push({ text: "In ground effect (IGE): the ground blocks the downwash, so hovering here needs less power (" +
+            kW(e.hoverPower) + " instead of " + kW(e.hoverPowerOGE) + " higher up)." });
+        } else {
+          lines.push({ text: "Out of ground effect (OGE): the ground is too far away to help, so hovering needs " + kW(e.hoverPowerOGE) + "." });
+        }
+
+        if (s.time === 0 && !running) {
+          if (powerShort && ceiling >= 0 && !e.ige) {
+            lines.push({ text: "Press Play: it will sink until it is low enough (about " + Math.round(ceiling) +
+              " ft) for ground effect to make up the missing power." });
+          } else {
+            lines.push({ text: "Move the collective or power slider, then press Play." });
+          }
+          return lines;
+        }
+
+        const climbing = s.climb > 0.1, sinking = s.climb < -0.1;
+        if (e.onGround && e.thrust < hac.weight - 0.1) {
+          lines.push({ text: "On the ground: rotor thrust is less than weight." });
+        } else if (e.atTop) {
+          lines.push({ text: "At the top of the practice area (" + H_SETTINGS.topHeightFt + " ft). Lower the collective to stop climbing." });
+        } else if (e.powerLimited) {
+          lines.push({ text: "The rotor is making all the thrust the engine's power allows. More collective won't help: in a real helicopter the rotor would slow down (rotor rpm droop)." });
+          if (sinking && ceiling >= 0 && e.heightFt > ceiling) {
+            lines.push({ text: "As it sinks into ground effect the power needed drops. It can hover again at about " + Math.round(ceiling) + " ft." });
+          }
+        } else if (climbing) {
+          lines.push({ text: "Rotor thrust is more than weight, so the helicopter climbs. Climbing also needs extra power." });
+        } else if (sinking) {
+          lines.push({ text: "Rotor thrust is less than weight, so the helicopter descends." + (mode === "manual" ? " Raise the collective to hover." : "") });
+        } else {
+          lines.push({ text: "Hovering: rotor thrust equals weight." });
+        }
+        return lines;
+      }
+
+      /* ---------------------------------------------------------------------
+         H5. DRAWING
+         --------------------------------------------------------------------- */
+
+      const $ = function (id) { return document.getElementById(id); };
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      function svgEl(tag, attrs) {
+        const node = document.createElementNS(SVG_NS, tag);
+        Object.keys(attrs).forEach(function (k) { node.setAttribute(k, attrs[k]); });
+        return node;
+      }
+
+      const CG = { x: 400, y: 215 };   // helicopter centre of gravity in the main picture
+      const HUB_Y = -50;               // rotor hub, relative to the centre of gravity
+      const SKID_Y = 50;               // bottom of the skids, relative to the centre of gravity
+      const PX_PER_FT = 2;             // height scale in the main picture (not to scale with the drawing)
+      const TAIL_HUB = { x: -206, y: -44 };
+
+      // Arrow from (x, y), pointing angleDeg anticlockwise from "forward",
+      // starting `gap` from the point. Returns the tip position.
+      function setArrow(group, x, y, angleDeg, length, gap) {
+        length = clamp(length, 0, H_ARROW.maxLength);
+        const line = group.querySelector("line");
+        const head = group.querySelector("polygon");
+        group.style.display = length > 4 ? "" : "none";
+        const tip = gap + length;
+        line.setAttribute("x1", gap);
+        line.setAttribute("y1", 0);
+        line.setAttribute("x2", Math.max(gap, tip - 14));
+        line.setAttribute("y2", 0);
+        head.setAttribute("points", tip + ",0 " + (tip - 22) + ",-14 " + (tip - 22) + ",14");
+        group.setAttribute("transform", "translate(" + x + " " + y + ") rotate(" + (-angleDeg) + ")");
+        const r = angleDeg * Math.PI / 180;
+        return { x: x + tip * Math.cos(r), y: y - tip * Math.sin(r) };
+      }
+
+      function buildGround() {
+        const g = $("h-ground");
+        g.append(
+          svgEl("rect", { class: "ige-band", x: 0, y: -IGE_FT * PX_PER_FT, width: 760, height: IGE_FT * PX_PER_FT }),
+          svgEl("line", { class: "ige-line", x1: 0, y1: -IGE_FT * PX_PER_FT, x2: 760, y2: -IGE_FT * PX_PER_FT })
+        );
+        const t1 = svgEl("text", { class: "band-text", x: 752, y: -IGE_FT * PX_PER_FT + 18, "text-anchor": "end" });
+        t1.textContent = "Ground effect zone";
+        const t2 = svgEl("text", { class: "band-text", x: 752, y: -IGE_FT * PX_PER_FT + 36, "text-anchor": "end" });
+        t2.textContent = "(about 1 rotor diameter)";
+        g.append(t1, t2);
+        for (let ft = 20; ft <= H_SETTINGS.topHeightFt; ft += 20) {
+          const y = -ft * PX_PER_FT;
+          g.appendChild(svgEl("line", { class: "tick", x1: 0, y1: y, x2: ft % 40 === 0 ? 16 : 9, y2: y }));
+          if (ft % 40 === 0) {
+            const label = svgEl("text", { class: "tick-text", x: 20, y: y + 4 });
+            label.textContent = ft + " ft";
+            g.appendChild(label);
+          }
+        }
+        g.append(
+          svgEl("rect", { class: "ground-fill", x: 0, y: 0, width: 760, height: 500 }),
+          svgEl("line", { class: "ground-edge", x1: 0, y1: 0, x2: 760, y2: 0 }),
+          svgEl("rect", { class: "pad", x: 300, y: 0, width: 200, height: 5 })
+        );
+      }
+
+      function drawDefects() {
+        const layer = $("h-defect-layer");
+        const ghosts = $("h-rotor-ghosts");
+        layer.replaceChildren();
+        ghosts.replaceChildren();
+        const parts = svgEl("g", {});
+        const markers = svgEl("g", {});
+        layer.append(parts, markers);
+
+        activeDefects().forEach(function (x) {
+          const d = x.defect, sev = x.severity, p = d.where;
+
+          if (d.id === "erosion") {
+            // Worn, dirty patches near both blade tips
+            for (let k = 0; k < 2 + sev * 2; k++) {
+              const off = 108 + k * (48 / (1 + sev * 2));
+              parts.appendChild(svgEl("circle", { class: "defect-speck", cx: off, cy: -50 + (k % 2 ? 2 : -2), r: 1.8 }));
+              parts.appendChild(svgEl("circle", { class: "defect-speck", cx: -off, cy: -50 + (k % 2 ? -2 : 2), r: 1.8 }));
+            }
+          } else if (d.id === "patch") {
+            parts.appendChild(svgEl("rect", { class: "defect-part", x: p.x - 9, y: -54, width: 18, height: 2 + sev * 1.5, rx: 1 }));
+          } else if (d.id === "tracking") {
+            // The two extremes of the wobbling disc
+            [1, -1].forEach(function (sign) {
+              ghosts.appendChild(svgEl("ellipse", { class: "rotor-ghost", cx: 0, cy: HUB_Y, rx: 160, ry: 6,
+                transform: "rotate(" + (sign * hac.wobbleDeg) + " 0 " + HUB_Y + ")" }));
+            });
+          } else if (d.id === "tail") {
+            // A chunk missing from one tail rotor blade
+            const len = 4 + sev * 3;
+            parts.appendChild(svgEl("path", { class: "defect-part",
+              d: "M" + (TAIL_HUB.x - 4) + " " + (TAIL_HUB.y - 20 + len) + " L" + (TAIL_HUB.x + 4) + " " + (TAIL_HUB.y - 20) +
+                 " L" + (TAIL_HUB.x + 4) + " " + (TAIL_HUB.y - 20 + len) + " Z" }));
+          } else if (d.id === "weight") {
+            const width = 22 + sev * 12;   // a bigger load for more weight
+            parts.appendChild(svgEl("rect", { class: "defect-part", x: -width / 2, y: 27, width: width, height: 18, rx: 3 }));
+          }
+
+          const marker = svgEl("g", { class: "marker", transform: "translate(" + p.x + " " + p.y + ")" });
+          const title = svgEl("title", {});
+          title.textContent = d.name + " (" + SEVERITY[sev - 1] + ")";
+          const number = svgEl("text", { y: 4, "text-anchor": "middle" });
+          number.textContent = H_DEFECTS.indexOf(d) + 1;
+          marker.append(title, svgEl("circle", { r: 8 }), number);
+          markers.appendChild(marker);
+        });
+        $("h-marker-note").hidden = activeDefects().length === 0;
+      }
+
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      // Rotor disc tilt for an out-of-track rotor, and a small shake for vibration.
+      function wobbleAngle(a) {
+        if (!running || reducedMotion.matches || a.wobbleDeg === 0) return 0;
+        return a.wobbleDeg * Math.sin(animTime * 2 * Math.PI * 1.2);
+      }
+      function shakeOffset(a) {
+        if (!running || reducedMotion.matches) return { x: 0, y: 0 };
+        const amp = Math.max(0, a.vibration - HELI.baseVibration) * 0.35;
+        return { x: amp * Math.sin(animTime * 53), y: amp * Math.sin(animTime * 71 + 1) };
+      }
+
+      // Bar gauges
+      function level(value, caution, danger, lowerIsWorse) {
+        if (lowerIsWorse) return value < danger ? "danger" : value < caution ? "caution" : "ok";
+        return value > danger ? "danger" : value > caution ? "caution" : "ok";
+      }
+      function setBar(id, fraction, lvl) {
+        const bar = $(id);
+        bar.style.height = clamp(fraction, 0, 1) * 100 + "%";
+        bar.classList.remove("lvl-ok", "lvl-caution", "lvl-danger");
+        if (lvl) bar.classList.add("lvl-" + lvl);
+      }
+      function setStatus(id, text, lvl) {
+        const p = $(id);
+        p.textContent = text;
+        p.className = "h-status txt-" + lvl;
+      }
+      // Faint green / amber / red bands behind a bar, from the bottom up.
+      function addZones(trackId, zones) {
+        const track = $(trackId);
+        zones.forEach(function (z) {
+          const div = document.createElement("div");
+          div.className = "bar-zone lvl-" + z.lvl;
+          div.style.bottom = z.from * 100 + "%";
+          div.style.height = (z.to - z.from) * 100 + "%";
+          track.insertBefore(div, track.firstChild);
+        });
+      }
+
+      let lastExplain = "";
+
+      function renderHeli() {
+        const s = hs;
+        const e = evaluate(s, hac);
+
+        // Ground moves so the helicopter stays in the middle of the picture
+        const groundY = CG.y + SKID_Y + e.heightFt * PX_PER_FT;
+        $("h-ground").setAttribute("transform", "translate(0 " + groundY.toFixed(1) + ")");
+        $("h-ground-below").textContent = groundY > 440 ? "Ground: " + Math.round(e.heightFt) + " ft below ↓" : "";
+
+        const ge = $("h-ge");
+        ge.textContent = e.ige ? "In ground effect (IGE)" : "Out of ground effect (OGE)";
+        ge.classList.toggle("ige", e.ige);
+
+        // Vibration shake and rotor wobble
+        const shake = shakeOffset(hac);
+        $("h-body").setAttribute("transform", "translate(" + shake.x.toFixed(2) + " " + shake.y.toFixed(2) + ")");
+        $("h-rotor").setAttribute("transform", "rotate(" + wobbleAngle(hac).toFixed(2) + " 0 " + HUB_Y + ")");
+
+        // Arrows and labels
+        const thrustTip = setArrow($("h-arrow-thrust"), CG.x, CG.y + HUB_Y, 90, e.thrust * H_ARROW.thrustWeight, 16);
+        place("h-label-thrust", thrustTip.x + 16, thrustTip.y + 22);
+        const weightTip = setArrow($("h-arrow-weight"), CG.x, CG.y, -90, hac.weight * H_ARROW.thrustWeight, SKID_Y + 8);
+        place("h-label-weight", weightTip.x + 16, weightTip.y - 4);
+        const dragTip = setArrow($("h-arrow-drag"), CG.x - 16, CG.y - 80, 180, e.drag * H_ARROW.drag, 0);
+        place("h-label-drag", dragTip.x - 6, dragTip.y + 9);
+        const tailTip = setArrow($("h-arrow-tail"), CG.x + TAIL_HUB.x, CG.y + TAIL_HUB.y, 215, e.tailThrust * H_ARROW.tail, 24);
+        const tailLabel = $("h-label-tail");
+        tailLabel.querySelectorAll("tspan").forEach(function (t, k) {
+          t.setAttribute("x", (tailTip.x + 12).toFixed(1));
+          t.setAttribute("y", (tailTip.y + 20 + k * 21).toFixed(1));
+        });
+        setArrow($("h-top-tail"), 30, 70, -90, e.tailThrust * 7, 0);   // top view: straight sideways
+
+        // Force numbers
+        $("h-val-thrust").textContent = Math.round(e.thrust * 10) / 10;
+        $("h-val-weight").textContent = Math.round(hac.weight * 10) / 10;
+        $("h-sign-tw").textContent = compareSign(e.thrust, hac.weight, 0.2);
+        $("h-val-drag").textContent = e.drag.toFixed(1);
+        $("h-val-tail").textContent = e.tailThrust.toFixed(1);
+        const fpm = Math.round(s.climb / FT * 60 / 10) * 10;
+        $("h-angles").textContent = "Climb / descent: " + (fpm > 0 ? "+" : "") + fpm.toLocaleString() + " ft per min" +
+          "  ·  Collective: " + Math.round(s.collective) + "%";
+
+        // Gauges
+        const ratio = e.available > 0 ? e.hoverPower / e.available : Infinity;
+        const powerLvl = ratio > 1 ? "danger" : ratio > LEVELS.powerCaution ? "caution" : "ok";
+        setBar("h-preq-bar", e.hoverPower / POWER_GAUGE_MAX_KW, powerLvl);
+        setBar("h-pavail-bar", e.available / POWER_GAUGE_MAX_KW, null);
+        $("h-preq").textContent = Math.round(e.hoverPower).toLocaleString();
+        $("h-pavail").textContent = Math.round(e.available).toLocaleString();
+        setStatus("h-power-status", ratio > 1 ? "Not enough power to hover" : ratio > LEVELS.powerCaution ? "Close to the limit" : "Enough power", powerLvl);
+
+        const sinkingNoPower = ratio > 1 && !e.onGround;
+        const heightLvl = sinkingNoPower ? "danger" : e.ige ? "caution" : "ok";
+        setBar("h-height-bar", e.heightFt / H_SETTINGS.topHeightFt, heightLvl);
+        $("h-height").textContent = Math.round(e.heightFt).toLocaleString();
+        setStatus("h-height-status", sinkingNoPower ? "Sinking: not enough power" : e.onGround ? "On the ground" :
+          e.ige ? "In ground effect (IGE)" : "Out of ground effect (OGE)", heightLvl);
+
+        const vibLvl = level(hac.vibration, LEVELS.vibrationCaution, LEVELS.vibrationDanger, false);
+        setBar("h-vib-bar", hac.vibration / 10, vibLvl);
+        $("h-vib").textContent = hac.vibration.toFixed(1);
+        setStatus("h-vib-status", vibLvl === "ok" ? "Low" : vibLvl === "caution" ? "Raised" : "High", vibLvl);
+
+        const pedalLvl = level(e.pedal, LEVELS.pedalCaution, LEVELS.pedalDanger, true);
+        setBar("h-pedal-bar", e.pedal / 100, pedalLvl);
+        $("h-pedal").textContent = Math.max(0, Math.round(e.pedal));
+        setStatus("h-pedal-status", e.pedal <= 0 ? "No pedal left: it will yaw" : pedalLvl === "ok" ? "Plenty of pedal" :
+          pedalLvl === "caution" ? "Reduced" : "Very little left", pedalLvl);
+
+        // Explanation (only rewritten when it changes, so screen readers aren't flooded)
+        const lines = describe(s, e);
+        const key = lines.map(function (l) { return l.text; }).join("|");
+        if (key !== lastExplain) {
+          lastExplain = key;
+          const box = $("h-explain");
+          box.replaceChildren();
+          lines.forEach(function (l) {
+            const p = document.createElement("p");
+            p.textContent = l.text;
+            if (l.warn) p.className = "warning";
+            box.appendChild(p);
+          });
+        }
+
+        // Controls
+        const slider = $("h-collective");
+        slider.value = Math.round(s.collective);
+        slider.disabled = mode === "hold";
+        $("h-collective-value").textContent = Math.round(s.collective) + "%";
+        $("h-collective-hint").innerHTML = mode === "hold"
+          ? "The pilot is moving the collective to hold <strong>" + Math.round(s.targetHeight / FT) + " ft</strong>."
+          : "Hover needs about <strong>" + Math.round(hoverCollective(hac)) + "%</strong> collective" +
+            (activeDefects().length ? " with this Hangar Condition (clean: " + HELI.hoverCollectivePercent + "%)." : ".") +
+            " More collective = more rotor thrust.";
+        $("h-power").value = powerPercent;
+        $("h-power-value").textContent = powerPercent + "%";
+        $("h-power-hint").textContent = "Engine power available: " + Math.round(e.available).toLocaleString() + " kW of " +
+          HELI.enginePowerKW.toLocaleString() + " kW.";
+        document.querySelectorAll(".h-modes button").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.hmode === mode));
+        });
+        $("h-play").disabled = running;
+        $("h-pause").disabled = !running;
+        $("h-clock").textContent = (running ? "Running" : "Paused") + "  ·  Time: " + formatTime(s.time) + "  ·  Real-time speed";
+
+        if (compareOn) renderCompare();
+      }
+
+      function place(id, x, y) {
+        $(id).setAttribute("x", x.toFixed(1));
+        $(id).setAttribute("y", y.toFixed(1));
+      }
+
+      /* ---------------------------------------------------------------------
+         H6. HANGAR CONDITION PANEL
+         --------------------------------------------------------------------- */
+
+      const hangar = {};   // defect id → { on, severity }
+
+      function activeDefects() {
+        return H_DEFECTS
+          .filter(function (d) { return hangar[d.id] && hangar[d.id].on; })
+          .map(function (d) { return { defect: d, severity: hangar[d.id].severity }; });
+      }
+
+      function buildHangar() {
+        const box = $("h-defects");
+        H_DEFECTS.forEach(function (d, i) {
+          hangar[d.id] = { on: false, severity: 2 };
+          const card = document.createElement("div");
+          card.className = "defect";
+          card.innerHTML =
+            '<label class="defect-top"><input type="checkbox" role="switch">' +
+              '<span class="defect-num" aria-hidden="true">' + (i + 1) + '</span><span>' + d.name + '</span></label>' +
+            '<p class="defect-effect">' + d.effect + '</p>' +
+            '<input type="range" min="1" max="3" step="1" value="2" disabled aria-label="How bad: ' + d.name + '">' +
+            '<div class="sev-labels" aria-hidden="true"><span>Light</span><span>Moderate</span><span>Severe</span></div>';
+          box.appendChild(card);
+
+          const toggle = card.querySelector('input[type="checkbox"]');
+          const slider = card.querySelector('input[type="range"]');
+          const labels = card.querySelectorAll(".sev-labels span");
+
+          function show() {
+            const h = hangar[d.id];
+            toggle.checked = h.on;
+            slider.disabled = !h.on;
+            slider.value = h.severity;
+            slider.setAttribute("aria-valuetext", SEVERITY[h.severity - 1]);
+            card.classList.toggle("on", h.on);
+            labels.forEach(function (l, k) { l.classList.toggle("current", k === h.severity - 1); });
+          }
+          toggle.addEventListener("change", function () { hangar[d.id].on = toggle.checked; show(); hangarChanged(); });
+          slider.addEventListener("input", function () { hangar[d.id].severity = Number(slider.value); show(); hangarChanged(); });
+          card.show = show;
+          show();
+        });
+
+        $("h-all-clean").addEventListener("click", function () {
+          H_DEFECTS.forEach(function (d) { hangar[d.id].on = false; });
+          box.querySelectorAll(".defect").forEach(function (card) { card.show(); });
+          hangarChanged();
+        });
+      }
+
+      function hangarChanged() {
+        hac = condition(activeDefects());
+        if (hs.time === 0) trimCollective();   // before Play, re-set the collective for a hover
+        drawDefects();
+        refreshMinis();
+        renderHeli();
+      }
+
+      /* ---------------------------------------------------------------------
+         H7. COMPARE MODE
+         --------------------------------------------------------------------- */
+
+      const MINI = {
+        width: 400, height: 240,
+        x: 200,                     // where the centre of gravity sits across the picture
+        groundY: 222,               // picture height (y) of the ground
+        pxPerFt: 0.76,              // 200 ft fills most of the picture
+        scale: 0.3                  // helicopter drawn at 30% of the main picture's size
+      };
+
+      function makeMini(figureId, name) {
+        const figure = $(figureId);
+        const gradient = "h-sky-" + figureId;
+        const svg = svgEl("svg", { viewBox: "0 0 " + MINI.width + " " + MINI.height, class: "mini-scene", role: "img",
+          "aria-label": name + " helicopter. Its height in the picture shows its height above the ground; arrows show rotor thrust and weight." });
+        const defs = svgEl("defs", {});
+        const grad = svgEl("linearGradient", { id: gradient, x1: 0, y1: 0, x2: 0, y2: 1 });
+        grad.append(svgEl("stop", { offset: 0, class: "sky-top" }), svgEl("stop", { offset: 1, class: "sky-bottom" }));
+        defs.appendChild(grad);
+        svg.append(defs, svgEl("rect", { width: MINI.width, height: MINI.height, fill: "url(#" + gradient + ")" }));
+
+        const bandTop = MINI.groundY - IGE_FT * MINI.pxPerFt;
+        svg.append(
+          svgEl("rect", { class: "ige-band", x: 0, y: bandTop, width: MINI.width, height: MINI.groundY - bandTop }),
+          svgEl("line", { class: "ige-line", x1: 0, y1: bandTop, x2: MINI.width, y2: bandTop })
+        );
+        for (let ft = 50; ft <= H_SETTINGS.topHeightFt; ft += 50) {
+          const y = MINI.groundY - ft * MINI.pxPerFt;
+          svg.appendChild(svgEl("line", { class: "scale-line" + (ft === H_SETTINGS.startHeightFt ? " start" : ""), x1: 44, y1: y, x2: MINI.width, y2: y }));
+          const label = svgEl("text", { class: "scale-text", x: 4, y: y + 4 });
+          label.textContent = ft + " ft";
+          svg.appendChild(label);
+        }
+        svg.appendChild(svgEl("rect", { class: "ground-fill", x: 0, y: MINI.groundY, width: MINI.width, height: MINI.height - MINI.groundY }));
+
+        const craft = svgEl("g", {});
+        const sized = svgEl("g", { transform: "scale(" + MINI.scale + ")" });
+        const body = svgEl("g", {});
+        function arrow(kind) {
+          const g = svgEl("g", { class: "arrow " + kind });
+          g.append(svgEl("line", {}), svgEl("polygon", {}));
+          return g;
+        }
+        const thrust = arrow("lift");
+        const weight = arrow("weight");
+        sized.append(body, thrust, weight);
+        craft.appendChild(sized);
+        svg.appendChild(craft);
+
+        const read = document.createElement("p");
+        read.className = "mini-read";
+        figure.append(svg, read);
+        return { svg: svg, craft: craft, body: body, thrust: thrust, weight: weight, read: read };
+      }
+
+      const minis = {};
+
+      // Copy the main picture's helicopter. The clean copy has no defect drawings.
+      function heliCopy(clean) {
+        const copy = $("h-body").cloneNode(true);
+        copy.removeAttribute("transform");
+        if (clean) {
+          copy.querySelector("#h-defect-layer").replaceChildren();
+          copy.querySelector("#h-rotor-ghosts").replaceChildren();
+        }
+        copy.removeAttribute("id");
+        copy.querySelectorAll("[id]").forEach(function (n) { n.removeAttribute("id"); });
+        return copy;
+      }
+
+      function refreshMinis() {
+        minis.clean.body.replaceChildren(heliCopy(true));
+        minis.defective.body.replaceChildren(heliCopy(false));
+        const count = activeDefects().length;
+        $("h-mini-defect-count").textContent = count === 0
+          ? "No defects on yet: switch some on in the Hangar Condition panel"
+          : count + (count === 1 ? " defect" : " defects") + " from the Hangar Condition panel";
+      }
+
+      function renderMini(m, s, a) {
+        const e = evaluate(s, a);
+        const cgY = MINI.groundY - e.heightFt * MINI.pxPerFt - SKID_Y * MINI.scale;
+        m.craft.setAttribute("transform", "translate(" + MINI.x + " " + cgY.toFixed(1) + ")");
+        const shake = shakeOffset(a);
+        m.body.setAttribute("transform", "translate(" + shake.x.toFixed(2) + " " + shake.y.toFixed(2) + ")");
+        m.body.querySelectorAll(".rotor-wobble").forEach(function (r) {
+          r.setAttribute("transform", "rotate(" + wobbleAngle(a).toFixed(2) + " 0 " + HUB_Y + ")");
+        });
+        setArrow(m.thrust, 0, HUB_Y, 90, e.thrust * H_ARROW.thrustWeight, 16);
+        setArrow(m.weight, 0, 0, -90, a.weight * H_ARROW.thrustWeight, SKID_Y + 8);
+        m.read.textContent = "Power to hover " + Math.round(e.hoverPower) + " / " + Math.round(e.available) + " kW  ·  " +
+          (e.ige ? "IGE" : "OGE") + "  ·  " + Math.round(e.heightFt) + " ft";
+      }
+
+      // ---- Results table ----------------------------------------------------
+
+      function fmt(n, decimals) {
+        return n.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+      }
+      function numberRow(name, unit, clean, defective, worseIfLower, decimals) {
+        const f = Math.pow(10, decimals);
+        clean = Math.round(clean * f) / f;
+        defective = Math.round(defective * f) / f;
+        const diff = Math.round((defective - clean) * f) / f;
+        return { name: name, unit: unit, clean: fmt(clean, decimals), defective: fmt(defective, decimals),
+          diff: diff === 0 ? "Same" : (diff > 0 ? "+" : "−") + fmt(Math.abs(diff), decimals),
+          worse: worseIfLower ? diff < 0 : diff > 0 };
+      }
+      function ceilingText(c) {
+        return c === Infinity ? "Yes, out of ground effect" : c < 0 ? "No" : "Only below about " + Math.round(c) + " ft (IGE)";
+      }
+
+      function renderResults() {
+        const ec = evaluate(hc, H_CLEAN), ed = evaluate(hs, hac);
+        const cc = hoverCeiling(H_CLEAN, ec.available), cd = hoverCeiling(hac, ed.available);
+        const rows = [
+          numberRow("Power to hover here", "kW", ec.hoverPower, ed.hoverPower, false, 0),
+          numberRow("Power margin", "kW (available − required)", ec.available - ec.hoverPower, ed.available - ed.hoverPower, true, 0),
+          numberRow("Collective", "%", hc.collective, hs.collective, false, 0),
+          numberRow("Height", "feet", ec.heightFt, ed.heightFt, true, 0),
+          numberRow("Vibration", "out of 10", H_CLEAN.vibration, hac.vibration, false, 1),
+          numberRow("Pedal margin", "% left", Math.max(0, ec.pedal), Math.max(0, ed.pedal), true, 0),
+          { name: "Can hover?", unit: "at this power", clean: ceilingText(cc), defective: ceilingText(cd),
+            diff: cd < cc ? "Worse" : "Same", worse: cd < cc }
+        ];
+        $("h-results-body").innerHTML = rows.map(function (r) {
+          return '<tr><th scope="row">' + r.name + '<span class="unit">' + r.unit + '</span></th>' +
+            '<td>' + r.clean + '</td><td>' + r.defective + '</td>' +
+            '<td' + (r.worse ? ' class="worse"' : '') + '>' + r.diff +
+              (r.worse ? '<span class="sr-only"> (defective is worse)</span>' : '') + '</td></tr>';
+        }).join("");
+      }
+
+      // ---- Pilot Report -------------------------------------------------------
+
+      function pilotReport() {
+        const active = activeDefects();
+        if (active.length === 0) {
+          return [{ text: "No abnormal symptoms", detail: "With no defects the two helicopters fly exactly the same." }];
+        }
+        const has = function (id) { return active.some(function (x) { return x.defect.id === id; }); };
+        const available = powerAvailable(powerPercent);
+        const kW = function (n) { return Math.round(n).toLocaleString() + " kW"; };
+        const items = [];
+
+        const cleanP = hoverPower(H_CLEAN, IGE_FT), nowP = hoverPower(hac, IGE_FT);
+        if (nowP - cleanP >= 5) {
+          items.push({ text: "Higher power needed to hover", detail: "Needs about " + kW(nowP) + " instead of " + kW(cleanP) +
+            " to hover out of ground effect (+" + Math.round((nowP / cleanP - 1) * 100) + "%), and about " +
+            Math.round(hoverCollective(hac)) + "% collective instead of " + HELI.hoverCollectivePercent + "%." });
+        }
+
+        if (hac.vibration - H_CLEAN.vibration >= 0.5) {
+          const why = [];
+          if (has("tracking")) why.push("the rotor is out of track or out of balance, so there is a strong once-per-turn shake and the rotor disc visibly wobbles");
+          if (has("patch")) why.push("the repaired or damaged blade no longer matches the others");
+          if (has("tail")) why.push("the damaged tail rotor adds a high-frequency buzz");
+          items.push({ text: "Increased vibration", detail: "Level " + hac.vibration.toFixed(1) + " out of 10 instead of " +
+            H_CLEAN.vibration.toFixed(1) + ": " + why.join("; ") + "." });
+        }
+
+        const pedalClean = hoverPedalMargin(H_CLEAN, available), pedalNow = hoverPedalMargin(hac, available);
+        if (pedalClean - pedalNow >= 3) {
+          items.push({ text: "Reduced pedal margin / yaw control", detail: "About " + Math.max(0, Math.round(pedalNow)) +
+            "% pedal left in the hover instead of " + Math.round(pedalClean) + "%. " +
+            (has("tail") ? "The damaged tail rotor makes less anti-torque, so more pedal is needed to stop the helicopter turning."
+                         : "More power means more torque for the tail rotor to balance.") +
+            (pedalNow <= 0 ? " There is no pedal left, so the helicopter would yaw." : "") });
+        }
+
+        const cleanCeiling = hoverCeiling(H_CLEAN, available), nowCeiling = hoverCeiling(hac, available);
+        if (nowCeiling < cleanCeiling) {
+          const also = cleanCeiling === Infinity ? "" : " (at this power the clean helicopter is limited too)";
+          if (nowCeiling < 0) {
+            items.push({ text: "Cannot hover, even in ground effect", detail: "With " + kW(available) +
+              " available, even a hover just above the ground needs more power" + also + "." });
+          } else {
+            items.push({ text: "Can only hover in ground effect", detail: "With " + kW(available) + " available it can only hover below about " +
+              Math.round(nowCeiling) + " ft, where the ground helps" + also + "." });
+          }
+        }
+
+        items.push({ engine: true, text: "Engine parameters normal", detail: "The engine gives the same power as in the clean helicopter. " +
+          "The extra power is needed by the rotor or the load, so check the blades, tail rotor and weight before blaming the engine." });
+        return items;
+      }
+
+      let lastReport = "";
+
+      function renderReport() {
+        const items = pilotReport();
+        const note = activeDefects().length > 0 && hs.time === 0
+          ? "Press Play to fly both helicopters and watch the difference."
+          : "";
+        const key = items.map(function (i) { return i.text + i.detail; }).join("|") + note;
+        if (key === lastReport) return;
+        lastReport = key;
+
+        const list = $("h-report-list");
+        list.replaceChildren();
+        items.forEach(function (i) {
+          const li = document.createElement("li");
+          const strong = document.createElement("strong");
+          strong.textContent = i.text;
+          if (i.engine) strong.className = "engine";
+          const detail = document.createElement("span");
+          detail.className = "detail";
+          detail.textContent = i.detail;
+          li.append(strong, detail);
+          list.appendChild(li);
+        });
+        $("h-report-note").textContent = note;
+        $("h-report-note").hidden = note === "";
+      }
+
+      function renderCompare() {
+        renderMini(minis.clean, hc, H_CLEAN);
+        renderMini(minis.defective, hs, hac);
+        renderResults();
+        renderReport();
+      }
+
+      function setCompare(on) {
+        compareOn = on;
+        if (on) {
+          // Start both together from the starting hover, keeping the chosen inputs.
+          const collective = hs.collective;
+          resetHeli();
+          if (mode === "manual" && Math.abs(collective - hoverCollective(hac)) > 0.5) hs.collective = hc.collective = collective;
+        }
+        $("h-compare").setAttribute("aria-pressed", String(on));
+        $("h-compare-state").textContent = on ? "On" : "Off";
+        $("h-compare-panel").hidden = !on;
+        renderHeli();
+        if (on) {
+          $("h-compare-panel").scrollIntoView({ block: "nearest", behavior: reducedMotion.matches ? "auto" : "smooth" });
+        }
+      }
+
+      /* ---------------------------------------------------------------------
+         H8. CONTROLS AND MAIN LOOP
+         --------------------------------------------------------------------- */
+
+      function both() { return compareOn ? [hs, hc] : [hs]; }
+
+      $("h-collective").addEventListener("input", function (e) {
+        both().forEach(function (s) { s.collective = Number(e.target.value); });
+        renderHeli();
+      });
+      $("h-power").addEventListener("input", function (e) {
+        powerPercent = Number(e.target.value);
+        renderHeli();
+      });
+      document.querySelectorAll(".h-modes button").forEach(function (button) {
+        button.addEventListener("click", function () {
+          mode = button.dataset.hmode;
+          // "Pilot holds the height" holds the height each helicopter has when it's chosen.
+          [hs, hc].forEach(function (s) { s.targetHeight = s.height; });
+          if (hs.time === 0) trimCollective();
+          renderHeli();
+        });
+      });
+      $("h-play").addEventListener("click", function () { running = true; renderHeli(); });
+      $("h-pause").addEventListener("click", function () { running = false; renderHeli(); });
+      $("h-reset").addEventListener("click", function () { resetHeli(); renderHeli(); });
+      $("h-compare").addEventListener("click", function () { setCompare(!compareOn); });
+
+      const STEP = 0.02;   // seconds per physics step
+      let lastFrame = null;
+
+      function frame(now) {
+        if (lastFrame !== null && running && !$("heli-mode").hidden) {
+          const wallDt = Math.min((now - lastFrame) / 1000, 0.1);   // cap so a background tab doesn't jump ahead
+          let remaining = wallDt;
+          while (remaining > 0) {
+            const dt = Math.min(STEP, remaining);
+            stepHeli(hs, hac, dt);
+            if (compareOn) stepHeli(hc, H_CLEAN, dt);
+            remaining -= dt;
+          }
+          animTime += wallDt;
+          renderHeli();
+        }
+        lastFrame = now;
+        requestAnimationFrame(frame);
+      }
+
+      /* ---------------------------------------------------------------------
+         H9. AIRCRAFT SELECTOR (Fixed-wing / Helicopter)
+         Opening the page with #helicopter on the end starts in helicopter mode.
+         --------------------------------------------------------------------- */
+
+      function setAircraft(kind) {
+        const heli = kind === "heli";
+        $("fw-mode").hidden = heli;
+        $("heli-mode").hidden = !heli;
+        document.querySelectorAll(".aircraft-switch button").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.aircraft === kind));
+        });
+        // Only one simulation runs at a time: pause the one that's being hidden.
+        if (heli) {
+          const fwPause = $("pause");
+          if (!fwPause.disabled) fwPause.click();
+        } else if (running) {
+          running = false;
+        }
+        try { history.replaceState(null, "", heli ? "#helicopter" : location.pathname + location.search); } catch (err) { /* ignore */ }
+        renderHeli();
+      }
+
+      document.querySelectorAll(".aircraft-switch button").forEach(function (button) {
+        button.addEventListener("click", function () { setAircraft(button.dataset.aircraft); });
+      });
+
+      /* ---------------------------------------------------------------------
+         H10. SMALL HELPERS
+         --------------------------------------------------------------------- */
+
+      function clamp(x, lo, hi) { return Math.min(hi, Math.max(lo, x)); }
+      function compareSign(a, b, tolerance) {
+        if (Math.abs(a - b) <= tolerance) return "=";
+        return a < b ? "<" : ">";
+      }
+      function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return m + ":" + String(sec).padStart(2, "0");
+      }
+
+      // Start
+      resetHeli();
+      buildGround();
+      addZones("h-vib-track", [
+        { from: 0, to: LEVELS.vibrationCaution / 10, lvl: "ok" },
+        { from: LEVELS.vibrationCaution / 10, to: LEVELS.vibrationDanger / 10, lvl: "caution" },
+        { from: LEVELS.vibrationDanger / 10, to: 1, lvl: "danger" }
+      ]);
+      addZones("h-pedal-track", [
+        { from: 0, to: LEVELS.pedalDanger / 100, lvl: "danger" },
+        { from: LEVELS.pedalDanger / 100, to: LEVELS.pedalCaution / 100, lvl: "caution" },
+        { from: LEVELS.pedalCaution / 100, to: 1, lvl: "ok" }
+      ]);
+      const igeShare = IGE_FT / H_SETTINGS.topHeightFt * 100 + "%";
+      $("h-ige-zone").style.height = igeShare;
+      $("h-ige-zone-label").style.bottom = "calc(" + igeShare + " - 1.1em)";
+      minis.clean = makeMini("h-mini-clean", "Clean");
+      minis.defective = makeMini("h-mini-defective", "Defective");
+      buildHangar();
+      hangarChanged();
+      if (location.hash === "#helicopter") setAircraft("heli");
+      requestAnimationFrame(frame);
+    })();
   </script>
 </body>
 </html>

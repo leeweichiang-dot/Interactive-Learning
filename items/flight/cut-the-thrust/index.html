@@ -38,6 +38,12 @@
       --plane: #e9ecf1;
       --plane-line: #4b5563;
 
+      /* Hangar defects */
+      --defect: #b91c1c;           /* defect markers and toggles */
+      --on-defect: #ffffff;
+      --wake: #475569;             /* turbulent airflow lines */
+      --ghost: #8b9098;            /* grey "clean aircraft" arrows */
+
       --radius: 12px;
     }
 
@@ -66,6 +72,11 @@
         --cloud: #3a4d6b;
         --plane: #c9ced6;
         --plane-line: #1f2937;
+
+        --defect: #ff7b72;
+        --on-defect: #1a0b0a;
+        --wake: #dbe4f0;
+        --ghost: #9aa0a8;
       }
     }
 
@@ -132,6 +143,21 @@
     .arrow polygon { fill: currentColor; }
 
     .arrow-note { margin: 8px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    /* Grey "ghost" arrows: the clean aircraft's forces, drawn beside the real ones */
+    .ghost { color: var(--ghost); opacity: 0.75; }
+    .ghost line { stroke: currentColor; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 2 9; }
+    .ghost polygon { fill: none; stroke: currentColor; stroke-width: 3; stroke-linejoin: round; }
+    .ghost-swatch { display: inline-block; width: 26px; border-top: 4px dotted var(--ghost); vertical-align: 4px; margin-right: 4px; }
+
+    /* Defect markers and turbulent airflow on the drawing */
+    .marker circle { fill: var(--defect); stroke: var(--sky-bottom); stroke-width: 2; }
+    .marker text { fill: var(--on-defect); font: 700 11px system-ui, sans-serif; }
+    .wake path { fill: none; stroke: var(--wake); stroke-width: 1.5; stroke-linecap: round; stroke-dasharray: 9 5; opacity: 0.7; }
+    #scene.running .wake path { animation: wake-flow 0.5s linear infinite; }
+    @keyframes wake-flow { to { stroke-dashoffset: -14; } }
+    .defect-part { fill: var(--plane); stroke: var(--defect); stroke-width: 2; stroke-linejoin: round; }
+    .elevator { stroke: var(--plane-line); stroke-width: 4; stroke-linecap: round; }
 
     /* Force comparison rows under the picture */
     .forces {
@@ -264,6 +290,81 @@
     }
     .swatch { display: inline-block; width: 14px; height: 14px; margin-right: 6px; border-radius: 3px; vertical-align: -1px; }
 
+    /* =====================================================================
+       HANGAR CONDITION
+       ===================================================================== */
+    .hangar { margin-top: 16px; }
+    .hangar-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+    .hangar-head h2 { margin: 0; }
+    .hangar h3 { margin: 20px 0 10px; font-size: 1.1rem; }
+
+    .defects {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .defect {
+      padding: 10px 12px 6px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+    }
+    .defect.on { border-color: var(--defect); }
+    .defect-top { display: flex; align-items: flex-start; gap: 8px; cursor: pointer; font-weight: 600; line-height: 1.3; }
+    .defect-top input { width: 22px; height: 22px; margin: 0; flex: none; accent-color: var(--defect); }
+    .defect-num {
+      flex: none;
+      display: inline-grid; place-items: center;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--muted);
+      color: var(--surface);
+      font-size: 0.75rem; font-weight: 700;
+    }
+    .defect.on .defect-num { background: var(--defect); color: var(--on-defect); }
+    .defect-effect { margin: 4px 0 0 60px; color: var(--muted); font-size: 0.85rem; line-height: 1.3; }
+    .defect input[type="range"] { accent-color: var(--defect); }
+    .defect input[type="range"]:disabled { opacity: 0.4; }
+    .sev-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; }
+    .defect:not(.on) .sev-labels { opacity: 0.5; }
+    .sev-labels .current { color: var(--text); font-weight: 700; }
+
+    /* Defect → Force change → Energy loss → Symptom */
+    .chain { display: grid; gap: 10px; }
+    .chain-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 4px;
+    }
+    .chain-row > div {
+      padding: 8px 10px;
+      background: var(--bg);
+      border-radius: 8px;
+      font-size: 0.92rem;
+      line-height: 1.4;
+    }
+    .chain-row > div + div::before { content: "\2193  "; color: var(--muted); font-weight: 700; }
+    .chain-row .step-name { display: block; color: var(--muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+    .chain-row ul { margin: 0; padding-left: 18px; }
+    .chain-row.total > div { border: 2px solid var(--border); }
+    .chain-head { display: none; }
+    .chain-empty { margin: 0; color: var(--muted); }
+    @media (min-width: 760px) {
+      .chain-row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0 22px; }
+      .chain-row > div { position: relative; }
+      .chain-row > div + div::before {
+        content: "\2192";
+        position: absolute; left: -18px; top: 50%;
+        transform: translateY(-50%);
+      }
+      .chain-row .step-name { display: none; }
+      .chain-head { display: grid; }
+      .chain-head > div { background: none; padding: 0 10px; color: var(--muted); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+      .chain-head > div + div::before { content: none; }
+    }
+    .defect-tag { color: var(--defect); font-weight: 700; }
+
     .disclaimer {
       margin: 20px 0 0;
       color: var(--muted);
@@ -273,6 +374,7 @@
 
     @media (prefers-reduced-motion: reduce) {
       .energy-track div { transition: none; }
+      #scene.running .wake path { animation: none; }
     }
   </style>
 </head>
@@ -280,7 +382,7 @@
   <main>
     <a class="back" href="../../../module.html?m=flight">&larr; Principles of Flight</a>
     <h1>Cut the Thrust: Clean vs Defective Aircraft</h1>
-    <p class="subtitle">Phase 1: a clean fixed-wing aircraft. Reduce the thrust, choose how the aircraft responds, and watch what happens.</p>
+    <p class="subtitle">Set the aircraft's <a href="#hangar-title">Hangar Condition</a> (clean, or with defects), reduce the thrust, choose how the aircraft responds, and watch what happens.</p>
 
     <div class="layout">
       <!-- ============================ AIRCRAFT VIEW ============================ -->
@@ -312,7 +414,16 @@
             <path class="plane-body" d="M-6 14 L36 14 C42 14 44 24 36 26 L-6 26 Z"></path>
             <!-- Cockpit windows -->
             <path class="plane-detail" d="M96 -11 L110 -6 L98 -5 Z"></path>
+            <!-- Elevator: deflects when flap/control mis-rigging needs trim -->
+            <line id="elevator" class="elevator" x1="-138" y1="8" x2="-150" y2="8"></line>
+            <!-- Defect drawings, turbulent airflow and numbered markers. JavaScript fills this in. -->
+            <g id="defect-layer"></g>
           </g>
+
+          <!-- Grey "ghost" arrows: the clean aircraft at the same speed. Shown only when a defect is on. -->
+          <g id="ghost-lift"   class="arrow ghost"><line></line><polygon></polygon></g>
+          <g id="ghost-weight" class="arrow ghost"><line></line><polygon></polygon></g>
+          <g id="ghost-drag"   class="arrow ghost"><line></line><polygon></polygon></g>
 
           <!-- Force arrows. JavaScript sets their direction and length. -->
           <g id="arrow-lift"   class="arrow lift"><line></line><polygon></polygon></g>
@@ -325,7 +436,8 @@
           <text id="label-thrust" class="arrow-label thrust" fill="currentColor" text-anchor="middle">Thrust</text>
           <text id="label-drag"   class="arrow-label drag"   fill="currentColor" text-anchor="middle">Drag</text>
         </svg>
-        <p class="arrow-note">Thrust and drag arrows are drawn larger than lift and weight so they are easy to compare.</p>
+        <p class="arrow-note">Thrust and drag arrows are drawn larger than lift and weight so they are easy to compare.
+          <span id="ghost-note" hidden><span class="ghost-swatch"></span>Grey dotted arrows show the <strong>clean</strong> aircraft at the same speed, for comparison. Numbered red markers are the defects switched on in the Hangar Condition panel.</span></p>
 
         <div class="forces">
           <div class="compare">
@@ -352,7 +464,7 @@
             <span class="thrust-value" id="thrust-value">60%</span>
           </div>
           <input type="range" id="thrust" min="0" max="100" step="1" value="60">
-          <p class="hint">Cruise setting is <strong>60%</strong> (thrust = drag). Slide left to cut thrust.</p>
+          <p class="hint" id="thrust-hint">Cruise setting is <strong>60%</strong> (thrust = drag). Slide left to cut thrust.</p>
         </div>
 
         <div>
@@ -384,6 +496,21 @@
         </div>
       </section>
     </div>
+
+    <!-- ========================== HANGAR CONDITION ========================== -->
+    <section class="panel hangar" aria-labelledby="hangar-title">
+      <div class="hangar-head">
+        <h2 id="hangar-title">Hangar Condition</h2>
+        <button type="button" id="all-clean">Make all clean</button>
+      </div>
+      <p class="hint">Switch on any defects found during inspection and choose how bad each one is.
+        Before you press Play, the aircraft is re-trimmed for level flight at cruise speed with the new condition.
+        After that, press Reset to start again with the new condition.</p>
+      <div class="defects" id="defects"></div>
+
+      <h3>Defect &rarr; Force change &rarr; Energy loss &rarr; Symptom</h3>
+      <div class="chain" id="chain" aria-live="polite"></div>
+    </section>
 
     <!-- ============================ INSTRUMENTS ============================ -->
     <section class="panel instruments" aria-labelledby="inst-title">
@@ -429,17 +556,89 @@
       cruiseThrustPercent: 60    // slider position where thrust exactly equals drag at cruise
     };
 
-    // The aircraft. Phase 2 can add "defective" versions, e.g. extra drag
-    // from damage or a stuck panel, by changing these values.
+    // The clean aircraft. Defects from the Hangar Condition panel change
+    // these values (see DEFECTS below).
     const AIRCRAFT = {
       weightKN: 600,             // weight (and lift in level flight)
       maxThrustKN: 100,          // thrust at 100% on the slider
       parasiteDragKN: 54,        // "shape" drag at cruise speed; grows with speed²
       inducedDragKN: 6,          // drag caused by making lift at cruise speed; grows with (lift coefficient)²
       cruiseAngleOfAttackDeg: 2, // wing angle at cruise
+      stallAngleDeg: 15,         // wing angle where the clean wing stalls
       fuelFlowIdleKgH: 300,      // fuel flow at 0% thrust
       fuelFlowMaxKgH: 3000       // fuel flow at 100% thrust
     };
+
+    // Hangar defects. Every effect has three values: [Light, Moderate, Severe].
+    //   parasite  extra parasite ("shape") drag, as a fraction of the clean value
+    //   induced   extra induced drag, as a fraction of the clean value
+    //   liftLoss  share of lift lost at the same wing angle
+    //   weight    extra weight, as a fraction of the clean weight
+    //   stallDeg  how many degrees sooner the wing stalls
+    //   trimDeg   elevator trim needed to fly straight
+    // Sizes follow real-life order: dirt and fasteners small, repair patch
+    // medium, open panel and damaged leading edge large.
+    //   where     marker position on the drawing (aircraft drawn nose-right, 0,0 = centre of gravity)
+    //   wake      length of the turbulent airflow drawn behind it (1 = small)
+    const DEFECTS = [
+      {
+        id: "dirt", name: "Dirt, bugs or oil on wing", effect: "Drag up, lift efficiency down",
+        dragName: "Surface drag",
+        parasite: [0.03, 0.06, 0.09], liftLoss: [0.01, 0.02, 0.04],
+        where: { x: 0, y: 6 }, wake: 1,
+        energy: "The rough wing surface drags a thicker layer of slow, swirling air along with it.",
+        symptom: "Slightly higher fuel flow at the same speed; the wing flies at a slightly higher angle."
+      },
+      {
+        id: "patch", name: "External repair patch (raised, poorly blended)", effect: "Parasite drag up",
+        dragName: "Parasite drag",
+        parasite: [0.06, 0.11, 0.16],
+        where: { x: -45, y: -17 }, wake: 1.5,
+        energy: "Air trips over the raised edges and breaks into eddies that carry energy away.",
+        symptom: "Slower cruise for the same thrust, or more fuel to keep the speed."
+      },
+      {
+        id: "fasteners", name: "Protruding fasteners / rough paint / corrosion", effect: "Skin friction drag up",
+        dragName: "Skin-friction drag",
+        parasite: [0.02, 0.04, 0.07],
+        where: { x: 45, y: -17 }, wake: 1,
+        energy: "Each bump stirs the thin layer of air next to the skin, turning engine work into heat and turbulence.",
+        symptom: "A small but constant extra fuel burn on every flight."
+      },
+      {
+        id: "panel", name: "Misaligned or open panel / missing fairing", effect: "Form drag up (a noticeable jump)",
+        dragName: "Form drag",
+        parasite: [0.15, 0.28, 0.42],
+        where: { x: -80, y: 14 }, wake: 2,
+        energy: "The air can't follow the shape, so a big turbulent wake forms behind the panel.",
+        symptom: "Clearly slower for the same thrust and much higher fuel flow; possible buffet or extra noise."
+      },
+      {
+        id: "leading", name: "Damaged leading edge or ice", effect: "Lift down, drag up, stalls at a lower angle",
+        dragName: "Drag",
+        parasite: [0.08, 0.15, 0.22], liftLoss: [0.05, 0.10, 0.18], stallDeg: [2, 4, 6],
+        where: { x: 25, y: 7 }, wake: 2,
+        energy: "The airflow breaks away early from the damaged edge, so the wing wastes energy in turbulence instead of making lift.",
+        symptom: "Higher stall speed and an earlier stall; higher nose attitude and more fuel at cruise."
+      },
+      {
+        id: "rigging", name: "Flap or control mis-rigging", effect: "Induced drag up; the aircraft needs trim",
+        dragName: "Trim drag",
+        parasite: [0.01, 0.02, 0.03], induced: [0.4, 0.8, 1.3], trimDeg: [1, 2, 3.5],
+        where: { x: -40, y: 14 }, wake: 1.3,
+        energy: "Uneven lift along the wing makes stronger wingtip vortices, and the trim deflection adds its own drag.",
+        symptom: "The aircraft wants to roll or pitch; the pilot has to hold the controls or wind on trim."
+      },
+      {
+        id: "equipment", name: "Extra equipment installed", effect: "Weight up, so more lift and more drag are needed",
+        dragName: "Drag of mounts and antennas",
+        parasite: [0.01, 0.02, 0.04], weight: [0.03, 0.06, 0.10],
+        where: { x: 70, y: 18 }, wake: 1.2,
+        energy: "Making the extra lift costs energy (more induced drag), and every climb has to lift the extra weight.",
+        symptom: "Higher stall speed, slower climb, and more fuel for the same flight."
+      }
+    ];
+    const SEVERITY_NAMES = ["Light", "Moderate", "Severe"];
 
     // Gauge ranges [min, max]
     const GAUGES = {
@@ -484,31 +683,92 @@
 
     // The lift coefficient is stored relative to cruise: 1 = cruise wing angle,
     // 2 = twice the cruise lift coefficient (and twice the angle), and so on.
-    //
-    // Slower than the "minimum drag speed", induced drag rises faster than shape
-    // drag falls. The Hold altitude pilot won't fly slower than this, so the
-    // wing angle is capped at the matching value.
-    const MAX_LIFT_FACTOR = Math.sqrt(AIRCRAFT.parasiteDragKN / AIRCRAFT.inducedDragKN);
     const MIN_LIFT_FACTOR = 0.2;
+
+    // The aircraft as it is now: the clean values changed by every active defect.
+    function effectiveAircraft(active) {
+      const a = {
+        weight: AIRCRAFT.weightKN,
+        parasite: AIRCRAFT.parasiteDragKN,
+        induced: AIRCRAFT.inducedDragKN,
+        liftEff: 1,                          // 1 = clean wing; 0.9 = 10% less lift at the same angle
+        stallDeg: AIRCRAFT.stallAngleDeg,
+        trimDeg: 0
+      };
+      active.forEach(function (x) {
+        const d = x.defect, i = x.severity - 1;
+        if (d.parasite) a.parasite += AIRCRAFT.parasiteDragKN * d.parasite[i];
+        if (d.induced) a.induced += AIRCRAFT.inducedDragKN * d.induced[i];
+        if (d.liftLoss) a.liftEff *= 1 - d.liftLoss[i];
+        if (d.weight) a.weight += AIRCRAFT.weightKN * d.weight[i];
+        if (d.stallDeg) a.stallDeg -= d.stallDeg[i];
+        if (d.trimDeg) a.trimDeg += d.trimDeg[i];
+      });
+      return a;
+    }
+
+    const CLEAN = effectiveAircraft([]);
+    let ac = CLEAN;                          // the current aircraft; changed by the Hangar Condition panel
+
+    // Wing angle factor that makes lift = weight in level flight at cruise speed.
+    function trimLiftFactor(a) {
+      return a.weight / (AIRCRAFT.weightKN * a.liftEff);
+    }
+
+    // Slower than the "minimum drag speed", induced drag rises faster than shape
+    // drag falls. The Hold altitude pilot won't fly slower than this (or closer
+    // than 10% to the stall angle), so the wing angle is capped here.
+    function maxLiftFactor(a) {
+      return Math.min(Math.sqrt(a.parasite / a.induced),
+                      0.9 * a.stallDeg / AIRCRAFT.cruiseAngleOfAttackDeg);
+    }
+
+    // Steady level flight at cruise speed: the numbers behind the
+    // Defect → Force change → Energy loss → Symptom chain.
+    function cruiseFigures(a) {
+      const c = trimLiftFactor(a);
+      const induced = a.induced * c * c;
+      const drag = a.parasite + induced;
+      const thrustPercent = drag / AIRCRAFT.maxThrustKN * 100;
+      const stallFactor = a.stallDeg / AIRCRAFT.cruiseAngleOfAttackDeg;
+      return {
+        liftFactor: c,
+        induced: induced,
+        drag: drag,
+        thrustPercent: thrustPercent,
+        fuel: fuelFlowKgH({ thrustPercent: Math.min(thrustPercent, 100) }),
+        stallSpeedKt: SETTINGS.cruiseSpeedKt * Math.sqrt(a.weight / (AIRCRAFT.weightKN * a.liftEff * stallFactor))
+      };
+    }
 
     /* =======================================================================
        3. THE TEACHING FORMULAS
        v = speed ÷ cruise speed, c = lift coefficient ÷ cruise lift coefficient
-         Lift    = Weight × v² × c
+         Lift    = Clean weight × v² × c × wing efficiency
          Drag    = (shape drag × v²) + (induced drag × c² × v²)
          Thrust  = max thrust × slider %
        In level flight c = 1 ÷ v², so induced drag = induced drag at cruise ÷ v²:
        it gets BIGGER as the aircraft slows down.
+       Defects raise the drag values, lower the wing efficiency or add weight.
        ======================================================================= */
 
-    function forces(s) {
+    function forces(s, a) {
+      a = a || ac;
       const v = s.speed / CRUISE_SPEED;
       return {
-        lift: AIRCRAFT.weightKN * v * v * s.liftFactor,
-        drag: (AIRCRAFT.parasiteDragKN + AIRCRAFT.inducedDragKN * s.liftFactor * s.liftFactor) * v * v,
+        lift: AIRCRAFT.weightKN * v * v * s.liftFactor * a.liftEff,
+        drag: (a.parasite + a.induced * s.liftFactor * s.liftFactor) * v * v,
         thrust: AIRCRAFT.maxThrustKN * s.thrustPercent / 100,
-        weight: AIRCRAFT.weightKN
+        weight: a.weight
       };
+    }
+
+    // The clean aircraft at the same speed and flight path, trimmed for it:
+    // the grey "ghost" arrows.
+    function cleanForces(s) {
+      const v = s.speed / CRUISE_SPEED;
+      const c = clamp(Math.cos(s.pathAngle) / (v * v), MIN_LIFT_FACTOR, maxLiftFactor(CLEAN));
+      return forces({ speed: s.speed, liftFactor: c, thrustPercent: s.thrustPercent }, CLEAN);
     }
 
     function angleOfAttackDeg(s) {
@@ -539,7 +799,7 @@
         speed: CRUISE_SPEED,                       // m/s along the flight path
         pathAngle: 0,                              // climb (+) / descent (−) angle, radians
         altitude: SETTINGS.startAltitudeFt * FT,   // m
-        liftFactor: 1,                             // wing lift coefficient ÷ cruise value
+        liftFactor: trimLiftFactor(ac),            // wing lift coefficient ÷ cruise value (trimmed for the hangar condition)
         thrustPercent: SETTINGS.cruiseThrustPercent,
         mode: "none",                              // "none", "altitude" or "speed"
         targetAltitude: SETTINGS.startAltitudeFt * FT,
@@ -586,13 +846,14 @@
       const wantedPathRate = CONTROL.pathGain * (targetPath - s.pathAngle);
       const liftOverWeight = Math.cos(s.pathAngle) + s.speed / G * wantedPathRate;
       const v = s.speed / CRUISE_SPEED;
-      const wanted = liftOverWeight / (v * v);
+      const wanted = liftOverWeight * trimLiftFactor(ac) / (v * v);
+      const maxFactor = maxLiftFactor(ac);
 
-      s.liftFactor = clamp(wanted, MIN_LIFT_FACTOR, MAX_LIFT_FACTOR);
+      s.liftFactor = clamp(wanted, MIN_LIFT_FACTOR, maxFactor);
 
       // Hold altitude has failed if the wing is at its limit and height is being lost.
       s.cannotHold = s.mode === "altitude" &&
-        wanted >= MAX_LIFT_FACTOR &&
+        wanted >= maxFactor &&
         s.altitude < s.targetAltitude - 15;
     }
 
@@ -643,10 +904,33 @@
       if (s.cannotHold) {
         lines.push({ warn: true, text: "Cannot hold altitude: there isn't enough thrust. Flying any slower would only add drag, so the aircraft has to descend." });
       }
+      const aoa = angleOfAttackDeg(s);
+      if (aoa >= ac.stallDeg) {
+        lines.push({ warn: true, text: "Stall: the wing angle (" + aoa.toFixed(1) + "°) is past this wing's stall angle (" + ac.stallDeg + "°)." });
+      } else if (aoa > ac.stallDeg - 2) {
+        lines.push({ warn: true, text: "Close to the stall: this wing stalls at " + ac.stallDeg + "° and the wing angle is " + aoa.toFixed(1) + "°." });
+      }
 
       if (s.time === 0) {
-        lines.push({ text: "The aircraft is in steady level cruise: thrust equals drag and lift equals weight." });
-        lines.push({ text: "Move the thrust slider, choose a response, then press Play." });
+        const defects = activeDefects().length;
+        if (defects === 0) {
+          lines.push({ text: "The aircraft is in steady level cruise: thrust equals drag and lift equals weight." });
+          lines.push({ text: "Move the thrust slider, choose a response, then press Play." });
+          return lines;
+        }
+        const cruise = cruiseFigures(ac);
+        lines.push({ text: "Hangar condition: " + defects + (defects === 1 ? " defect" : " defects") +
+          ". The aircraft is trimmed so lift equals weight at cruise speed" +
+          (s.liftFactor > 1.02 ? ", but the wing needs a higher angle (" + aoa.toFixed(1) + "° instead of " +
+            AIRCRAFT.cruiseAngleOfAttackDeg + "°) to make enough lift." : ".") });
+        if (f.drag > f.thrust + 0.5) {
+          lines.push({ text: "Drag is now " + Math.round(f.drag) + " kN but thrust is only " + Math.round(f.thrust) +
+            " kN. Press Play and the aircraft will slow down or descend: the defects are using up its energy. " +
+            (cruise.thrustPercent <= 100 ? "Holding cruise speed needs " + Math.ceil(cruise.thrustPercent) + "% thrust."
+                                         : "Even full thrust can't hold cruise speed.") });
+        } else {
+          lines.push({ text: "Thrust still covers drag. Move the thrust slider, choose a response, then press Play." });
+        }
         return lines;
       }
 
@@ -694,10 +978,11 @@
     const CG = { x: 380, y: 210 };     // aircraft centre of gravity in the picture
 
     // Point an arrow from the centre of gravity. angleDeg is measured
-    // anticlockwise from "forward"; startGap leaves room for the aircraft.
-    function drawArrow(name, angleDeg, forceKN, scale, startGap) {
+    // anticlockwise from "forward"; startGap leaves room for the aircraft;
+    // sideOffset moves it sideways (used to put the ghost beside the real arrow).
+    // Returns the distance from the centre of gravity to the tip.
+    function placeArrow(group, angleDeg, forceKN, scale, startGap, sideOffset) {
       const length = clamp(forceKN * scale, 0, ARROW_SCALE.maxLength);
-      const group = el("arrow-" + name);
       const line = group.querySelector("line");
       const head = group.querySelector("polygon");
       const visible = length > 4;
@@ -710,13 +995,93 @@
       line.setAttribute("y2", 0);
       head.setAttribute("points", tip + ",0 " + (tip - 22) + ",-14 " + (tip - 22) + ",14");
       // SVG rotates clockwise with y pointing down, hence the minus sign.
-      group.setAttribute("transform", "translate(" + CG.x + " " + CG.y + ") rotate(" + (-angleDeg) + ")");
+      group.setAttribute("transform", "translate(" + CG.x + " " + CG.y + ") rotate(" + (-angleDeg) + ") translate(0 " + sideOffset + ")");
+      return tip;
+    }
+
+    function drawArrow(name, angleDeg, forceKN, scale, startGap) {
+      const tip = placeArrow(el("arrow-" + name), angleDeg, forceKN, scale, startGap, 0);
 
       // Label just beyond the arrow tip
       const labelDistance = tip + (name === "lift" || name === "weight" ? 26 : 48);
       const label = el("label-" + name);
       label.setAttribute("x", CG.x + labelDistance * Math.cos(angleDeg * DEG));
       label.setAttribute("y", CG.y - labelDistance * Math.sin(angleDeg * DEG) + 9);
+    }
+
+    // Grey ghost arrow for the clean aircraft, drawn just beside the real one.
+    function drawGhost(name, angleDeg, forceKN, scale, startGap, show) {
+      const group = el("ghost-" + name);
+      placeArrow(group, angleDeg, forceKN, scale, startGap, 18);
+      if (!show) group.style.display = "none";
+    }
+
+    // Defect drawings, numbered markers and the turbulent airflow behind them.
+    // Drawn inside the aircraft group, so they move with it.
+    const SVG_NS = "http://www.w3.org/2000/svg";
+    function svgEl(tag, attrs) {
+      const node = document.createElementNS(SVG_NS, tag);
+      Object.keys(attrs).forEach(function (k) { node.setAttribute(k, attrs[k]); });
+      return node;
+    }
+
+    // A wavy line trailing backwards (to the left) from x0,y0 that gets
+    // wilder further from the defect, like a growing turbulent wake.
+    function wavePath(x0, y0, length, amplitude, phase) {
+      let d = "M" + x0 + " " + y0;
+      for (let x = 3; x <= length; x += 3) {
+        const t = x / length;
+        const y = y0 + amplitude * (0.3 + 0.7 * t) * Math.sin(x / 22 * 2 * Math.PI + phase);
+        d += " L" + (x0 - x) + " " + y.toFixed(1);
+      }
+      return d;
+    }
+
+    function drawDefects() {
+      const layer = el("defect-layer");
+      layer.replaceChildren();
+      const wakes = svgEl("g", { class: "wake" });
+      const parts = svgEl("g", {});
+      const markers = svgEl("g", {});
+      layer.append(wakes, parts, markers);
+
+      activeDefects().forEach(function (x) {
+        const d = x.defect, sev = x.severity, p = d.where;
+
+        // Turbulent airflow: more, longer and wilder lines for worse defects.
+        const lineCount = sev + 1;
+        const length = Math.min(150, 30 + 22 * sev * d.wake);
+        const amplitude = 1 + 0.7 * sev * d.wake;
+        for (let k = 0; k < lineCount; k++) {
+          wakes.appendChild(svgEl("path", {
+            d: wavePath(p.x - 6, p.y + (k - (lineCount - 1) / 2) * 4, length, amplitude, k * 0.5)
+          }));
+        }
+
+        // Simple drawings of the defects you can see from the side
+        if (d.id === "patch") {
+          parts.appendChild(svgEl("rect", { class: "defect-part", x: p.x - 10, y: p.y - 3, width: 20, height: 2 + sev, rx: 1 }));
+        } else if (d.id === "panel") {
+          const drop = 3 + sev * 3;   // how far the panel hangs open
+          parts.appendChild(svgEl("path", { class: "defect-part",
+            d: "M" + (p.x - 10) + " " + (p.y - 1) + " L" + (p.x + 10) + " " + (p.y - 1) +
+               " L" + (p.x + 6) + " " + (p.y - 1 + drop) + " L" + (p.x - 12) + " " + (p.y - 1 + drop - 2) + " Z" }));
+        } else if (d.id === "equipment") {
+          const width = 14 + sev * 6;   // bigger pod for more equipment
+          parts.appendChild(svgEl("rect", { class: "defect-part", x: p.x - width / 2, y: p.y - 6, width: width, height: 8, rx: 4 }));
+        }
+
+        const marker = svgEl("g", { class: "marker", transform: "translate(" + p.x + " " + p.y + ")" });
+        const title = svgEl("title", {});
+        title.textContent = d.name + " (" + SEVERITY_NAMES[sev - 1] + ")";
+        const number = svgEl("text", { y: 4, "text-anchor": "middle" });
+        number.textContent = DEFECTS.indexOf(d) + 1;
+        marker.append(title, svgEl("circle", { r: 8 }), number);
+        markers.appendChild(marker);
+      });
+
+      // Mis-rigging: the elevator sits deflected to trim the aircraft (drawn exaggerated).
+      el("elevator").setAttribute("transform", "rotate(" + (ac.trimDeg * 6) + " -138 8)");
     }
 
     // Clouds drift past to show movement through the air
@@ -810,6 +1175,15 @@
 
       // Aircraft and arrows
       el("plane").setAttribute("transform", "translate(" + CG.x + " " + CG.y + ") rotate(" + (-pitchDeg) + ")");
+      el("scene").classList.toggle("running", s.running);
+
+      // Ghosts first, so the real arrows are drawn over them where they touch
+      const showGhosts = activeDefects().length > 0;
+      const clean = cleanForces(s);
+      drawGhost("lift", 90 + pathDeg, clean.lift, ARROW_SCALE.liftWeight, 30, showGhosts);
+      drawGhost("weight", -90, clean.weight, ARROW_SCALE.liftWeight, 30, showGhosts);
+      drawGhost("drag", 180 + pathDeg, clean.drag, ARROW_SCALE.thrustDrag, 145, showGhosts);
+      el("ghost-note").hidden = !showGhosts;
       drawArrow("lift", 90 + pathDeg, f.lift, ARROW_SCALE.liftWeight, 30);      // at right angles to the flight path
       drawArrow("weight", -90, f.weight, ARROW_SCALE.liftWeight, 30);           // always straight down
       drawArrow("thrust", pitchDeg, f.thrust, ARROW_SCALE.thrustDrag, 128);     // along the engine line
@@ -825,7 +1199,9 @@
 
       const pathText = Math.abs(pathDeg) < 0.1 ? "level" :
         (pathDeg < 0 ? "descending " : "climbing ") + Math.abs(pathDeg).toFixed(1) + "°";
-      el("angles").textContent = "Wing angle (angle of attack): " + aoa.toFixed(1) + "°  ·  Flight path: " + pathText;
+      el("angles").textContent = "Wing angle (angle of attack): " + aoa.toFixed(1) + "° (stalls at " + ac.stallDeg + "°)" +
+        "  ·  Flight path: " + pathText +
+        (ac.trimDeg > 0 ? "  ·  Elevator trim needed: " + ac.trimDeg + "°" : "");
 
       // Gauges
       setSpeedGauge(s.speed / KT);
@@ -877,7 +1253,159 @@
     }
 
     /* =======================================================================
-       9. CONTROLS AND MAIN LOOP
+       9. HANGAR CONDITION PANEL
+       ======================================================================= */
+
+    const hangar = {};   // defect id → { on, severity (1 = Light, 2 = Moderate, 3 = Severe) }
+
+    function activeDefects() {
+      return DEFECTS
+        .filter(function (d) { return hangar[d.id] && hangar[d.id].on; })
+        .map(function (d) { return { defect: d, severity: hangar[d.id].severity }; });
+    }
+
+    function buildHangar() {
+      const box = el("defects");
+      DEFECTS.forEach(function (d, i) {
+        hangar[d.id] = { on: false, severity: 2 };
+        const card = document.createElement("div");
+        card.className = "defect";
+        card.innerHTML =
+          '<label class="defect-top"><input type="checkbox" role="switch">' +
+            '<span class="defect-num" aria-hidden="true">' + (i + 1) + '</span><span>' + d.name + '</span></label>' +
+          '<p class="defect-effect">' + d.effect + '</p>' +
+          '<input type="range" min="1" max="3" step="1" value="2" disabled aria-label="How bad: ' + d.name + '">' +
+          '<div class="sev-labels" aria-hidden="true"><span>Light</span><span>Moderate</span><span>Severe</span></div>';
+        box.appendChild(card);
+
+        const toggle = card.querySelector('input[type="checkbox"]');
+        const slider = card.querySelector('input[type="range"]');
+        const labels = card.querySelectorAll(".sev-labels span");
+
+        function show() {
+          const h = hangar[d.id];
+          toggle.checked = h.on;
+          slider.disabled = !h.on;
+          slider.value = h.severity;
+          slider.setAttribute("aria-valuetext", SEVERITY_NAMES[h.severity - 1]);
+          card.classList.toggle("on", h.on);
+          labels.forEach(function (l, k) { l.classList.toggle("current", k === h.severity - 1); });
+        }
+        toggle.addEventListener("change", function () { hangar[d.id].on = toggle.checked; show(); hangarChanged(); });
+        slider.addEventListener("input", function () { hangar[d.id].severity = Number(slider.value); show(); hangarChanged(); });
+        card.show = show;
+        show();
+      });
+
+      el("all-clean").addEventListener("click", function () {
+        DEFECTS.forEach(function (d) { hangar[d.id].on = false; });
+        box.querySelectorAll(".defect").forEach(function (card) { card.show(); });
+        hangarChanged();
+      });
+    }
+
+    function hangarChanged() {
+      ac = effectiveAircraft(activeDefects());
+      // Before Play, re-trim so the aircraft starts in level flight (lift = weight).
+      if (state.time === 0) state.liftFactor = trimLiftFactor(ac);
+      drawDefects();
+      renderChain();
+      renderThrustHint();
+      render();
+    }
+
+    function renderThrustHint() {
+      const cruise = cruiseFigures(ac);
+      el("thrust-hint").innerHTML = activeDefects().length === 0
+        ? "Cruise setting is <strong>60%</strong> (thrust = drag). Slide left to cut thrust."
+        : "Clean cruise setting is 60%. With these defects, holding cruise speed needs " +
+          (cruise.thrustPercent <= 100 ? "<strong>" + Math.ceil(cruise.thrustPercent) + "%</strong>."
+                                       : "<strong>more than full thrust</strong>.");
+    }
+
+    // One row of the chain for one defect (or for all of them together).
+    function chainRow(nameHtml, forceItems, energyHtml, symptomHtml, extraClass) {
+      return '<div class="chain-row' + (extraClass ? " " + extraClass : "") + '">' +
+        '<div><span class="step-name">Defect</span>' + nameHtml + '</div>' +
+        '<div><span class="step-name">Force change</span><ul><li>' + forceItems.join("</li><li>") + '</li></ul></div>' +
+        '<div><span class="step-name">Energy loss</span>' + energyHtml + '</div>' +
+        '<div><span class="step-name">Symptom</span>' + symptomHtml + '</div>' +
+      '</div>';
+    }
+
+    function renderChain() {
+      const box = el("chain");
+      const active = activeDefects();
+      if (active.length === 0) {
+        box.innerHTML = '<p class="chain-empty">The aircraft is clean. Switch on a defect above to see how it leads to a symptom.</p>';
+        return;
+      }
+
+      const clean = cruiseFigures(CLEAN);
+      const kN = function (n) { return (Math.round(n * 10) / 10).toLocaleString(); };
+
+      // Numbers shared by every row: total drag, power lost, thrust and fuel needed, stall speed.
+      function totals(a) {
+        const c = cruiseFigures(a);
+        const extraDrag = c.drag - clean.drag;
+        return {
+          drag: "<strong>Total drag " + Math.round(clean.drag) + " &rarr; " + kN(c.drag) + " kN (+" +
+                Math.round(extraDrag / clean.drag * 100) + "%)</strong>",
+          // power = force × speed: kN × m/s = kW
+          energy: "About <strong>" + (Math.round(extraDrag * CRUISE_SPEED / 10) * 10).toLocaleString() +
+                  " kW</strong> more engine power is lost to the air at cruise speed.",
+          symptom: (c.thrustPercent <= 100
+                     ? "Holding cruise needs <strong>" + Math.ceil(c.thrustPercent) + "% thrust</strong> instead of 60% (about +" +
+                       Math.round(c.fuel - clean.fuel).toLocaleString() + " kg of fuel per hour)."
+                     : "<strong>Can't hold cruise speed even at full thrust.</strong>") +
+                   (c.stallSpeedKt - clean.stallSpeedKt >= 1
+                     ? " Stall speed " + Math.round(clean.stallSpeedKt) + " &rarr; <strong>" + Math.round(c.stallSpeedKt) + " kt</strong>."
+                     : ""),
+          figures: c
+        };
+      }
+
+      let html = '<div class="chain-row chain-head" aria-hidden="true">' +
+        '<div>Defect</div><div>Force change</div><div>Energy loss</div><div>Symptom</div></div>';
+      active.forEach(function (x) {
+        const d = x.defect, i = x.severity - 1;
+        const a = effectiveAircraft([x]);
+        const t = totals(a);
+        const items = [];
+        if (a.parasite - CLEAN.parasite > 0.05) items.push(d.dragName + " +" + kN(a.parasite - CLEAN.parasite) + " kN");
+        if (d.liftLoss) items.push("Lift &minus;" + Math.round(d.liftLoss[i] * 100) + "% at the same wing angle");
+        if (d.weight) {
+          const extra = Math.round(a.weight - CLEAN.weight);
+          items.push("Weight +" + extra + " kN, so lift needed +" + extra + " kN");
+        }
+        const extraInduced = t.figures.induced - clean.induced;
+        if (extraInduced >= 0.3) items.push("Induced drag +" + kN(extraInduced) + " kN");
+        if (d.stallDeg) items.push("Stalls at " + a.stallDeg + "&deg; instead of " + CLEAN.stallDeg + "&deg;");
+        if (d.trimDeg) items.push("Needs " + a.trimDeg + "&deg; of elevator trim");
+        items.push(t.drag);
+
+        html += chainRow(
+          '<span class="defect-tag">' + (DEFECTS.indexOf(d) + 1) + '.</span> ' + d.name +
+            ' <em>(' + SEVERITY_NAMES[i] + ')</em>',
+          items,
+          d.energy + " " + t.energy,
+          d.symptom + " " + t.symptom);
+      });
+
+      if (active.length > 1) {
+        const t = totals(ac);
+        const items = [t.drag];
+        if (ac.weight > CLEAN.weight) items.push("Weight " + Math.round(CLEAN.weight) + " &rarr; " + Math.round(ac.weight) + " kN");
+        items.push("Wing angle at cruise " + AIRCRAFT.cruiseAngleOfAttackDeg + "&deg; &rarr; " +
+          (AIRCRAFT.cruiseAngleOfAttackDeg * t.figures.liftFactor).toFixed(1) + "&deg;");
+        if (ac.stallDeg < CLEAN.stallDeg) items.push("Stalls at " + ac.stallDeg + "&deg; instead of " + CLEAN.stallDeg + "&deg;");
+        html += chainRow("<strong>All " + active.length + " defects together</strong>", items, t.energy, t.symptom, "total");
+      }
+      box.innerHTML = html;
+    }
+
+    /* =======================================================================
+       10. CONTROLS AND MAIN LOOP
        ======================================================================= */
 
     el("thrust").addEventListener("input", function (e) {
@@ -923,7 +1451,7 @@
     }
 
     /* =======================================================================
-       10. SMALL HELPERS
+       11. SMALL HELPERS
        ======================================================================= */
 
     function clamp(x, lo, hi) { return Math.min(hi, Math.max(lo, x)); }
@@ -942,7 +1470,8 @@
     // Start
     resetState();
     makeClouds();
-    render();
+    buildHangar();
+    hangarChanged();
     requestAnimationFrame(frame);
   </script>
 </body>

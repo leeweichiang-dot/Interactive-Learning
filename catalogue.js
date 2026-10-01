@@ -63,7 +63,7 @@ window.CATALOGUE = {
       module: "flight",
       type: "tool",
       title: "Cut the Thrust: Clean vs Defective Aircraft",
-      summary: "Add hangar defects, reduce the thrust, and see how the aircraft slows, descends or holds altitude, with live force arrows, gauges and energy. Switch to Helicopter to explore hover power, ground effect and rotor defects."
+      summary: "Add hangar defects, reduce the thrust, and see how the aircraft slows, descends or holds altitude, with live force arrows, gauges and energy. Switch to Helicopter to explore hover power, ground effect and rotor defects. Includes three training activities: Predict First, Mystery Aircraft and Fix & Verify."
     }
   ]
 };

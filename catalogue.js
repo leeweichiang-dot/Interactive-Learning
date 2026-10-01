@@ -28,6 +28,11 @@ window.CATALOGUE = {
       code: "DEMO 101",
       title: "Sample Module",
       description: "Example items showing each kind of content. Copy one as the starting point for a new item."
+    },
+    {
+      id: "flight",
+      title: "Principles of Flight",
+      description: "How lift, weight, thrust and drag work together, explained in plain English for maintenance trainees."
     }
   ],
 
@@ -52,6 +57,13 @@ window.CATALOGUE = {
       type: "quiz",
       title: "Binary Check-up",
       summary: "Five quick questions with instant feedback. Nothing is saved."
+    },
+    {
+      id: "cut-the-thrust",
+      module: "flight",
+      type: "tool",
+      title: "Cut the Thrust: Clean vs Defective Aircraft",
+      summary: "Reduce the thrust and see how the aircraft slows, descends or holds altitude, with live force arrows, gauges and energy."
     }
   ]
 };

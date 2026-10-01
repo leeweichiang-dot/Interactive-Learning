@@ -1,0 +1,949 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cut the Thrust: Clean vs Defective Aircraft</title>
+  <style>
+    /* =====================================================================
+       COLOURS AND THEME
+       Change colours here. Dark-mode values are in the @media block below.
+       ===================================================================== */
+    :root {
+      color-scheme: light dark;
+      --bg: #f6f6f4;
+      --surface: #ffffff;
+      --text: #1c1c1e;
+      --muted: #5d6167;
+      --border: #dadad6;
+      --accent: #2553b8;
+      --on-accent: #ffffff;
+      --warning-bg: #fff3d6;
+      --warning-text: #7a4b00;
+
+      /* Force arrow colours */
+      --lift: #2563eb;
+      --weight: #8a5a00;
+      --thrust: #15803d;
+      --drag: #c2410c;
+
+      /* Energy bar colours */
+      --potential: #7c3aed;
+      --kinetic: #0e7490;
+
+      /* Aircraft view */
+      --sky-top: #cfe3fb;
+      --sky-bottom: #eef5fd;
+      --cloud: #ffffff;
+      --plane: #e9ecf1;
+      --plane-line: #4b5563;
+
+      --radius: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141517;
+        --surface: #1d1f23;
+        --text: #ececee;
+        --muted: #a9adb4;
+        --border: #34373d;
+        --accent: #93b1ff;
+        --on-accent: #10131a;
+        --warning-bg: #3a2a08;
+        --warning-text: #ffd27a;
+
+        --lift: #7aa7ff;
+        --weight: #e0b25c;
+        --thrust: #5fd38a;
+        --drag: #ff8f5c;
+
+        --potential: #b794ff;
+        --kinetic: #4fc6dd;
+
+        --sky-top: #0f2240;
+        --sky-bottom: #1b3357;
+        --cloud: #3a4d6b;
+        --plane: #c9ced6;
+        --plane-line: #1f2937;
+      }
+    }
+
+    /* =====================================================================
+       PAGE LAYOUT
+       ===================================================================== */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 18px;            /* large, clear base text size */
+      line-height: 1.5;
+    }
+
+    a { color: var(--accent); }
+    :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 48px; }
+
+    .back { display: inline-block; margin-bottom: 12px; font-size: 1rem; }
+
+    h1 { margin: 0 0 4px; font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.2; }
+    h2 { margin: 0 0 12px; font-size: 1.2rem; }
+
+    .subtitle { margin: 0 0 20px; color: var(--muted); }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+    }
+
+    /* Two columns on wide screens (picture | controls); one column on phones */
+    .layout {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    @media (min-width: 900px) {
+      .layout { grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr); }
+    }
+
+    /* =====================================================================
+       AIRCRAFT VIEW
+       ===================================================================== */
+    .view svg { display: block; width: 100%; height: auto; border-radius: 8px; }
+    .sky-top { stop-color: var(--sky-top); }
+    .sky-bottom { stop-color: var(--sky-bottom); }
+    .cloud { fill: var(--cloud); opacity: 0.85; }
+    .plane-body { fill: var(--plane); stroke: var(--plane-line); stroke-width: 2.5; stroke-linejoin: round; }
+    .plane-detail { fill: var(--plane-line); }
+    .arrow-label { font: 700 26px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; paint-order: stroke; stroke: var(--sky-bottom); stroke-width: 6px; }
+
+    .lift   { color: var(--lift); }
+    .weight { color: var(--weight); }
+    .thrust { color: var(--thrust); }
+    .drag   { color: var(--drag); }
+
+    .arrow line { stroke: currentColor; stroke-width: 9; stroke-linecap: round; }
+    .arrow polygon { fill: currentColor; }
+
+    .arrow-note { margin: 8px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    /* Force comparison rows under the picture */
+    .forces {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .compare {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: center;
+      gap: 4px 10px;
+      padding: 10px;
+      background: var(--bg);
+      border-radius: 8px;
+      font-variant-numeric: tabular-nums;
+    }
+    .compare strong { font-size: 1.05rem; }
+    .compare .sign { font-size: 1.4rem; font-weight: 700; }
+
+    .angles {
+      margin: 10px 0 0;
+      color: var(--muted);
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* "What's happening" plain-English explanation */
+    .explain { margin-top: 16px; }
+    .explain p { margin: 0 0 8px; }
+    .explain p:last-child { margin-bottom: 0; }
+    .warning {
+      padding: 10px 12px;
+      background: var(--warning-bg);
+      border-radius: 8px;
+      color: var(--warning-text);
+      font-weight: 700;
+    }
+
+    /* =====================================================================
+       CONTROLS
+       ===================================================================== */
+    .controls { display: grid; gap: 22px; align-content: start; }
+
+    .thrust-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .thrust-value { font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+    input[type="range"] {
+      width: 100%;
+      height: 44px;              /* big touch target */
+      margin: 4px 0 0;
+      accent-color: var(--thrust);
+    }
+    .hint { margin: 2px 0 0; color: var(--muted); font-size: 0.9rem; }
+
+    button {
+      min-height: 48px;
+      padding: 10px 16px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.4; cursor: default; }
+
+    .modes { display: grid; gap: 8px; }
+    .modes button { text-align: left; }
+    .modes button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+    }
+    .mode-hint { display: block; font-size: 0.85rem; font-weight: 400; opacity: 0.85; }
+
+    .playback { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .playback .play { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+
+    .time-speed { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px; color: var(--muted); }
+    .time-speed button { min-height: 40px; padding: 6px 12px; font-size: 0.9rem; }
+    .time-speed button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+
+    .clock { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
+
+    /* =====================================================================
+       GAUGES AND ENERGY BAR
+       ===================================================================== */
+    .instruments { margin-top: 16px; }
+
+    .gauges {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));   /* two per row on phones */
+      gap: 12px;
+    }
+    .gauge { text-align: center; }
+    .gauge svg { display: block; width: 100%; max-width: 220px; height: auto; margin: 0 auto; }
+    .gauge-track { fill: none; stroke: var(--border); stroke-width: 14; stroke-linecap: round; }
+    .gauge-fill  { fill: none; stroke: var(--accent); stroke-width: 14; stroke-linecap: round; }
+    .gauge-needle { stroke: var(--text); stroke-width: 4; stroke-linecap: round; }
+    .gauge-hub { fill: var(--text); }
+    .gauge-end { fill: var(--muted); font: 13px system-ui, sans-serif; }
+    .gauge-name { margin: 0; font-weight: 700; }
+    .gauge-value { margin: 0; font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .gauge-unit { display: block; color: var(--muted); font-size: 0.95rem; font-weight: 400; line-height: 1.2; }
+
+    .energy { margin-top: 20px; }
+    .energy-track {
+      display: flex;
+      height: 36px;
+      overflow: hidden;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .energy-track div { height: 100%; transition: width 0.1s linear; }
+    .energy-pe { background: var(--potential); }
+    .energy-ke { background: var(--kinetic); }
+    .energy-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+      font-variant-numeric: tabular-nums;
+    }
+    .swatch { display: inline-block; width: 14px; height: 14px; margin-right: 6px; border-radius: 3px; vertical-align: -1px; }
+
+    .disclaimer {
+      margin: 20px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .energy-track div { transition: none; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="../../../module.html?m=flight">&larr; Principles of Flight</a>
+    <h1>Cut the Thrust: Clean vs Defective Aircraft</h1>
+    <p class="subtitle">Phase 1: a clean fixed-wing aircraft. Reduce the thrust, choose how the aircraft responds, and watch what happens.</p>
+
+    <div class="layout">
+      <!-- ============================ AIRCRAFT VIEW ============================ -->
+      <section class="panel view" aria-labelledby="view-title">
+        <h2 id="view-title">The four forces</h2>
+
+        <svg id="scene" viewBox="0 0 760 420" role="img"
+             aria-label="Side view of the aircraft with arrows for lift, weight, thrust and drag. Arrow lengths show the size of each force.">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" class="sky-top"></stop>
+              <stop offset="1" class="sky-bottom"></stop>
+            </linearGradient>
+          </defs>
+          <rect width="760" height="420" fill="url(#sky)"></rect>
+          <g id="clouds"></g>
+
+          <!-- Aircraft drawn nose-right, centred on (0,0) = centre of gravity -->
+          <g id="plane">
+            <!-- Fuselage -->
+            <path class="plane-body" d="M-115 -6 C-95 -16 60 -18 92 -14 C108 -12 118 -6 120 0 C118 6 106 12 90 13 L-90 13 C-104 11 -112 6 -115 -6 Z"></path>
+            <!-- Tail fin -->
+            <path class="plane-body" d="M-112 -6 L-128 -58 L-104 -58 L-74 -12 Z"></path>
+            <!-- Tailplane -->
+            <path class="plane-body" d="M-118 0 L-138 8 L-104 8 L-94 2 Z"></path>
+            <!-- Wing (seen from the side) -->
+            <path class="plane-body" d="M-30 4 L28 2 L18 12 L-36 12 Z"></path>
+            <!-- Engine under the wing -->
+            <path class="plane-body" d="M-6 14 L36 14 C42 14 44 24 36 26 L-6 26 Z"></path>
+            <!-- Cockpit windows -->
+            <path class="plane-detail" d="M96 -11 L110 -6 L98 -5 Z"></path>
+          </g>
+
+          <!-- Force arrows. JavaScript sets their direction and length. -->
+          <g id="arrow-lift"   class="arrow lift"><line></line><polygon></polygon></g>
+          <g id="arrow-weight" class="arrow weight"><line></line><polygon></polygon></g>
+          <g id="arrow-thrust" class="arrow thrust"><line></line><polygon></polygon></g>
+          <g id="arrow-drag"   class="arrow drag"><line></line><polygon></polygon></g>
+
+          <text id="label-lift"   class="arrow-label lift"   fill="currentColor" text-anchor="middle">Lift</text>
+          <text id="label-weight" class="arrow-label weight" fill="currentColor" text-anchor="middle">Weight</text>
+          <text id="label-thrust" class="arrow-label thrust" fill="currentColor" text-anchor="middle">Thrust</text>
+          <text id="label-drag"   class="arrow-label drag"   fill="currentColor" text-anchor="middle">Drag</text>
+        </svg>
+        <p class="arrow-note">Thrust and drag arrows are drawn larger than lift and weight so they are easy to compare.</p>
+
+        <div class="forces">
+          <div class="compare">
+            <span class="thrust">Thrust <strong id="val-thrust">60</strong> kN</span>
+            <span class="sign" id="sign-td">=</span>
+            <span class="drag">Drag <strong id="val-drag">60</strong> kN</span>
+          </div>
+          <div class="compare">
+            <span class="lift">Lift <strong id="val-lift">600</strong> kN</span>
+            <span class="sign" id="sign-lw">=</span>
+            <span class="weight">Weight <strong id="val-weight">600</strong> kN</span>
+          </div>
+        </div>
+        <p class="angles" id="angles"></p>
+
+        <div class="explain" id="explain" aria-live="polite"></div>
+      </section>
+
+      <!-- ============================== CONTROLS ============================== -->
+      <section class="panel controls" aria-label="Controls">
+        <div>
+          <div class="thrust-head">
+            <h2 style="margin:0"><label for="thrust">Thrust</label></h2>
+            <span class="thrust-value" id="thrust-value">60%</span>
+          </div>
+          <input type="range" id="thrust" min="0" max="100" step="1" value="60">
+          <p class="hint">Cruise setting is <strong>60%</strong> (thrust = drag). Slide left to cut thrust.</p>
+        </div>
+
+        <div>
+          <h2>How does the aircraft respond?</h2>
+          <div class="modes" role="group" aria-label="Response">
+            <button type="button" data-mode="none" aria-pressed="true">No pilot input
+              <span class="mode-hint">Hands off: the wing angle stays where it is.</span></button>
+            <button type="button" data-mode="altitude" aria-pressed="false">Hold altitude
+              <span class="mode-hint">Raise the nose to stay at the same height.</span></button>
+            <button type="button" data-mode="speed" aria-pressed="false">Auto-speed hold
+              <span class="mode-hint">Lower the nose to keep the same speed.</span></button>
+          </div>
+        </div>
+
+        <div>
+          <h2>Simulation</h2>
+          <div class="playback">
+            <button type="button" class="play" id="play">Play</button>
+            <button type="button" id="pause">Pause</button>
+            <button type="button" id="reset">Reset</button>
+          </div>
+          <div class="time-speed" role="group" aria-label="Time speed">
+            <span>Time speed:</span>
+            <button type="button" data-speed="slow">Slow</button>
+            <button type="button" data-speed="normal">Normal</button>
+            <button type="button" data-speed="fast">Fast</button>
+          </div>
+          <p class="clock" id="clock"></p>
+        </div>
+      </section>
+    </div>
+
+    <!-- ============================ INSTRUMENTS ============================ -->
+    <section class="panel instruments" aria-labelledby="inst-title">
+      <h2 id="inst-title">Instruments</h2>
+      <div class="gauges">
+        <div class="gauge" id="gauge-speed"></div>
+        <div class="gauge" id="gauge-altitude"></div>
+        <div class="gauge" id="gauge-vs"></div>
+        <div class="gauge" id="gauge-fuel"></div>
+      </div>
+
+      <div class="energy">
+        <h2>Energy</h2>
+        <div class="energy-track" role="img" id="energy-bar" aria-label="Energy bar">
+          <div class="energy-pe" id="energy-pe"></div>
+          <div class="energy-ke" id="energy-ke"></div>
+        </div>
+        <ul class="energy-legend">
+          <li><span class="swatch energy-pe"></span>Height energy (potential): <strong id="energy-pe-val"></strong></li>
+          <li><span class="swatch energy-ke"></span>Speed energy (kinetic): <strong id="energy-ke-val"></strong></li>
+          <li>Total: <strong id="energy-total-val"></strong> of starting energy</li>
+        </ul>
+      </div>
+    </section>
+
+    <p class="disclaimer">Illustrative values – not aircraft data. Simple teaching formulas are used, and time runs faster than real life.</p>
+  </main>
+
+  <script>
+    "use strict";
+
+    /* =======================================================================
+       1. SETTINGS YOU CAN CHANGE
+       All numbers are made-up teaching values, not real aircraft data.
+       ======================================================================= */
+
+    const SETTINGS = {
+      timeSpeeds: { slow: 2, normal: 5, fast: 10 },   // simulated seconds per real second for each choice
+      defaultTimeSpeed: "normal",
+      startAltitudeFt: 20000,    // altitude at the start / after Reset
+      stopAltitudeFt: 1000,      // the simulation stops here so the aircraft never "lands"
+      cruiseSpeedKt: 250,        // airspeed at the start / after Reset
+      cruiseThrustPercent: 60    // slider position where thrust exactly equals drag at cruise
+    };
+
+    // The aircraft. Phase 2 can add "defective" versions, e.g. extra drag
+    // from damage or a stuck panel, by changing these values.
+    const AIRCRAFT = {
+      weightKN: 600,             // weight (and lift in level flight)
+      maxThrustKN: 100,          // thrust at 100% on the slider
+      parasiteDragKN: 54,        // "shape" drag at cruise speed; grows with speed²
+      inducedDragKN: 6,          // drag caused by making lift at cruise speed; grows with (lift coefficient)²
+      cruiseAngleOfAttackDeg: 2, // wing angle at cruise
+      fuelFlowIdleKgH: 300,      // fuel flow at 0% thrust
+      fuelFlowMaxKgH: 3000       // fuel flow at 100% thrust
+    };
+
+    // Gauge ranges [min, max]
+    const GAUGES = {
+      speedKt: [0, 350],
+      altitudeFt: [0, 25000],
+      verticalSpeedFtMin: [-3000, 3000],
+      fuelFlowKgH: [0, 3000]
+    };
+
+    // How quickly the "pilot" in Hold altitude and Auto-speed hold reacts.
+    const CONTROL = {
+      pathGain: 0.5,             // how quickly the climb/descent angle is corrected (per second)
+      altitudeGain: 0.05,        // how hard altitude errors are corrected
+      speedGain: 0.2,            // how hard speed errors are corrected
+      maxPathAngleDeg: 15        // steepest climb or descent the speed hold will use
+    };
+
+    // Natural damping of the up-and-down "porpoising" a real aircraft does
+    // after a disturbance (the phugoid). It's set high so the motion settles
+    // quickly; set it to 0 to see the slow, lightly damped real-life swing.
+    // It only applies to "No pilot input": in the other responses the
+    // pilot/autopilot does the steadying.
+    const PHUGOID_DAMPING = 0.0139;
+
+    // Arrow drawing scale (pixels per kN)
+    const ARROW_SCALE = {
+      liftWeight: 0.18,          // 600 kN → 108 px
+      thrustDrag: 1.2,           // 60 kN → 72 px (drawn larger so they can be compared)
+      maxLength: 160
+    };
+
+    /* =======================================================================
+       2. UNITS AND DERIVED VALUES
+       ======================================================================= */
+
+    const G = 9.81;              // gravity, m/s²
+    const KT = 0.514444;         // 1 knot in m/s
+    const FT = 0.3048;           // 1 foot in metres
+    const DEG = Math.PI / 180;
+
+    const CRUISE_SPEED = SETTINGS.cruiseSpeedKt * KT;   // m/s
+
+    // The lift coefficient is stored relative to cruise: 1 = cruise wing angle,
+    // 2 = twice the cruise lift coefficient (and twice the angle), and so on.
+    //
+    // Slower than the "minimum drag speed", induced drag rises faster than shape
+    // drag falls. The Hold altitude pilot won't fly slower than this, so the
+    // wing angle is capped at the matching value.
+    const MAX_LIFT_FACTOR = Math.sqrt(AIRCRAFT.parasiteDragKN / AIRCRAFT.inducedDragKN);
+    const MIN_LIFT_FACTOR = 0.2;
+
+    /* =======================================================================
+       3. THE TEACHING FORMULAS
+       v = speed ÷ cruise speed, c = lift coefficient ÷ cruise lift coefficient
+         Lift    = Weight × v² × c
+         Drag    = (shape drag × v²) + (induced drag × c² × v²)
+         Thrust  = max thrust × slider %
+       In level flight c = 1 ÷ v², so induced drag = induced drag at cruise ÷ v²:
+       it gets BIGGER as the aircraft slows down.
+       ======================================================================= */
+
+    function forces(s) {
+      const v = s.speed / CRUISE_SPEED;
+      return {
+        lift: AIRCRAFT.weightKN * v * v * s.liftFactor,
+        drag: (AIRCRAFT.parasiteDragKN + AIRCRAFT.inducedDragKN * s.liftFactor * s.liftFactor) * v * v,
+        thrust: AIRCRAFT.maxThrustKN * s.thrustPercent / 100,
+        weight: AIRCRAFT.weightKN
+      };
+    }
+
+    function angleOfAttackDeg(s) {
+      return AIRCRAFT.cruiseAngleOfAttackDeg * s.liftFactor;
+    }
+
+    function fuelFlowKgH(s) {
+      return AIRCRAFT.fuelFlowIdleKgH + (AIRCRAFT.fuelFlowMaxKgH - AIRCRAFT.fuelFlowIdleKgH) * s.thrustPercent / 100;
+    }
+
+    // "Specific energy": the height (m) the aircraft would reach if all its
+    // speed were turned into height. Height part = potential, speed part = kinetic.
+    function energy(s) {
+      return { potential: s.altitude, kinetic: s.speed * s.speed / (2 * G) };
+    }
+
+    /* =======================================================================
+       4. SIMULATION STATE
+       ======================================================================= */
+
+    let state;
+    let startEnergy;
+    let timeSpeed = SETTINGS.defaultTimeSpeed;   // kept across Reset
+
+    function resetState() {
+      state = {
+        time: 0,                                   // simulated seconds
+        speed: CRUISE_SPEED,                       // m/s along the flight path
+        pathAngle: 0,                              // climb (+) / descent (−) angle, radians
+        altitude: SETTINGS.startAltitudeFt * FT,   // m
+        liftFactor: 1,                             // wing lift coefficient ÷ cruise value
+        thrustPercent: SETTINGS.cruiseThrustPercent,
+        mode: "none",                              // "none", "altitude" or "speed"
+        targetAltitude: SETTINGS.startAltitudeFt * FT,
+        targetSpeed: CRUISE_SPEED,
+        speedRate: 0,                              // m/s² (speeding up +, slowing −)
+        pathRate: 0,                               // rad/s (nose path curving up +, down −)
+        cannotHold: false,                         // true when Hold altitude has run out of thrust
+        running: false,
+        stopped: false                             // true once the stop altitude is reached
+      };
+      const e = energy(state);
+      startEnergy = e.potential + e.kinetic;
+    }
+
+    /* =======================================================================
+       5. PILOT / AUTOPILOT RESPONSES
+       Each one chooses the wing's lift coefficient (its angle of attack).
+       ======================================================================= */
+
+    function chooseLiftFactor(s) {
+      if (s.mode === "none") {
+        // No pilot input: the wing angle stays fixed at its trimmed value.
+        s.cannotHold = false;
+        return;
+      }
+
+      const maxPath = CONTROL.maxPathAngleDeg * DEG;
+      let targetPath;
+
+      if (s.mode === "altitude") {
+        // Aim for level flight, gently correcting any height already lost or gained.
+        const climbNeeded = CONTROL.altitudeGain * (s.targetAltitude - s.altitude);   // m/s
+        targetPath = clamp(climbNeeded / s.speed, -0.05, 0.05);
+      } else {
+        // Auto-speed hold: pick the slope where gravity makes up for missing thrust.
+        //   Thrust − Drag − Weight × sin(slope) = the speed change we want
+        const f = forces(s);
+        const wantedSpeedRate = CONTROL.speedGain * (s.targetSpeed - s.speed);
+        const sinPath = (f.thrust - f.drag - f.weight * wantedSpeedRate / G) / f.weight;
+        targetPath = Math.asin(clamp(sinPath, -Math.sin(maxPath), Math.sin(maxPath)));
+      }
+
+      // Lift needed to bend the flight path towards the target slope.
+      const wantedPathRate = CONTROL.pathGain * (targetPath - s.pathAngle);
+      const liftOverWeight = Math.cos(s.pathAngle) + s.speed / G * wantedPathRate;
+      const v = s.speed / CRUISE_SPEED;
+      const wanted = liftOverWeight / (v * v);
+
+      s.liftFactor = clamp(wanted, MIN_LIFT_FACTOR, MAX_LIFT_FACTOR);
+
+      // Hold altitude has failed if the wing is at its limit and height is being lost.
+      s.cannotHold = s.mode === "altitude" &&
+        wanted >= MAX_LIFT_FACTOR &&
+        s.altitude < s.targetAltitude - 15;
+    }
+
+    /* =======================================================================
+       6. MOTION (one small time step)
+         Speed change   = g × (Thrust − Drag − Weight × sin(slope)) ÷ Weight
+         Path bending   = g × (Lift − Weight × cos(slope)) ÷ (Weight × speed)
+       ======================================================================= */
+
+    function step(s, dt) {
+      chooseLiftFactor(s);
+      const f = forces(s);
+
+      s.speedRate = G * (f.thrust - f.drag - f.weight * Math.sin(s.pathAngle)) / f.weight;
+      s.pathRate = G * (f.lift - f.weight * Math.cos(s.pathAngle)) / (f.weight * s.speed);
+      if (s.mode === "none") s.pathRate += PHUGOID_DAMPING * s.speedRate;
+
+      s.speed = Math.max(30, s.speed + s.speedRate * dt);
+      s.pathAngle += s.pathRate * dt;
+      s.altitude += s.speed * Math.sin(s.pathAngle) * dt;
+      s.time += dt;
+
+      if (s.altitude <= SETTINGS.stopAltitudeFt * FT) {
+        s.altitude = SETTINGS.stopAltitudeFt * FT;
+        s.stopped = true;
+        s.running = false;
+      }
+    }
+
+    /* =======================================================================
+       7. PLAIN-ENGLISH EXPLANATION
+       Returns a list of short sentences describing what's happening now.
+       ======================================================================= */
+
+    function describe(s) {
+      const f = forces(s);
+      const verticalSpeed = s.speed * Math.sin(s.pathAngle);   // m/s
+      const slowing = s.speedRate < -0.05;      // m/s²; small changes count as "steady"
+      const speeding = s.speedRate > 0.05;
+      const descending = verticalSpeed < -0.5;
+      const climbing = verticalSpeed > 0.5;
+      const steady = !slowing && !speeding && Math.abs(s.pathRate) < 0.0015;
+      const lines = [];
+
+      if (s.stopped) {
+        lines.push({ warn: true, text: "The simulation stopped at " + SETTINGS.stopAltitudeFt.toLocaleString() + " ft. Press Reset to start again." });
+      }
+      if (s.cannotHold) {
+        lines.push({ warn: true, text: "Cannot hold altitude: there isn't enough thrust. Flying any slower would only add drag, so the aircraft has to descend." });
+      }
+
+      if (s.time === 0) {
+        lines.push({ text: "The aircraft is in steady level cruise: thrust equals drag and lift equals weight." });
+        lines.push({ text: "Move the thrust slider, choose a response, then press Play." });
+        return lines;
+      }
+
+      if (steady) {
+        if (!descending && !climbing) {
+          lines.push({ text: "Steady level flight: thrust equals drag and lift equals weight." });
+          if (s.speed < CRUISE_SPEED - 3 * KT) {
+            lines.push({ text: "The aircraft is slower than at cruise, so the wing is at a higher angle to make enough lift. That higher angle adds extra drag (induced drag)." });
+          }
+        } else if (descending) {
+          lines.push({ text: "Steady descent: speed and descent rate are no longer changing." });
+          lines.push({ text: "Thrust is less than drag. Gravity, pulling the aircraft down the slope, makes up the difference, so height energy is being used up." });
+        } else {
+          lines.push({ text: "Steady climb: thrust is more than drag, and the extra thrust is lifting the aircraft higher." });
+        }
+        return lines;
+      }
+
+      // Speed
+      if (slowing) lines.push({ text: "Thrust is less than drag, so the aircraft is slowing down." });
+      else if (speeding && f.thrust < f.drag) lines.push({ text: "Thrust is less than drag, but gravity, pulling the aircraft down the slope, is speeding it back up." });
+      else if (speeding) lines.push({ text: "Thrust is more than drag, so the aircraft is speeding up." });
+      else if (descending) lines.push({ text: "Speed is steady: gravity, pulling the aircraft down the slope, makes up for the missing thrust." });
+
+      // Height
+      const liftShortfall = f.lift - f.weight * Math.cos(s.pathAngle);
+      if (liftShortfall < -3) lines.push({ text: "Lift is less than weight, so the flight path bends downward." });
+      else if (liftShortfall > 3) lines.push({ text: "Lift is more than weight, so the flight path bends upward." });
+
+      // Response-specific notes
+      if (s.mode === "altitude" && slowing && !s.cannotHold) {
+        lines.push({ text: "To hold altitude while slowing, the wing tilts to a higher angle of attack. That keeps lift equal to weight but adds induced drag." });
+      }
+      if (s.mode === "speed" && descending) {
+        lines.push({ text: "Auto-speed hold lowers the nose just enough that gravity keeps the speed constant." });
+      }
+      return lines;
+    }
+
+    /* =======================================================================
+       8. DRAWING
+       ======================================================================= */
+
+    const el = function (id) { return document.getElementById(id); };
+    const CG = { x: 380, y: 210 };     // aircraft centre of gravity in the picture
+
+    // Point an arrow from the centre of gravity. angleDeg is measured
+    // anticlockwise from "forward"; startGap leaves room for the aircraft.
+    function drawArrow(name, angleDeg, forceKN, scale, startGap) {
+      const length = clamp(forceKN * scale, 0, ARROW_SCALE.maxLength);
+      const group = el("arrow-" + name);
+      const line = group.querySelector("line");
+      const head = group.querySelector("polygon");
+      const visible = length > 4;
+
+      group.style.display = visible ? "" : "none";
+      const tip = startGap + length;
+      line.setAttribute("x1", startGap);
+      line.setAttribute("y1", 0);
+      line.setAttribute("x2", Math.max(startGap, tip - 14));
+      line.setAttribute("y2", 0);
+      head.setAttribute("points", tip + ",0 " + (tip - 22) + ",-14 " + (tip - 22) + ",14");
+      // SVG rotates clockwise with y pointing down, hence the minus sign.
+      group.setAttribute("transform", "translate(" + CG.x + " " + CG.y + ") rotate(" + (-angleDeg) + ")");
+
+      // Label just beyond the arrow tip
+      const labelDistance = tip + (name === "lift" || name === "weight" ? 26 : 48);
+      const label = el("label-" + name);
+      label.setAttribute("x", CG.x + labelDistance * Math.cos(angleDeg * DEG));
+      label.setAttribute("y", CG.y - labelDistance * Math.sin(angleDeg * DEG) + 9);
+    }
+
+    // Clouds drift past to show movement through the air
+    const clouds = [];
+    function makeClouds() {
+      const group = el("clouds");
+      const ns = "http://www.w3.org/2000/svg";
+      for (let i = 0; i < 6; i++) {
+        const cloud = document.createElementNS(ns, "ellipse");
+        cloud.setAttribute("class", "cloud");
+        cloud.setAttribute("rx", 40 + (i % 3) * 18);
+        cloud.setAttribute("ry", 12 + (i % 2) * 6);
+        group.appendChild(cloud);
+        clouds.push({ node: cloud, x: i * 140 + 40, y: 40 + ((i * 97) % 340) });
+      }
+      placeClouds();
+    }
+    function moveClouds(wallDt) {
+      const s = state;
+      const dx = -(s.speed / CRUISE_SPEED) * 90 * wallDt;                                   // drift left as we fly right
+      const dy = s.speed * Math.sin(s.pathAngle) * SETTINGS.timeSpeeds[timeSpeed] * 0.5 * wallDt;       // drift up as we descend
+      clouds.forEach(function (c) {
+        c.x += dx;
+        c.y += dy;
+        if (c.x < -80) c.x += 920;
+        if (c.y < -30) c.y += 480;
+        if (c.y > 450) c.y -= 480;
+      });
+      placeClouds();
+    }
+    function placeClouds() {
+      clouds.forEach(function (c) {
+        c.node.setAttribute("cx", c.x.toFixed(1));
+        c.node.setAttribute("cy", c.y.toFixed(1));
+      });
+    }
+
+    // A semicircle gauge. Returns a function that sets the value.
+    function makeGauge(id, name, unit, range, format) {
+      const box = el(id);
+      const [min, max] = range;
+      box.innerHTML =
+        '<svg viewBox="-16 0 232 120" aria-hidden="true">' +
+          '<path class="gauge-track" d="M20 100 A80 80 0 0 1 180 100"></path>' +
+          '<path class="gauge-fill"></path>' +
+          '<line class="gauge-needle" x1="100" y1="100" x2="100" y2="34"></line>' +
+          '<circle class="gauge-hub" cx="100" cy="100" r="7"></circle>' +
+          '<text class="gauge-end" x="20" y="116" text-anchor="middle">' + format(min) + '</text>' +
+          '<text class="gauge-end" x="180" y="116" text-anchor="middle">' + format(max) + '</text>' +
+        '</svg>' +
+        '<p class="gauge-name">' + name + '</p>' +
+        '<p class="gauge-value"><span></span> <span class="gauge-unit">' + unit + '</span></p>';
+
+      const needle = box.querySelector(".gauge-needle");
+      const fill = box.querySelector(".gauge-fill");
+      const value = box.querySelector(".gauge-value span");
+      // The coloured arc starts from 0 (the middle for the vertical speed gauge).
+      const zero = clamp((0 - min) / (max - min), 0, 1);
+
+      function pointAt(fraction) {
+        const a = Math.PI * (1 - fraction);
+        return [100 + 80 * Math.cos(a), 100 - 80 * Math.sin(a)];
+      }
+
+      return function (v) {
+        const fraction = clamp((v - min) / (max - min), 0, 1);
+        needle.setAttribute("transform", "rotate(" + (fraction * 180 - 90) + " 100 100)");
+        const from = pointAt(Math.min(zero, fraction));
+        const to = pointAt(Math.max(zero, fraction));
+        fill.setAttribute("d", Math.abs(fraction - zero) < 0.002 ? "" :
+          "M" + from[0].toFixed(1) + " " + from[1].toFixed(1) + " A80 80 0 0 1 " + to[0].toFixed(1) + " " + to[1].toFixed(1));
+        value.textContent = format(v);
+      };
+    }
+
+    const round = function (n) { return Math.round(n).toLocaleString(); };
+    const setSpeedGauge = makeGauge("gauge-speed", "Airspeed", "knots", GAUGES.speedKt, round);
+    const setAltitudeGauge = makeGauge("gauge-altitude", "Altitude", "feet", GAUGES.altitudeFt, round);
+    const setVsGauge = makeGauge("gauge-vs", "Climb / descent", "ft per min", GAUGES.verticalSpeedFtMin,
+      function (n) { const r = Math.round(n / 10) * 10; return (r > 0 ? "+" : "") + r.toLocaleString(); });
+    const setFuelGauge = makeGauge("gauge-fuel", "Fuel flow", "kg per hour", GAUGES.fuelFlowKgH, round);
+
+    let lastExplanation = "";
+
+    function render() {
+      const s = state;
+      const f = forces(s);
+      const aoa = angleOfAttackDeg(s);
+      const pathDeg = s.pathAngle / DEG;
+      const pitchDeg = pathDeg + aoa;   // nose angle = flight path angle + wing angle
+
+      // Aircraft and arrows
+      el("plane").setAttribute("transform", "translate(" + CG.x + " " + CG.y + ") rotate(" + (-pitchDeg) + ")");
+      drawArrow("lift", 90 + pathDeg, f.lift, ARROW_SCALE.liftWeight, 30);      // at right angles to the flight path
+      drawArrow("weight", -90, f.weight, ARROW_SCALE.liftWeight, 30);           // always straight down
+      drawArrow("thrust", pitchDeg, f.thrust, ARROW_SCALE.thrustDrag, 128);     // along the engine line
+      drawArrow("drag", 180 + pathDeg, f.drag, ARROW_SCALE.thrustDrag, 145);    // against the direction of travel
+
+      // Force numbers
+      el("val-thrust").textContent = Math.round(f.thrust);
+      el("val-drag").textContent = Math.round(f.drag);
+      el("val-lift").textContent = Math.round(f.lift);
+      el("val-weight").textContent = Math.round(f.weight);
+      el("sign-td").textContent = compareSign(f.thrust, f.drag, 0.5);
+      el("sign-lw").textContent = compareSign(f.lift, f.weight * Math.cos(s.pathAngle), 3);
+
+      const pathText = Math.abs(pathDeg) < 0.1 ? "level" :
+        (pathDeg < 0 ? "descending " : "climbing ") + Math.abs(pathDeg).toFixed(1) + "°";
+      el("angles").textContent = "Wing angle (angle of attack): " + aoa.toFixed(1) + "°  ·  Flight path: " + pathText;
+
+      // Gauges
+      setSpeedGauge(s.speed / KT);
+      setAltitudeGauge(s.altitude / FT);
+      setVsGauge(s.speed * Math.sin(s.pathAngle) / FT * 60);
+      setFuelGauge(fuelFlowKgH(s));
+
+      // Energy bar: widths are a share of 115% of the starting energy,
+      // leaving room for the total to grow if thrust is increased.
+      const e = energy(s);
+      const scale = startEnergy * 1.15;
+      el("energy-pe").style.width = clamp(e.potential / scale * 100, 0, 100) + "%";
+      el("energy-ke").style.width = clamp(e.kinetic / scale * 100, 0, 100) + "%";
+      const pct = function (x) { return Math.round(x / startEnergy * 100) + "%"; };
+      el("energy-pe-val").textContent = pct(e.potential);
+      el("energy-ke-val").textContent = pct(e.kinetic);
+      el("energy-total-val").textContent = pct(e.potential + e.kinetic);
+      el("energy-bar").setAttribute("aria-label",
+        "Height energy " + pct(e.potential) + ", speed energy " + pct(e.kinetic) + " of starting energy");
+
+      // Explanation (only rewritten when it changes, so screen readers aren't flooded)
+      const lines = describe(s);
+      const key = lines.map(function (l) { return l.text; }).join("|");
+      if (key !== lastExplanation) {
+        lastExplanation = key;
+        const box = el("explain");
+        box.replaceChildren();
+        lines.forEach(function (l) {
+          const p = document.createElement("p");
+          p.textContent = l.text;
+          if (l.warn) p.className = "warning";
+          box.appendChild(p);
+        });
+      }
+
+      // Controls
+      el("thrust").value = s.thrustPercent;
+      el("thrust-value").textContent = s.thrustPercent + "%";
+      document.querySelectorAll(".modes button").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.mode === s.mode));
+      });
+      el("play").disabled = s.running || s.stopped;
+      el("pause").disabled = !s.running;
+      el("clock").textContent = (s.running ? "Running" : "Paused") + "  ·  Time: " + formatTime(s.time) +
+        "  ·  Time runs " + SETTINGS.timeSpeeds[timeSpeed] + "× faster than real life";
+      document.querySelectorAll(".time-speed button").forEach(function (b) {
+        b.setAttribute("aria-pressed", String(b.dataset.speed === timeSpeed));
+      });
+    }
+
+    /* =======================================================================
+       9. CONTROLS AND MAIN LOOP
+       ======================================================================= */
+
+    el("thrust").addEventListener("input", function (e) {
+      state.thrustPercent = Number(e.target.value);
+      render();
+    });
+
+    document.querySelectorAll(".modes button").forEach(function (button) {
+      button.addEventListener("click", function () {
+        // Each response holds the altitude / speed the aircraft has when it's chosen.
+        state.mode = button.dataset.mode;
+        state.targetAltitude = state.altitude;
+        state.targetSpeed = state.speed;
+        render();
+      });
+    });
+
+    document.querySelectorAll(".time-speed button").forEach(function (button) {
+      button.addEventListener("click", function () { timeSpeed = button.dataset.speed; render(); });
+    });
+
+    el("play").addEventListener("click", function () { state.running = true; render(); });
+    el("pause").addEventListener("click", function () { state.running = false; render(); });
+    el("reset").addEventListener("click", function () { resetState(); lastExplanation = ""; render(); });
+
+    const STEP = 0.05;   // simulated seconds per physics step
+    let lastFrame = null;
+
+    function frame(now) {
+      if (lastFrame !== null && state.running) {
+        const wallDt = Math.min((now - lastFrame) / 1000, 0.1);   // cap so a background tab doesn't jump ahead
+        let remaining = wallDt * SETTINGS.timeSpeeds[timeSpeed];
+        while (remaining > 0 && state.running) {
+          const dt = Math.min(STEP, remaining);
+          step(state, dt);
+          remaining -= dt;
+        }
+        moveClouds(wallDt);
+        render();
+      }
+      lastFrame = now;
+      requestAnimationFrame(frame);
+    }
+
+    /* =======================================================================
+       10. SMALL HELPERS
+       ======================================================================= */
+
+    function clamp(x, lo, hi) { return Math.min(hi, Math.max(lo, x)); }
+
+    function compareSign(a, b, tolerance) {
+      if (Math.abs(a - b) <= tolerance) return "=";
+      return a < b ? "<" : ">";
+    }
+
+    function formatTime(seconds) {
+      const m = Math.floor(seconds / 60);
+      const sec = Math.floor(seconds % 60);
+      return m + ":" + String(sec).padStart(2, "0");
+    }
+
+    // Start
+    resetState();
+    makeClouds();
+    render();
+    requestAnimationFrame(frame);
+  </script>
+</body>
+</html>

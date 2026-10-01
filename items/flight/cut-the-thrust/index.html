@@ -541,6 +541,175 @@
     .txt-caution { color: var(--caution); }
     .txt-danger { color: var(--danger); }
 
+    /* =====================================================================
+       TRAINING MENU AND ACTIVITIES
+       ===================================================================== */
+    [hidden] { display: none !important; }
+
+    .training-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 10px 16px;
+      margin: 12px 0 4px;
+    }
+    .training-menu { flex: 1 1 520px; min-width: 0; }
+    .training-label {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .training-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    @media (min-width: 720px) {
+      .training-buttons { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    .training-buttons button { min-height: 60px; text-align: left; line-height: 1.25; }
+    .training-buttons button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .session-score {
+      flex: 0 1 auto;
+      margin: 0;
+      padding: 8px 16px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+    .session-score strong { font-size: 1.6rem; }
+    .session-score .breakdown { display: block; color: var(--muted); font-size: 0.8rem; }
+
+    .training { margin: 0 0 16px; border-left: 6px solid var(--accent); }
+    .t-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; }
+    .t-head h2 { margin: 0; font-size: 1.35rem; }
+    .t-intro { margin: 6px 0 0; color: var(--muted); }
+    .t-step { margin-top: 18px; }
+    .t-step h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .t-step > p { margin: 0 0 8px; }
+    .t-box { padding: 12px 14px; background: var(--bg); border-radius: 10px; }
+    .t-box p { margin: 0 0 6px; }
+    .t-box p:last-child { margin-bottom: 0; }
+    .t-note { margin: 8px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .t-options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+      gap: 8px;
+    }
+    .t-options button { min-height: 56px; text-align: left; line-height: 1.3; }
+    .t-options button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .t-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 16px; }
+    .t-primary {
+      min-height: 56px;
+      padding: 12px 24px;
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+      font-size: 1.05rem;
+    }
+    .t-progress { margin: 0; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .t-result {
+      margin-top: 10px;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-left-width: 6px;
+      border-radius: 10px;
+    }
+    .t-result p { margin: 0 0 6px; }
+    .t-result p:last-child { margin-bottom: 0; }
+    .t-result.right { border-color: var(--ok); }
+    .t-result.wrong { border-color: var(--danger); }
+    .t-result.missed { border-color: var(--caution); }
+    .t-mark { margin-right: 4px; font-size: 1.2rem; }
+    .t-points { font-size: 1.15rem; font-weight: 700; }
+
+    /* Mystery Aircraft: inspection */
+    .t-report { margin: 0; padding-left: 20px; }
+    .t-report li { margin: 0 0 6px; }
+    .t-report .detail { display: block; color: var(--muted); font-size: 0.88rem; line-height: 1.35; }
+    .t-report .engine { color: var(--thrust); }
+    .t-areas button.found { border-color: var(--defect); }
+    .t-areas button.clear { border-color: var(--ok); }
+    .t-findings { display: grid; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .t-findings li { padding: 8px 10px; background: var(--bg); border-left: 5px solid var(--ok); border-radius: 6px; }
+    .t-findings li.found { border-left-color: var(--defect); }
+    .t-finding { min-height: 1.5em; margin: 8px 0 0; font-weight: 700; }
+    .t-checks { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+    .t-check {
+      display: flex; align-items: center; gap: 10px;
+      min-height: 56px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-weight: 600; line-height: 1.3;
+      cursor: pointer;
+    }
+    .t-check input { flex: none; width: 26px; height: 26px; margin: 0; accent-color: var(--accent); }
+    .t-check:has(input:checked) { border-color: var(--accent); }
+    .t-score-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+    .t-score-table td { padding: 6px 4px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .t-score-table td:last-child { text-align: right; white-space: nowrap; font-weight: 700; }
+
+    /* Clickable inspection areas on the drawings (Mystery Aircraft only) */
+    .inspect-layer { display: none; }
+    body.t-mystery .inspect-layer { display: inline; }
+    .mini .inspect-layer { display: none !important; }   /* the Compare pictures copy the drawing */
+    .inspect-spot { cursor: pointer; }
+    .inspect-spot line { stroke: var(--accent); stroke-width: 2; stroke-dasharray: 4 4; }
+    .inspect-spot circle { fill: var(--accent); fill-opacity: 0.25; stroke: var(--accent); stroke-width: 2; }
+    .inspect-spot rect { fill: var(--surface); stroke: var(--accent); stroke-width: 2.5; stroke-dasharray: 7 4; }
+    .inspect-spot text { fill: var(--text); font: 700 20px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .inspect-spot:hover rect { stroke-width: 4; stroke-dasharray: none; }
+    .inspect-spot.clear rect, .inspect-spot.clear circle, .inspect-spot.clear line { stroke: var(--ok); stroke-dasharray: none; }
+    .inspect-spot.found rect, .inspect-spot.found circle, .inspect-spot.found line { stroke: var(--defect); stroke-dasharray: none; }
+    .inspect-spot.found rect { fill: var(--warning-bg); }
+
+    /* While the defects are secret, hide everything that would give them away */
+    body.t-secret #defect-layer, body.t-secret #h-defect-layer, body.t-secret #h-rotor-ghosts,
+    body.t-secret #ghost-note, body.t-secret #h-marker-note, body.t-secret #explain,
+    body.t-secret .hangar, body.t-secret .t-compare-box, body.t-secret .comparison { display: none !important; }
+    .hangar[inert] { opacity: 0.65; }
+    .t-locked { margin: 0 0 10px; padding: 8px 12px; background: var(--warning-bg); border-radius: 8px; color: var(--warning-text); font-weight: 700; }
+
+    /* Fix & Verify: run log and ordering */
+    .t-defect-row {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+      padding: 8px 10px;
+      background: var(--bg);
+      border: 2px solid var(--defect);
+      border-radius: 10px;
+    }
+    .t-defect-row.fixed { border-color: var(--ok); }
+    .t-defect-row + .t-defect-row { margin-top: 8px; }
+    .t-defect-row span { font-weight: 600; line-height: 1.3; }
+    .t-defect-row button { min-width: 110px; }
+    .t-sort { display: grid; gap: 8px; margin: 6px 0; padding: 0; list-style: none; }
+    .t-sort li {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      cursor: grab;
+      touch-action: none;           /* lets a finger drag the item instead of scrolling the page */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .t-sort li.dragging { position: relative; z-index: 2; border-color: var(--accent); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2); cursor: grabbing; }
+    .t-sort .t-rank {
+      flex: none;
+      display: grid; place-items: center;
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--on-accent);
+      font-weight: 700;
+    }
+    .t-sort .t-grip { flex: none; color: var(--muted); font-size: 1.4rem; line-height: 1; }
+    .t-sort .t-name { flex: 1; min-width: 0; font-weight: 600; line-height: 1.3; }
+    .t-sort button { flex: none; min-width: 48px; padding: 6px; touch-action: manipulation; }
+    .t-sort-end { margin: 0; color: var(--muted); font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+
     .sr-only {
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
       overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
@@ -563,10 +732,40 @@
   <main>
     <a class="back" href="../../../module.html?m=flight">&larr; Principles of Flight</a>
     <h1>Cut the Thrust: Clean vs Defective Aircraft</h1>
+
+    <!-- ============================ TRAINING MENU ============================ -->
+    <div class="training-bar">
+      <nav class="training-menu" aria-labelledby="training-label">
+        <p class="training-label" id="training-label">Training</p>
+        <div class="training-buttons">
+          <button type="button" data-activity="free" aria-pressed="true">Free Play
+            <span class="mode-hint">The full simulator</span></button>
+          <button type="button" data-activity="predict" aria-pressed="false">1. Predict First
+            <span class="mode-hint">Guess, then fly</span></button>
+          <button type="button" data-activity="mystery" aria-pressed="false">2. Mystery Aircraft
+            <span class="mode-hint">Find the hidden defects</span></button>
+          <button type="button" data-activity="fix" aria-pressed="false">3. Fix &amp; Verify
+            <span class="mode-hint">Repair and re-test</span></button>
+        </div>
+      </nav>
+      <p class="session-score" aria-live="polite">Session score <strong id="t-score">0</strong> points
+        <span class="breakdown" id="t-score-breakdown">Not saved: it resets when you leave the page.</span></p>
+    </div>
+
     <div class="aircraft-switch" role="group" aria-label="Aircraft">
       <button type="button" data-aircraft="fixed" aria-pressed="true">Fixed-wing</button>
       <button type="button" data-aircraft="heli" aria-pressed="false">Helicopter</button>
     </div>
+
+    <!-- ========================== TRAINING ACTIVITY ========================== -->
+    <section class="panel training" id="training" aria-labelledby="t-title" hidden>
+      <div class="t-head">
+        <h2 id="t-title"></h2>
+        <button type="button" id="t-restart">Restart activity</button>
+      </div>
+      <p class="t-intro" id="t-intro"></p>
+      <div id="t-body"></div>
+    </section>
 
     <!-- ===================== FIXED-WING MODE (unchanged) ===================== -->
     <div id="fw-mode">
@@ -1016,7 +1215,8 @@
     </section>
     </div>
 
-    <p class="disclaimer">Illustrative values – not aircraft data. Simple teaching formulas are used, and time runs faster than real life.</p>
+    <p class="disclaimer">Illustrative values – not aircraft data. Simple teaching formulas are used, and time runs faster than real life.
+      Training scores stay on this page only: nothing is saved or sent anywhere, and they reset when you reload or close it.</p>
   </main>
 
   <script>
@@ -2336,6 +2536,53 @@
     buildHangar();
     hangarChanged();
     requestAnimationFrame(frame);
+
+    /* =======================================================================
+       13. TRAINING HOOKS
+       A few functions the Training activities (the last script) use to drive
+       this simulator. Nothing above depends on them.
+       ======================================================================= */
+
+    window.FW_SIM = {
+      defects: DEFECTS,
+      severityNames: SEVERITY_NAMES,
+      // list: [{ id, severity }]. Every defect not in the list is switched off.
+      setDefects: function (list) {
+        DEFECTS.forEach(function (d) {
+          const x = list.find(function (l) { return l.id === d.id; });
+          hangar[d.id].on = Boolean(x);
+          if (x) hangar[d.id].severity = x.severity;
+        });
+        el("defects").querySelectorAll(".defect").forEach(function (card) { card.show(); });
+        hangarChanged();
+      },
+      reset: function () { resetState(); lastExplanation = ""; render(); },
+      setThrust: function (percent) {
+        bothAircraft().forEach(function (s) { s.thrustPercent = percent; inputChanged(s); });
+        render();
+      },
+      setMode: function (mode) { document.querySelector('.modes button[data-mode="' + mode + '"]').click(); },
+      play: function () { el("play").click(); },
+      pause: function () { el("pause").click(); },
+      isRunning: function () { return state.running; },
+      stopped: function () { return state.stopped; },
+      time: function () { return state.time; },
+      // Readings of the aircraft being flown right now.
+      snapshot: function () {
+        return { speedKt: state.speed / KT, altitudeFt: state.altitude / FT };
+      },
+      // Steady cruise numbers for a list of [{ id, severity }] (the current hangar if left out).
+      figures: function (list) {
+        const a = list ? effectiveAircraft(list.map(function (x) {
+          return { defect: DEFECTS.find(function (d) { return d.id === x.id; }), severity: x.severity };
+        })) : ac;
+        const c = cruiseFigures(a);
+        return { weight: a.weight, lift: a.weight, drag: c.drag, thrustNeeded: c.thrustPercent, maxThrust: AIRCRAFT.maxThrustKN };
+      },
+      pilotReport: pilotReport,
+      setCompare: function (on) { if (compareOn !== on) setCompare(on); },
+      drawing: el("plane")
+    };
   </script>
   <script>
     /* =======================================================================
@@ -3336,6 +3583,1077 @@
       hangarChanged();
       if (location.hash === "#helicopter") setAircraft("heli");
       requestAnimationFrame(frame);
+
+      /* ---------------------------------------------------------------------
+         H11. TRAINING HOOKS
+         A few functions the Training activities (the last script) use to
+         drive this simulator. Nothing above depends on them.
+         --------------------------------------------------------------------- */
+
+      window.HELI_SIM = {
+        defects: H_DEFECTS,
+        severityNames: SEVERITY,
+        // list: [{ id, severity }]. Every defect not in the list is switched off.
+        setDefects: function (list) {
+          H_DEFECTS.forEach(function (d) {
+            const x = list.find(function (l) { return l.id === d.id; });
+            hangar[d.id].on = Boolean(x);
+            if (x) hangar[d.id].severity = x.severity;
+          });
+          $("h-defects").querySelectorAll(".defect").forEach(function (card) { card.show(); });
+          hangarChanged();
+        },
+        reset: function () { resetHeli(); renderHeli(); },
+        setMode: function (m) { document.querySelector('.h-modes button[data-hmode="' + m + '"]').click(); },
+        setPower: function (percent) { powerPercent = percent; renderHeli(); },
+        setCollective: function (percent) { both().forEach(function (s) { s.collective = percent; }); renderHeli(); },
+        play: function () { running = true; renderHeli(); },
+        pause: function () { running = false; renderHeli(); },
+        isRunning: function () { return running; },
+        stopped: function () { return false; },
+        time: function () { return hs.time; },
+        snapshot: function () { return { heightFt: hs.height / FT }; },
+        // Hover numbers for a list of [{ id, severity }] (the current hangar if left out).
+        figures: function (list) {
+          const a = list ? condition(list.map(function (x) {
+            return { defect: H_DEFECTS.find(function (d) { return d.id === x.id; }), severity: x.severity };
+          })) : hac;
+          return {
+            weight: a.weight,
+            drag: HELI.rotorDragKN * a.profile,
+            tail: HELI.tailThrustKN * a.tailEff,
+            hoverPower: hoverPower(a, IGE_FT),
+            vibration: a.vibration,
+            pedal: hoverPedalMargin(a, powerAvailable(powerPercent)),
+            maxThrust: MAX_THRUST
+          };
+        },
+        pilotReport: pilotReport,
+        setCompare: function (on) { if (compareOn !== on) setCompare(on); },
+        drawing: $("h-heli")
+      };
+    })();
+  </script>
+  <script>
+    /* =======================================================================
+       TRAINING ACTIVITIES
+       Predict First, Mystery Aircraft and Fix & Verify. They drive the two
+       simulators above through window.FW_SIM and window.HELI_SIM, and work
+       for whichever aircraft (Fixed-wing or Helicopter) is selected.
+       The score lives only in this page: nothing is saved or sent anywhere.
+       ======================================================================= */
+    (function () {
+      "use strict";
+
+      /* ---------------------------------------------------------------------
+         T1. SETTINGS YOU CAN CHANGE
+         --------------------------------------------------------------------- */
+
+      const POINTS = {
+        predictRight: 5,          // each correct prediction
+        mysteryRight: 10,         // each defect correctly diagnosed
+        mysteryWrong: -5,         // each defect ticked that was not there
+        mysteryUnusedArea: 2,     // bonus for each area NOT inspected (only if the diagnosis is fully right)
+        fixVerified: 5,           // each fix checked with a re-run
+        orderRight: 10            // each defect put in the right place in the order
+      };
+
+      // Length of each activity run, in simulated seconds.
+      const RUN_SECONDS = { fixed: 45, heli: 8 };
+
+      // Predict First and Mystery Aircraft fly from cruise / a hover with these inputs.
+      // Fix & Verify uses Hold altitude / Pilot holds the height, so the gauges show
+      // how hard the aircraft has to work.
+      const FLY = {
+        fixed: { predict: { mode: "none", thrust: 60 }, fix: { mode: "altitude", thrust: 60 } },
+        heli:  { predict: { mode: "manual", power: 80 }, fix: { mode: "hold", power: 80 } }
+      };
+      const CUT = { thrust: 35, collective: 50 };   // the "pilot cuts the power" scenarios in Predict First
+
+      // Teaching text for each aircraft. For every defect:
+      //   area      where it is found in Mystery Aircraft (see `areas`)
+      //   finding   what the inspection finds
+      //   cause     why the forces change (Predict First, Fix & Verify)
+      //   report    what the pilot reports (the right answer in Predict First)
+      //   why       why the pilot reports that
+      //   group     symptoms in the same group are too alike to be offered together
+      //   after     optional: replaces the usual "what happens next" sentence
+      // Area positions are in the drawing's own units (0,0 = centre of gravity):
+      //   at = the point on the aircraft, tag = top-left corner of the clickable label.
+      const TRAINING = {
+        fixed: {
+          sim: window.FW_SIM,
+          label: "Fixed-wing",
+          forces: ["Lift", "Weight", "Thrust", "Drag"],
+          decimals: 0,
+          defects: {
+            dirt: {
+              area: "wings", finding: "dirt, bug splatter and oil streaks found on the upper surface",
+              cause: "The dirty wing adds a little surface drag and spoils some lift, so the wing has to fly at a slightly higher angle.",
+              report: "Slightly higher fuel burn to keep the usual speed",
+              why: "Only a little drag is added, so the pilot just sees a little more thrust and fuel needed. Nothing feels wrong.",
+              group: "fuel"
+            },
+            patch: {
+              area: "skin", finding: "a raised, poorly blended repair patch found",
+              cause: "The raised edges of the repair patch added parasite drag.",
+              report: "Slower cruise, or more fuel for the same speed",
+              why: "More drag with the same thrust means the aircraft settles at a lower speed, or needs more thrust (and fuel) to keep its speed.",
+              group: "fuel"
+            },
+            fasteners: {
+              area: "skin", finding: "protruding fasteners, rough paint and corrosion found",
+              cause: "The protruding fasteners and rough paint added skin-friction drag.",
+              report: "A small, constant extra fuel burn",
+              why: "The extra drag is small but always there, so it shows up as slightly higher fuel use on every flight.",
+              group: "fuel"
+            },
+            panel: {
+              area: "panels", finding: "an access panel found open and a fairing missing",
+              cause: "The open panel added form drag.",
+              report: "Clearly slower at the same thrust, with buffet or extra noise",
+              why: "Form drag is a big jump in drag, and the turbulent air behind the open panel is felt as buffet and heard as noise.",
+              group: "panel"
+            },
+            leading: {
+              area: "leading", finding: "dent and paint damage found",
+              cause: "The damaged leading edge spoils the airflow: the wing needs a higher angle to make the same lift, and drag goes up.",
+              report: "Higher stall speed and a nose-high attitude",
+              why: "The wing makes less lift at each angle, so it flies nose-high and stalls sooner, which raises the stall speed.",
+              group: "stall"
+            },
+            rigging: {
+              area: "flaps", finding: "one flap found rigged out of position",
+              cause: "The mis-rigged flap gives uneven lift along the wing, which adds induced drag, and the trim needed adds trim drag.",
+              report: "Aircraft wants to roll or pitch; needs constant trim",
+              why: "The two sides of the aircraft no longer match, so it rolls or pitches away unless the pilot holds the controls or winds on trim.",
+              group: "trim"
+            },
+            equipment: {
+              area: "cabin", finding: "extra equipment found installed (mounts, antennas and extra weight)",
+              cause: "The extra equipment added weight.",
+              report: "Slower climb, and the aircraft feels heavy",
+              why: "More weight needs more lift, so the wing flies at a higher angle, stalls at a higher speed, and climbing is slower.",
+              group: "climb"
+            }
+          },
+          cut: {
+            cause: "The pilot cut the thrust; the aircraft itself is clean.",
+            report: "Slows down and starts to sink, but nothing feels abnormal",
+            why: "With less thrust than drag the aircraft loses speed and then height. That is the normal response to a power cut, not a defect.",
+            group: "normal"
+          },
+          engineReport: "Engine running rough, with high engine temperatures",
+          // "What happens next", by the force that changed most. f = { Lift: { before, after }, ... }
+          after: {
+            Drag: function (f) {
+              return "With the same thrust (" + kN(f.Thrust.after) + " kN), drag is now bigger than thrust (" + kN(f.Drag.after) +
+                " kN), so the aircraft slows down.";
+            },
+            Weight: function () {
+              return "Lift has to grow by the same amount to hold the aircraft up, and the higher wing angle that needs adds some drag too.";
+            },
+            Thrust: function (f) {
+              return "Drag is still " + kN(f.Drag.after) + " kN, so with thrust smaller than drag the aircraft slows down and then starts to descend.";
+            }
+          },
+          scenario: function (sc) {
+            if (sc.id === "cut") {
+              return "The aircraft is <strong>clean</strong> (no defects) and cruising at 250 kt. The pilot cuts the thrust from 60% to <strong>" +
+                CUT.thrust + "%</strong> and flies hands-off (No pilot input).";
+            }
+            return "Hangar inspection found: <strong>" + defectName(sc.list[0]) + "</strong>. The aircraft starts in level cruise at 250 kt. " +
+              "The pilot keeps the thrust at 60% and flies hands-off (No pilot input).";
+          },
+          areas: [
+            { id: "skin", name: "Fuselage skin", at: { x: -45, y: -15 }, tag: { x: -330, y: -150 } },
+            { id: "cabin", name: "Cabin & equipment", at: { x: 60, y: -8 }, tag: { x: 40, y: -165 } },
+            { id: "wings", name: "Wings", at: { x: -5, y: 8 }, tag: { x: 30, y: 60 } },
+            { id: "leading", name: "Leading edge", at: { x: 27, y: 4 }, tag: { x: 60, y: 115 } },
+            { id: "panels", name: "Panels & fairings", at: { x: -80, y: 14 }, tag: { x: -330, y: 60 } },
+            { id: "flaps", name: "Flaps & controls", at: { x: -34, y: 11 }, tag: { x: -330, y: 115 } },
+            { id: "engine", name: "Engine", at: { x: 20, y: 22 }, tag: { x: 200, y: 60 },
+              clear: "Engine: no defect found. Oil, filters and engine readings are all normal." }
+          ],
+          // Pilot Report details that would name the defect are replaced by these in Mystery Aircraft.
+          clues: {
+            "Poorer climb": "Climbs more slowly than usual.",
+            "Aircraft rolls/yaws to one side": "The pilot has to hold some aileron or rudder to fly straight.",
+            "Buffet or extra noise": "A rumble or buffet is felt, and the cabin is noisier than usual.",
+            "Engine parameters normal": "Same thrust setting and fuel flow as usual for that thrust: the engine is working properly."
+          },
+          fix: {
+            runText: "Each run: thrust 60%, Hold altitude, " + RUN_SECONDS.fixed + " seconds of flight.",
+            metric: "the thrust needed to hold cruise speed (less drag = less thrust and fuel)",
+            columns: [["Drag at cruise", "kN"], ["Thrust needed for cruise", "%"], ["Airspeed after the run", "knots"], ["Altitude after the run", "feet"]],
+            measure: function (s) {
+              const f = s.figures(), r = s.snapshot();
+              return [Math.round(f.drag), Math.round(f.thrustNeeded), Math.round(r.speedKt), (Math.round(r.altitudeFt / 10) * 10).toLocaleString()];
+            },
+            value: function (fig) { return fig.drag; },   // what "performance gain" is measured by
+            tolerance: 0.3,
+            explain: function (id, before, after, gain) {
+              return "Drag at cruise " + kN(before.drag) + " &rarr; " + kN(after.drag) + " kN, thrust needed " +
+                Math.round(before.thrustNeeded) + "% &rarr; " + Math.round(after.thrustNeeded) + "%: a gain of <strong>" +
+                (Math.round(gain * 10) / 10).toLocaleString() + " kN</strong>.";
+            },
+            lesson: "Defects that disturb a lot of air (an open panel, a damaged leading edge) cost the most. Small ones, like dirt or fasteners, still add up over many flights."
+          }
+        },
+
+        heli: {
+          sim: window.HELI_SIM,
+          label: "Helicopter",
+          forces: ["Rotor thrust", "Weight", "Drag", "Anti-torque"],
+          decimals: 1,
+          defects: {
+            erosion: {
+              area: "blades", finding: "eroded leading edges and dirt found near the blade tips",
+              cause: "The eroded, dirty blades added rotor drag.",
+              report: "Needs more power and more collective to hover",
+              why: "More rotor drag, and less thrust from each blade, mean more power and more collective for the same hover.",
+              group: "power"
+            },
+            patch: {
+              area: "blades", finding: "a raised repair patch found on one blade",
+              cause: "The repair patch adds only a little rotor drag.",
+              report: "A slight increase in vibration",
+              why: "The repaired blade is a little different from the others, so the rotor is slightly out of balance and the pilot feels a mild vibration.",
+              group: "vibration",
+              after: "Its main effect is vibration, because that blade no longer matches the others."
+            },
+            tracking: {
+              area: "head", finding: "blades found out of track: the rotor is out of balance",
+              cause: "Out-of-track blades hardly change the forces.",
+              report: "Strong vibration; the rotor disc wobbles",
+              why: "Each blade flies on a slightly different path, giving a strong once-per-turn shake.",
+              group: "vibration",
+              after: "The big effect is a strong shake (vibration), not a loss of performance."
+            },
+            tail: {
+              area: "tail", finding: "nicks and a damaged tip found on one tail rotor blade",
+              cause: "The damaged tail rotor blades make less anti-torque push.",
+              report: "Less pedal left; harder to stop the helicopter turning",
+              why: "With less push from the tail rotor, the pilot needs more pedal to stop the main rotor's torque turning the helicopter.",
+              group: "pedal"
+            },
+            weight: {
+              area: "cabin", finding: "extra cargo and equipment found on board, heavier than planned",
+              cause: "The extra load added weight.",
+              report: "Needs much more power to hover; may only hover in ground effect",
+              why: "More weight needs more rotor thrust, and more thrust needs much more power, so the power margin shrinks or runs out.",
+              group: "power"
+            }
+          },
+          cut: {
+            cause: "Lowering the collective reduced the rotor thrust; the helicopter itself is clean.",
+            report: "The helicopter descends, but nothing feels abnormal",
+            why: "Less rotor thrust than weight makes the helicopter sink. That is the normal response to lowering the collective, not a defect.",
+            group: "normal"
+          },
+          engineReport: "Engine power low, with high engine temperatures",
+          after: {
+            "Rotor thrust": function (f) {
+              if (f["Rotor thrust"].after < f.Weight.after) {
+                return "Rotor thrust (" + kN(f["Rotor thrust"].after) + " kN) is now less than weight (" + kN(f.Weight.after) + " kN), so the helicopter descends.";
+              }
+              return "To hover, the rotor must make the same extra thrust, and more thrust needs much more power.";
+            },
+            Weight: function () { return "To hover, the rotor must make the same extra thrust, and more thrust needs much more power."; },
+            Drag: function () { return "The engine has to spend more power just turning the rotor, so less power is left for hovering and climbing."; },
+            "Anti-torque": function () { return "The pilot needs more pedal to stop the helicopter turning, so less pedal is left for control."; }
+          },
+          scenario: function (sc) {
+            if (sc.id === "cut") {
+              return "The helicopter is <strong>clean</strong> (no defects) and hovering at 80 ft. The pilot lowers the collective from 60% to <strong>" +
+                CUT.collective + "%</strong>.";
+            }
+            return "Hangar inspection found: <strong>" + defectName(sc.list[0]) + "</strong>. The helicopter starts in a hover at 80 ft, " +
+              "with the collective set for the hover and 80% power available.";
+          },
+          areas: [
+            { id: "blades", name: "Main rotor blades", at: { x: -120, y: -50 }, tag: { x: -390, y: -205 } },
+            { id: "head", name: "Rotor head", at: { x: 0, y: -52 }, tag: { x: -390, y: -158 } },
+            { id: "tail", name: "Tail rotor", at: { x: -206, y: -44 }, tag: { x: -390, y: -111 } },
+            { id: "engine", name: "Engine", at: { x: -10, y: -36 }, tag: { x: 90, y: -110 },
+              clear: "Engine: no defect found. Oil, filters and engine readings are all normal." },
+            { id: "cabin", name: "Cabin & load", at: { x: 20, y: 8 }, tag: { x: 90, y: 60 } }
+          ],
+          clues: {
+            "Increased vibration": function () {
+              return "Vibration level " + window.HELI_SIM.figures().vibration.toFixed(1) + " out of 10 (a healthy helicopter is about 1).";
+            },
+            "Reduced pedal margin / yaw control": "More pedal than usual is needed to stop the helicopter turning.",
+            "Engine parameters normal": "The engine gives its normal power: the extra power is being used up somewhere else."
+          },
+          fix: {
+            runText: "Each run: 80% power available, Pilot holds the height, " + RUN_SECONDS.heli + " seconds.",
+            metric: "the power needed to hover out of ground effect (less power needed = more margin)",
+            columns: [["Power to hover (OGE)", "kW"], ["Height after the run", "feet"], ["Vibration", "out of 10"], ["Pedal left", "%"]],
+            measure: function (s) {
+              const f = s.figures(), r = s.snapshot();
+              return [Math.round(f.hoverPower).toLocaleString(), Math.round(r.heightFt), f.vibration.toFixed(1), Math.max(0, Math.round(f.pedal))];
+            },
+            value: function (fig) { return fig.hoverPower; },
+            tolerance: 2,
+            explain: function (id, before, after, gain) {
+              let text = "Power to hover " + Math.round(before.hoverPower).toLocaleString() + " &rarr; " +
+                Math.round(after.hoverPower).toLocaleString() + " kW: a gain of <strong>" + Math.round(gain) + " kW</strong>.";
+              if (before.vibration - after.vibration >= 0.5) {
+                text += " It also cut vibration from " + before.vibration.toFixed(1) + " to " + after.vibration.toFixed(1) + " out of 10.";
+              }
+              if (after.pedal - before.pedal >= 3) {
+                text += " It gave back pedal margin (" + Math.max(0, Math.round(before.pedal)) + "% &rarr; " + Math.round(after.pedal) + "% left).";
+              }
+              if (gain < 10) text += " Very little power came back: this fix matters more for comfort, wear or control than for performance.";
+              return text;
+            },
+            lesson: "Power comes back from removing weight and rotor drag. Tracking and tail rotor faults give little power back, but fixing them matters for vibration and yaw control."
+          }
+        }
+      };
+
+      /* ---------------------------------------------------------------------
+         T2. SMALL HELPERS
+         --------------------------------------------------------------------- */
+
+      const $ = function (id) { return document.getElementById(id); };
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      function kind() { return $("heli-mode").hidden ? "fixed" : "heli"; }
+      function T() { return TRAINING[kind()]; }
+      function sim() { return T().sim; }
+
+      function kN(n) {
+        const d = T().decimals;
+        return n.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
+      }
+      function defectName(x) {
+        const d = sim().defects.find(function (d) { return d.id === x.id; });
+        return d.name + " (" + sim().severityNames[x.severity - 1] + ")";
+      }
+      function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
+      function shuffle(list) {
+        const a = list.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+      // `count` different defects, each Moderate or Severe so the symptoms show.
+      function randomDefects(count) {
+        return shuffle(sim().defects).slice(0, count).map(function (d) {
+          return { id: d.id, severity: 2 + Math.floor(Math.random() * 2) };
+        });
+      }
+      function formatTime(seconds) {
+        const m = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return m + ":" + String(sec).padStart(2, "0");
+      }
+      function signedPercent(p) {
+        const r = Math.round(p);
+        return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r) + "%";
+      }
+      function signed(n) { return n < 0 ? "−" + Math.abs(n) : String(n); }
+      function plural(n, word) { return n + " " + word + (n === 1 ? "" : "s"); }
+      function button(action, value, label, attrs) {
+        return '<button type="button" data-action="' + action + '" data-value="' + value + '" data-key="' + action + "|" + value + '"' +
+          (attrs || "") + ">" + label + "</button>";
+      }
+      function scrollToEl(node, block) {
+        if (!node) return;
+        const r = node.getBoundingClientRect();
+        if (r.top < 0 || r.top > window.innerHeight * 0.6) {
+          node.scrollIntoView({ block: block || "start", behavior: reducedMotion.matches ? "auto" : "smooth" });
+        }
+      }
+
+      /* ---------------------------------------------------------------------
+         T3. SESSION SCORE (kept in memory only)
+         --------------------------------------------------------------------- */
+
+      const score = { predict: 0, mystery: 0, fix: 0 };
+
+      function addPoints(act, n) {
+        score[act] = Math.max(0, score[act] + n);
+        $("t-score").textContent = score.predict + score.mystery + score.fix;
+        $("t-score-breakdown").textContent = "Predict " + score.predict + " · Mystery " + score.mystery + " · Fix " + score.fix +
+          " · not saved";
+      }
+
+      /* ---------------------------------------------------------------------
+         T4. ACTIVITY SWITCHING AND RUNS
+         --------------------------------------------------------------------- */
+
+      let activity = "free";
+      let A = null;        // the current activity's state
+      let run = null;      // the activity run in progress: { kind, end, onDone }
+      let shownKind = kind();
+
+      const hangars = [$("hangar-title").closest("section"), $("h-hangar-title").closest("section")];
+      $("compare").parentElement.classList.add("t-compare-box");
+      $("h-compare").parentElement.classList.add("t-compare-box");
+
+      function setActivity(name) {
+        activity = name;
+        run = null;
+        document.body.classList.remove("t-secret", "t-mystery");
+        hangars.forEach(function (h) { h.inert = name !== "free"; });
+        document.querySelectorAll(".training-buttons button").forEach(function (b) {
+          b.setAttribute("aria-pressed", String(b.dataset.activity === name));
+        });
+        $("training").hidden = name === "free";
+        if (name === "free") {
+          A = null;
+          showFinding("");
+          return;
+        }
+        startActivity();
+        scrollToEl($("training"));
+      }
+
+      function startActivity() {
+        run = null;
+        shownKind = kind();
+        document.body.classList.remove("t-secret", "t-mystery");
+        showFinding("");
+        const act = ACTIVITIES[activity];
+        $("t-title").textContent = act.title + " · " + T().label;
+        $("t-intro").innerHTML = act.intro();
+        act.start();
+        renderBody();
+      }
+
+      // Flies the simulator for RUN_SECONDS, then calls onDone.
+      function startRun(onDone) {
+        run = { kind: kind(), end: RUN_SECONDS[kind()], onDone: onDone };
+        sim().play();
+        renderBody();
+        scrollToEl(kind() === "fixed" ? $("scene") : $("h-scene"), "center");
+      }
+
+      function tick() {
+        if (run) {
+          const s = TRAINING[run.kind].sim;
+          if (run.kind !== kind()) {
+            run = null;
+          } else if (s.time() >= run.end - 1e-6 || s.stopped()) {
+            s.pause();
+            const done = run.onDone;
+            run = null;
+            done();
+            renderBody();
+            scrollToEl($("t-body"));
+          } else if (!s.isRunning() && s.time() === 0) {
+            run = null;               // the trainee pressed Reset: let them start the run again
+            renderBody();
+          } else {
+            const p = $("t-progress");
+            if (p) {
+              p.textContent = s.isRunning()
+                ? "Running… " + formatTime(s.time()) + " of " + formatTime(run.end) + " (simulated time). Watch the drawing and gauges."
+                : "Paused at " + formatTime(s.time()) + ". Press Play in the simulator to carry on.";
+            }
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+
+      // Put the simulator back to its start with these defects and inputs.
+      function prepare(list, fly) {
+        const s = sim();
+        s.pause();
+        s.setDefects(list);
+        if (kind() === "fixed") {
+          s.reset();
+          s.setMode(fly.mode);
+          s.setThrust(fly.thrust);
+        } else {
+          s.setPower(fly.power);
+          s.setMode(fly.mode);
+          s.reset();
+          if (fly.collective) s.setCollective(fly.collective);
+        }
+      }
+
+      // Rebuilds the activity panel. Keeps keyboard focus on the same button if it still exists.
+      function renderBody() {
+        if (activity === "free" || !A) return;
+        const focused = document.activeElement;
+        const key = focused && $("t-body").contains(focused) ? focused.getAttribute("data-key") : null;
+        $("t-body").innerHTML = (activity !== "mystery"
+          ? '<p class="t-locked">The Hangar Condition panel is locked during this activity: the activity sets the defects.</p>' : "") +
+          ACTIVITIES[activity].render();
+        if (key) {
+          const again = $("t-body").querySelector('[data-key="' + key + '"]');
+          if (again && !again.disabled) again.focus();
+        }
+        updateSpots();
+      }
+
+      /* ---------------------------------------------------------------------
+         T5. ACTIVITY 1: PREDICT FIRST
+         --------------------------------------------------------------------- */
+
+      function startPredict() {
+        A = { round: 0, points: 0, last: null };
+        nextScenario();
+      }
+
+      function nextScenario() {
+        const t = T();
+        const ids = Object.keys(t.defects).concat("cut").filter(function (id) { return id !== A.last; });
+        const id = pick(ids);
+        const sc = id === "cut"
+          ? { id: "cut", list: [], info: t.cut }
+          : { id: id, list: [{ id: id, severity: 2 + Math.floor(Math.random() * 2) }], info: t.defects[id] };
+        sc.forces = forceChanges(sc);
+        const most = Math.max.apply(null, sc.forces.map(function (f) { return Math.abs(f.pct); }));
+        sc.right = sc.forces.filter(function (f) { return Math.abs(f.pct) >= most - 0.5; }).map(function (f) { return f.name; });
+        sc.reports = reportOptions(sc.info);
+        A.last = id;
+        A.round += 1;
+        A.sc = sc;
+        A.force = null;
+        A.report = null;
+        A.result = null;
+        // Start from the clean aircraft so the screen doesn't give the answers away.
+        prepare([], FLY[kind()].predict);
+      }
+
+      // Each force before (clean, at the start) and after the scenario is applied.
+      function forceChanges(sc) {
+        const t = T(), s = sim();
+        const clean = s.figures([]), now = s.figures(sc.list);
+        let values;
+        if (kind() === "fixed") {
+          const thrust = clean.maxThrust * FLY.fixed.predict.thrust / 100;
+          values = {
+            Lift: [clean.lift, now.lift],
+            Weight: [clean.weight, now.weight],
+            Thrust: [thrust, sc.id === "cut" ? clean.maxThrust * CUT.thrust / 100 : thrust],
+            Drag: [clean.drag, now.drag]
+          };
+        } else {
+          values = {
+            "Rotor thrust": [clean.weight, sc.id === "cut" ? clean.maxThrust * CUT.collective / 100 : now.weight],
+            Weight: [clean.weight, now.weight],
+            Drag: [clean.drag, now.drag],
+            "Anti-torque": [clean.tail, now.tail]
+          };
+        }
+        return t.forces.map(function (name) {
+          const v = values[name];
+          return { name: name, before: v[0], after: v[1], pct: (v[1] - v[0]) / v[0] * 100 };
+        });
+      }
+
+      // The right symptom, two symptoms from other groups, and one engine problem.
+      function reportOptions(info) {
+        const t = T();
+        const byGroup = {};
+        Object.keys(t.defects).map(function (id) { return t.defects[id]; }).concat(t.cut).forEach(function (d) {
+          if (d.group === info.group) return;
+          (byGroup[d.group] = byGroup[d.group] || []).push(d.report);
+        });
+        const others = shuffle(Object.keys(byGroup)).slice(0, 2).map(function (g) { return { text: pick(byGroup[g]) }; });
+        return shuffle([{ text: info.report, right: true }, { text: t.engineReport, engine: true }].concat(others));
+      }
+
+      function predictRun() {
+        const sc = A.sc;
+        const fly = Object.assign({}, FLY[kind()].predict);
+        if (sc.id === "cut" && kind() === "heli") fly.collective = CUT.collective;
+        prepare(sc.list, fly);
+        if (sc.id === "cut" && kind() === "fixed") sim().setThrust(CUT.thrust);
+        startRun(finishPredict);
+      }
+
+      function finishPredict() {
+        const t = T(), sc = A.sc;
+        const forceRight = sc.right.indexOf(A.force) >= 0;
+        const choice = sc.reports[A.report];
+        const reportRight = Boolean(choice.right);
+        const points = (forceRight ? POINTS.predictRight : 0) + (reportRight ? POINTS.predictRight : 0);
+        A.points += points;
+        addPoints("predict", points);
+
+        // Force explanation: what changed most, why, and what happens next.
+        const f = {};
+        sc.forces.forEach(function (x) { f[x.name] = x; });
+        const top = f[sc.right[0]];
+        const names = sc.right.length > 1 ? sc.right.join(" and ") + " both" : sc.right[0];
+        const small = Math.abs(top.pct) < 8;
+        const next = sc.info.after || t.after[sc.right[0]](f);
+        const forceText = names + " changed most" + (small ? ", but only a little" : "") + ": " + kN(top.before) + " &rarr; " +
+          kN(top.after) + " kN (" + signedPercent(top.pct) + "). " + sc.info.cause + " " + next;
+
+        let reportText = (reportRight ? "" : "The pilot would report: “" + sc.info.report + "”. ") + sc.info.why;
+        if (choice.engine) reportText += " The engine itself is fine, so the engine readings stay normal.";
+
+        A.result = { forceRight: forceRight, reportRight: reportRight, forceText: forceText, reportText: reportText, points: points };
+      }
+
+      function renderPredict() {
+        const t = T(), sc = A.sc, res = A.result;
+        const locked = Boolean(run || res);
+        let html = '<div class="t-step"><h3>Run ' + A.round + ": the situation</h3>" +
+          '<div class="t-box"><p>' + t.scenario(sc) + "</p></div></div>";
+
+        if (!res) {
+          html += '<div class="t-step"><h3>a) Which force will change most?</h3><div class="t-options">' +
+            t.forces.map(function (name) {
+              return button("force", name, name, ' aria-pressed="' + (A.force === name) + '"' + (locked ? " disabled" : ""));
+            }).join("") + "</div></div>";
+          html += '<div class="t-step"><h3>b) What will the pilot report?</h3><div class="t-options">' +
+            sc.reports.map(function (r, i) {
+              return button("report", i, r.text, ' aria-pressed="' + (A.report === i) + '"' + (locked ? " disabled" : ""));
+            }).join("") + "</div></div>";
+          html += '<div class="t-actions">' +
+            (run ? "" : button("run", "predict", "Run the simulation", ' class="t-primary"' + (A.force && A.report !== null ? "" : " disabled"))) +
+            '<p class="t-progress" id="t-progress" aria-live="polite">' +
+            (run ? "" : A.force && A.report !== null ? "Ready: press Run and watch what happens." : "Answer both questions first.") + "</p></div>";
+          return html;
+        }
+
+        html += '<div class="t-step"><h3>How did you do?</h3>' +
+          resultBox(res.forceRight, "a) Which force changed most?", A.force, res.forceText) +
+          resultBox(res.reportRight, "b) What will the pilot report?", sc.reports[A.report].text, res.reportText) + "</div>";
+        html += '<div class="t-actions">' + button("next", "predict", "Next situation", ' class="t-primary"') +
+          '<p class="t-points">+' + res.points + " points this run · " + A.points + " in this activity</p></div>";
+        return html;
+      }
+
+      function resultBox(right, question, answer, text) {
+        return '<div class="t-result ' + (right ? "right" : "wrong") + '">' +
+          '<p><span class="t-mark" aria-hidden="true">' + (right ? "✅" : "❌") + "</span><strong>" + question + "</strong> " +
+          '<span class="sr-only">' + (right ? "Correct." : "Not correct.") + "</span></p>" +
+          "<p>Your answer: " + answer + "</p><p>" + text + "</p></div>";
+      }
+
+      /* ---------------------------------------------------------------------
+         T6. ACTIVITY 2: MYSTERY AIRCRAFT
+         --------------------------------------------------------------------- */
+
+      function startMystery() {
+        A = { defects: randomDefects(1 + Math.floor(Math.random() * 3)), inspected: {}, findings: [], clicks: 0, picked: {}, result: null };
+        sim().setCompare(false);
+        prepare(A.defects, FLY[kind()].predict);
+        document.body.classList.add("t-secret", "t-mystery");
+        A.report = mysteryReport();
+      }
+
+      // The simulator's Pilot Report, with any detail that would name the defect replaced by a plain symptom.
+      function mysteryReport() {
+        const t = T();
+        const items = sim().pilotReport().map(function (i) {
+          const clue = t.clues[i.text];
+          return { text: i.text, engine: i.engine, detail: clue === undefined ? i.detail : typeof clue === "function" ? clue() : clue };
+        });
+        if (!items.some(function (i) { return i.engine; })) {
+          items.push({ engine: true, text: "Engine parameters normal", detail: t.clues["Engine parameters normal"] });
+        }
+        return items;
+      }
+
+      function inspect(areaId) {
+        if (activity !== "mystery" || !A) return;
+        const t = T();
+        const area = t.areas.find(function (a) { return a.id === areaId; });
+        let finding = A.inspected[areaId];
+        if (!finding) {
+          const found = A.defects.filter(function (x) { return t.defects[x.id].area === areaId; });
+          finding = {
+            found: found.length > 0,
+            text: found.length
+              ? area.name + ": " + found.map(function (x) { return t.defects[x.id].finding; }).join("; also ") + "."
+              : area.clear || area.name + ": no defect found."
+          };
+          A.inspected[areaId] = finding;
+          A.findings.unshift(finding);
+          if (!A.result) A.clicks += 1;      // inspections after the diagnosis are free
+        }
+        showFinding((finding.found ? "⚠ " : "✓ ") + finding.text);
+        renderBody();
+      }
+
+      function submitDiagnosis() {
+        const t = T();
+        const present = {};
+        A.defects.forEach(function (x) { present[x.id] = x; });
+        const rows = [];
+        let right = 0, wrong = 0, missed = 0;
+        sim().defects.forEach(function (d) {
+          const has = Boolean(present[d.id]), picked = Boolean(A.picked[d.id]);
+          if (has && picked) { right++; rows.push({ status: "right", name: defectName(present[d.id]) }); }
+          else if (has) { missed++; rows.push({ status: "missed", name: defectName(present[d.id]) }); }
+          else if (picked) { wrong++; rows.push({ status: "wrong", name: d.name }); }
+        });
+        const perfect = missed === 0 && wrong === 0;
+        const unused = t.areas.length - A.clicks;
+        const bonus = perfect ? Math.max(0, unused) * POINTS.mysteryUnusedArea : 0;
+        const total = Math.max(0, right * POINTS.mysteryRight + wrong * POINTS.mysteryWrong + bonus);
+        A.result = { rows: rows, right: right, wrong: wrong, missed: missed, perfect: perfect, unused: unused, bonus: bonus, total: total };
+        addPoints("mystery", total);
+        // Show the real Hangar Condition and the defect markers again.
+        document.body.classList.remove("t-secret");
+      }
+
+      function renderMystery() {
+        const t = T(), res = A.result;
+        let html = '<div class="t-step"><h3>Pilot Report</h3><div class="t-box"><ul class="t-report">' +
+          A.report.map(function (i) {
+            return "<li><strong" + (i.engine ? ' class="engine"' : "") + ">" + i.text + '</strong><span class="detail">' + i.detail + "</span></li>";
+          }).join("") + "</ul></div>" +
+          '<p class="t-note">' + (res ? "" : "The Hangar Condition panel is hidden: 1 to 3 defects are switched on. ") +
+          "You can also fly the " + (kind() === "fixed" ? "aircraft" : "helicopter") + " with the simulator controls to watch the gauges.</p></div>";
+
+        html += '<div class="t-step"><h3>Inspect the ' + (kind() === "fixed" ? "aircraft" : "helicopter") + "</h3>" +
+          "<p>Tap an area on the drawing, or use these buttons. Each new area counts as one inspection" +
+          (res ? "." : ": fewer inspections earn bonus points.") + "</p>" +
+          '<div class="t-options t-areas">' + t.areas.map(function (a) {
+            const f = A.inspected[a.id];
+            return button("inspect", a.id, (f ? (f.found ? "⚠ " : "✓ ") : "") + a.name, f ? ' class="' + (f.found ? "found" : "clear") + '"' : "");
+          }).join("") + "</div>" +
+          '<p class="t-progress"><strong>Inspections used: ' + A.clicks + "</strong> of " + t.areas.length + " areas</p>" +
+          (A.findings.length ? '<ul class="t-findings" aria-live="polite">' + A.findings.map(function (f) {
+            return '<li class="' + (f.found ? "found" : "") + '">' + f.text + "</li>";
+          }).join("") + "</ul>" : "") + "</div>";
+
+        if (!res) {
+          html += '<div class="t-step"><h3>Your diagnosis</h3><p>Tick every defect you think is present, then submit.</p>' +
+            '<div class="t-checks">' + sim().defects.map(function (d) {
+              return '<label class="t-check"><input type="checkbox" data-pick="' + d.id + '"' + (A.picked[d.id] ? " checked" : "") + ">" +
+                "<span>" + d.name + "</span></label>";
+            }).join("") + "</div>" +
+            '<div class="t-actions">' + button("submit", "mystery", "Submit diagnosis", ' class="t-primary"') + "</div></div>";
+          return html;
+        }
+
+        const label = { right: ["✅", "Right: it was there and you found it"], missed: ["⚠️", "Missed: it was there"],
+                        wrong: ["❌", "Wrong: it was not there"] };
+        html += '<div class="t-step"><h3>Result</h3>' + res.rows.map(function (r) {
+          return '<div class="t-result ' + r.status + '"><p><span class="t-mark" aria-hidden="true">' + label[r.status][0] + "</span><strong>" +
+            r.name + "</strong></p><p>" + label[r.status][1] + ".</p></div>";
+        }).join("") +
+          '<table class="t-score-table" style="margin-top:12px"><tbody>' +
+          "<tr><td>Right: " + res.right + " × " + POINTS.mysteryRight + "</td><td>" + res.right * POINTS.mysteryRight + "</td></tr>" +
+          (res.wrong ? "<tr><td>Wrong: " + res.wrong + " × " + signed(POINTS.mysteryWrong) + "</td><td>" + signed(res.wrong * POINTS.mysteryWrong) + "</td></tr>" : "") +
+          (res.missed ? "<tr><td>Missed: " + res.missed + " × 0</td><td>0</td></tr>" : "") +
+          "<tr><td>Inspection bonus: " + (res.perfect
+            ? plural(Math.max(0, res.unused), "area") + " not inspected × " + POINTS.mysteryUnusedArea
+            : "only when every defect is found and none are wrong") + "</td><td>" + res.bonus + "</td></tr>" +
+          "<tr><td><strong>Score for this aircraft</strong></td><td>" + res.total + "</td></tr></tbody></table>" +
+          '<p class="t-note">The real defects are now marked on the drawing, and the Hangar Condition panel is shown below (locked).</p></div>';
+        html += '<div class="t-actions">' + button("restart", "mystery", "Try another mystery " + (kind() === "fixed" ? "aircraft" : "helicopter"),
+          ' class="t-primary"') + "</div>";
+        return html;
+      }
+
+      // Clickable labels on both drawings. They are only shown in Mystery Aircraft.
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      function svgEl(tag, attrs) {
+        const node = document.createElementNS(SVG_NS, tag);
+        Object.keys(attrs).forEach(function (k) { node.setAttribute(k, attrs[k]); });
+        return node;
+      }
+      const spots = { fixed: {}, heli: {} };
+
+      function buildSpots(k) {
+        const t = TRAINING[k];
+        const layer = svgEl("g", { class: "inspect-layer", "aria-hidden": "true" });
+        t.areas.forEach(function (a) {
+          const w = (a.name.length + 2) * 11.5 + 24, h = 40;
+          const end = { x: Math.min(Math.max(a.at.x, a.tag.x), a.tag.x + w), y: Math.min(Math.max(a.at.y, a.tag.y), a.tag.y + h) };
+          const g = svgEl("g", { class: "inspect-spot" });
+          const text = svgEl("text", { x: a.tag.x + 12, y: a.tag.y + 27 });
+          text.textContent = a.name;
+          g.append(
+            svgEl("line", { x1: a.at.x, y1: a.at.y, x2: end.x, y2: end.y }),
+            svgEl("circle", { cx: a.at.x, cy: a.at.y, r: 7 }),
+            svgEl("rect", { x: a.tag.x, y: a.tag.y, width: w, height: h, rx: 8 }),
+            text
+          );
+          g.addEventListener("click", function () { if (kind() === k) inspect(a.id); });
+          layer.appendChild(g);
+          spots[k][a.id] = { group: g, text: text, name: a.name };
+        });
+        t.sim.drawing.appendChild(layer);
+
+        // A line under the drawing that repeats the last finding (handy on phones).
+        const p = document.createElement("p");
+        p.className = "t-finding";
+        p.id = "t-finding-" + k;
+        p.setAttribute("aria-live", "polite");
+        p.hidden = true;
+        const svg = $(k === "fixed" ? "scene" : "h-scene");
+        svg.parentNode.insertBefore(p, svg.nextSibling);
+      }
+
+      function updateSpots() {
+        const k = kind();
+        Object.keys(spots[k]).forEach(function (id) {
+          const s = spots[k][id];
+          const f = activity === "mystery" && A ? A.inspected[id] : null;
+          s.group.classList.toggle("found", Boolean(f && f.found));
+          s.group.classList.toggle("clear", Boolean(f && !f.found));
+          s.text.textContent = (f ? (f.found ? "⚠ " : "✓ ") : "") + s.name;
+        });
+      }
+
+      function showFinding(text) {
+        ["fixed", "heli"].forEach(function (k) {
+          const p = $("t-finding-" + k);
+          if (!p) return;
+          p.textContent = text;
+          p.hidden = activity !== "mystery";
+        });
+        if (activity === "mystery" && text === "") {
+          $("t-finding-" + kind()).textContent = "Tap a labelled area on the drawing to inspect it.";
+        }
+      }
+
+      /* ---------------------------------------------------------------------
+         T7. ACTIVITY 3: FIX & VERIFY
+         --------------------------------------------------------------------- */
+
+      function startFix() {
+        A = { defects: randomDefects(3), fixed: [], log: [], needRun: true, before: {}, after: {}, gains: {}, order: null, result: null, points: 0 };
+        prepare(A.defects, FLY[kind()].fix);
+      }
+
+      function stillBroken() {
+        return A.defects.filter(function (x) { return A.fixed.indexOf(x.id) < 0; });
+      }
+      function shortName(id) {
+        return sim().defects.find(function (d) { return d.id === id; }).name;
+      }
+
+      function fixRun() {
+        prepare(stillBroken(), FLY[kind()].fix);
+        startRun(finishFixRun);
+      }
+
+      function finishFixRun() {
+        const t = T();
+        const label = A.log.length === 0 ? "Start: 3 defects" : "After fix " + A.fixed.length + ": " + shortName(A.fixed[A.fixed.length - 1]);
+        A.log.push({ label: label, cells: t.fix.measure(sim()) });
+        if (A.log.length > 1) {
+          A.points += POINTS.fixVerified;
+          addPoints("fix", POINTS.fixVerified);
+        }
+        A.needRun = false;
+        if (A.fixed.length === A.defects.length) {
+          // Shuffle the fixed defects for the ordering step (not already in the right order, if possible).
+          const right = correctOrder().join();
+          let order = shuffle(A.fixed);
+          for (let k = 0; k < 10 && order.join() === right; k++) order = shuffle(A.fixed);
+          A.order = order;
+        }
+      }
+
+      function fixDefect(id) {
+        if (A.needRun || run || A.fixed.indexOf(id) >= 0) return;
+        const t = T(), s = sim();
+        const before = s.figures(stillBroken());
+        A.fixed.push(id);
+        const after = s.figures(stillBroken());
+        A.before[id] = before;
+        A.after[id] = after;
+        A.gains[id] = t.fix.value(before) - t.fix.value(after);
+        A.needRun = true;
+        s.setDefects(stillBroken());   // the defect disappears from the drawing and the Hangar Condition panel
+      }
+
+      function correctOrder() {
+        return A.fixed.slice().sort(function (a, b) { return A.gains[b] - A.gains[a]; });
+      }
+
+      function checkOrder() {
+        const tol = T().fix.tolerance;
+        const right = correctOrder();
+        const marks = A.order.map(function (id, k) { return Math.abs(A.gains[id] - A.gains[right[k]]) <= tol; });
+        const points = marks.filter(Boolean).length * POINTS.orderRight;
+        A.points += points;
+        addPoints("fix", points);
+        A.result = { right: right, marks: marks, points: points };
+      }
+
+      function moveItem(id, dir) {
+        const i = A.order.indexOf(id), j = i + dir;
+        if (i < 0 || j < 0 || j >= A.order.length) return;
+        A.order[i] = A.order[j];
+        A.order[j] = id;
+      }
+
+      function renderFix() {
+        const t = T(), res = A.result;
+        let html = '<div class="t-step"><h3>Defects on this ' + (kind() === "fixed" ? "aircraft" : "helicopter") + "</h3>" +
+          A.defects.map(function (x) {
+            const n = A.fixed.indexOf(x.id);
+            return '<div class="t-defect-row' + (n >= 0 ? " fixed" : "") + '"><span>' + defectName(x) + "</span>" +
+              (n >= 0 ? "<span>✅ Fixed (fix " + (n + 1) + ")</span>"
+                      : button("fix", x.id, "Fix", ' aria-label="Fix ' + defectName(x) + '"' + (A.needRun || run ? " disabled" : ""))) + "</div>";
+          }).join("") +
+          '<p class="t-note">' + (A.log.length === 0 ? "First fly the poor-performance run to see how bad it is."
+            : A.fixed.length === A.defects.length ? "All three defects are fixed."
+            : A.needRun ? "Re-run to verify this fix before you fix the next defect."
+            : "Fix one defect, then re-run to see the forces and gauges recover.") + " " + t.fix.runText + "</p></div>";
+
+        if (A.needRun || run) {
+          html += '<div class="t-actions">' +
+            (run ? "" : button("run", "fix", A.log.length === 0 ? "Fly the poor-performance run" : "Re-run to verify the fix", ' class="t-primary"')) +
+            '<p class="t-progress" id="t-progress" aria-live="polite"></p></div>';
+        }
+
+        if (A.log.length) {
+          html += '<div class="t-step"><h3 id="t-log-title">Run log</h3><div class="results-wrap"><table class="results" aria-labelledby="t-log-title">' +
+            '<thead><tr><th scope="col">Run</th>' + t.fix.columns.map(function (c) {
+              return '<th scope="col">' + c[0] + '<span class="unit">' + c[1] + "</span></th>";
+            }).join("") + "</tr></thead><tbody>" +
+            A.log.map(function (row) {
+              return '<tr><th scope="row">' + row.label + "</th>" + row.cells.map(function (c) { return "<td>" + c + "</td>"; }).join("") + "</tr>";
+            }).join("") + "</tbody></table></div></div>";
+        }
+
+        if (!A.order) return html;
+
+        if (!res) {
+          html += '<div class="t-step"><h3>Put the fixes in order</h3>' +
+            "<p>Drag the defects (or use ▲ ▼) from the <strong>biggest</strong> performance gain at the top to the <strong>smallest</strong> at the bottom. " +
+            "Performance here means " + t.fix.metric + ". Use your run log as evidence.</p>" +
+            '<p class="t-sort-end">Biggest gain</p><ol class="t-sort" id="t-sort">' +
+            A.order.map(function (id, k) {
+              return '<li data-id="' + id + '"><span class="t-rank">' + (k + 1) + '</span><span class="t-grip" aria-hidden="true">⠿</span>' +
+                '<span class="t-name">' + shortName(id) + "</span>" +
+                button("up", id, "▲", ' aria-label="Move ' + shortName(id) + ' up"' + (k === 0 ? " disabled" : "")) +
+                button("down", id, "▼", ' aria-label="Move ' + shortName(id) + ' down"' + (k === A.order.length - 1 ? " disabled" : "")) + "</li>";
+            }).join("") + '</ol><p class="t-sort-end">Smallest gain</p>' +
+            '<div class="t-actions">' + button("check", "fix", "Check my order", ' class="t-primary"') + "</div></div>";
+          return html;
+        }
+
+        html += '<div class="t-step"><h3>Your order</h3>' + A.order.map(function (id, k) {
+          return '<div class="t-result ' + (res.marks[k] ? "right" : "wrong") + '"><p><span class="t-mark" aria-hidden="true">' +
+            (res.marks[k] ? "✅" : "❌") + "</span><strong>" + (k + 1) + ". " + shortName(id) + "</strong>" +
+            '<span class="sr-only">' + (res.marks[k] ? " Right place." : " Wrong place.") + "</span></p></div>";
+        }).join("") + "</div>";
+        html += '<div class="t-step"><h3>The correct order, and why</h3>' + res.right.map(function (id, k) {
+          const x = A.defects.find(function (d) { return d.id === id; });
+          return '<div class="t-result"><p><strong>' + (k + 1) + ". " + defectName(x) + "</strong></p><p>" +
+            t.fix.explain(id, A.before[id], A.after[id], A.gains[id]) + " " + t.defects[id].cause + "</p></div>";
+        }).join("") + '<p class="t-note">' + t.fix.lesson + "</p></div>";
+        html += '<div class="t-actions">' + button("restart", "fix", "Try again with new defects", ' class="t-primary"') +
+          '<p class="t-points">+' + res.points + " points for the order · " + A.points + " in this activity</p></div>";
+        return html;
+      }
+
+      // Dragging the order list with a finger, pen or mouse.
+      let dragging = null;
+      $("t-body").addEventListener("pointerdown", function (e) {
+        const li = e.target.closest(".t-sort li");
+        if (!li || e.target.closest("button") || e.button > 0) return;
+        e.preventDefault();
+        dragging = { li: li, startY: e.clientY, pointer: e.pointerId };
+        li.setPointerCapture(e.pointerId);
+        li.classList.add("dragging");
+      });
+      $("t-body").addEventListener("pointermove", function (e) {
+        if (!dragging || e.pointerId !== dragging.pointer) return;
+        const li = dragging.li, gap = 8;
+        const prev = li.previousElementSibling, next = li.nextElementSibling;
+        let dy = e.clientY - dragging.startY;
+        if (next && dy > next.offsetHeight / 2 + gap) {
+          li.parentNode.insertBefore(next, li);
+          dragging.startY += next.offsetHeight + gap;
+        } else if (prev && dy < -(prev.offsetHeight / 2 + gap)) {
+          li.parentNode.insertBefore(li, prev);
+          dragging.startY -= prev.offsetHeight + gap;
+        }
+        dy = e.clientY - dragging.startY;
+        li.style.transform = "translateY(" + dy + "px)";
+      });
+      function endDrag(e) {
+        if (!dragging || e.pointerId !== dragging.pointer) return;
+        dragging.li.style.transform = "";
+        dragging.li.classList.remove("dragging");
+        dragging = null;
+        A.order = Array.prototype.map.call($("t-sort").children, function (li) { return li.dataset.id; });
+        renderBody();
+      }
+      $("t-body").addEventListener("pointerup", endDrag);
+      $("t-body").addEventListener("pointercancel", endDrag);
+
+      /* ---------------------------------------------------------------------
+         T8. THE ACTIVITIES, BUTTONS AND START
+         --------------------------------------------------------------------- */
+
+      const ACTIVITIES = {
+        predict: {
+          title: "1. Predict First",
+          intro: function () { return "Read the situation, answer both questions, then run the simulation to see if you were right. " +
+            POINTS.predictRight + " points for each correct answer."; },
+          start: startPredict,
+          render: renderPredict
+        },
+        mystery: {
+          title: "2. Mystery Aircraft",
+          intro: function () { return "Some defects have been switched on in secret. Read the Pilot Report, inspect the areas you think are to blame, then submit your diagnosis. " +
+            POINTS.mysteryRight + " points per defect found, " + signed(POINTS.mysteryWrong) + " for each wrong one, and a bonus for using fewer inspections."; },
+          start: startMystery,
+          render: renderMystery
+        },
+        fix: {
+          title: "3. Fix & Verify",
+          intro: function () { return "Three defects are switched on. Fly a run, fix one defect, re-run to see the recovery, and repeat. Then put the fixes in order of performance gain. " +
+            POINTS.fixVerified + " points per verified fix and " + POINTS.orderRight + " per defect in the right place."; },
+          start: startFix,
+          render: renderFix
+        }
+      };
+
+      $("t-body").addEventListener("click", function (e) {
+        const b = e.target.closest("button[data-action]");
+        if (!b || b.disabled || !A) return;
+        const v = b.dataset.value;
+        switch (b.dataset.action) {
+          case "force": A.force = v; break;
+          case "report": A.report = Number(v); break;
+          case "run": if (activity === "predict") predictRun(); else fixRun(); return;
+          case "next": nextScenario(); break;
+          case "inspect": inspect(v); return;
+          case "submit": submitDiagnosis(); break;
+          case "fix": fixDefect(v); break;
+          case "up": moveItem(v, -1); break;
+          case "down": moveItem(v, 1); break;
+          case "check": checkOrder(); break;
+          case "restart": startActivity(); return;
+        }
+        renderBody();
+      });
+      $("t-body").addEventListener("change", function (e) {
+        const id = e.target.getAttribute("data-pick");
+        if (id && A) A.picked[id] = e.target.checked;
+      });
+
+      document.querySelectorAll(".training-buttons button").forEach(function (b) {
+        b.addEventListener("click", function () { setActivity(b.dataset.activity); });
+      });
+      $("t-restart").addEventListener("click", function () { startActivity(); });
+
+      // Switching between Fixed-wing and Helicopter restarts the activity for the new aircraft.
+      document.querySelectorAll(".aircraft-switch button").forEach(function (b) {
+        b.addEventListener("click", function () {
+          if (activity !== "free" && kind() !== shownKind) startActivity();
+          shownKind = kind();
+        });
+      });
+
+      buildSpots("fixed");
+      buildSpots("heli");
+      requestAnimationFrame(tick);
     })();
   </script>
 </body>

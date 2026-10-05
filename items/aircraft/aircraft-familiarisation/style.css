@@ -860,3 +860,244 @@ h1, h2 { line-height: 1.25; margin: 0; }
   /* Let module buttons shrink below 220px so nothing scrolls sideways. */
   .module-list { grid-template-columns: 1fr; }
 }
+
+
+/* ===========================================================================
+   13. NEW FEATURES
+   Styles for the login screen, trainee badge, progress text, score messages
+   and the instructor dashboard (dashboard.html). They reuse the colour
+   variables from section 1, so they match the rest of the page and switch
+   to dark mode automatically.
+   =========================================================================== */
+
+/* --- 13a. LOGIN SCREEN ---------------------------------------------------
+   The card itself reuses .welcome-card (section 5); these rules only add
+   the form. */
+
+/* Keep the login card narrower than the welcome card: it only holds a form. */
+.login-card { max-width: 520px; }
+
+/* The form: labels and boxes stacked one under another, left-aligned. */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  text-align: left;
+}
+
+.login-label {
+  font-weight: 600;
+  margin-top: 0.6rem;
+}
+
+/* The text boxes (also used for the dashboard password box). */
+.login-input {
+  font: inherit;               /* use the page font, not the browser default */
+  width: 100%;
+  min-height: 48px;            /* comfortable size to tap, like the buttons */
+  padding: 0.6rem 0.8rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
+.login-input:focus { border-color: var(--navy); }
+
+/* The error message: the amber "hint" colours from the parts check. */
+.login-error {
+  margin: 0.6rem 0 0;
+  padding: 0.75rem 1rem;
+  background: var(--hint-bg);
+  color: var(--hint-text);
+  border-left: 5px solid currentColor;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+/* Begin Training: centred, with space above it. */
+.login-button {
+  align-self: center;
+  margin-top: 1.25rem;
+}
+
+
+/* --- 13b. TRAINEE BADGE (top bar) ----------------------------------------
+   "Jane Tan (S1234)  Not you? Switch trainee". The top bar is always navy,
+   so these use white text like the back link. */
+.trainee-badge {
+  display: flex;
+  flex-wrap: wrap;             /* the button drops under the name on phones */
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  font-size: 1rem;
+  /* Long names break onto a new line instead of widening the page. */
+  overflow-wrap: anywhere;
+}
+
+/* A small outlined button that suits the navy bar. */
+.switch-trainee {
+  font: inherit;
+  font-size: 0.9rem;
+  min-height: 36px;
+  padding: 0.2rem 0.75rem;
+  background: transparent;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  cursor: pointer;
+}
+.switch-trainee:hover { background: rgba(255, 255, 255, 0.12); }
+
+
+/* --- 13c. PROGRESS TEXT ----------------------------------------------------
+   "1 of 3 modules completed, 33%" is longer than the old "33%", so let the
+   label wrap onto two lines on narrow screens instead of squashing. */
+.progress-label {
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+}
+
+
+/* --- 13d. SCORE MESSAGE AFTER A PARTS CHECK ------------------------------
+   Same shape as the parts check feedback line: green when passed (80% or
+   more), amber when the trainee should review and try again. */
+.score-message {
+  display: flex;
+  flex-direction: column;      /* the bold message above the score details */
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  border-radius: 6px;
+  border-left: 5px solid currentColor;
+}
+.score-message strong { font-size: 1.15rem; }
+.score-message.is-pass   { background: var(--success-bg); color: var(--success-text); }
+.score-message.is-review { background: var(--hint-bg);    color: var(--hint-text); }
+
+
+/* --- 13e. INSTRUCTOR DASHBOARD (dashboard.html) --------------------------
+   The password screen reuses the login styles above. */
+
+/* The dashboard area: same width and padding as the learning area. */
+.dashboard {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* White card for each part of the dashboard, like the content area. */
+.dashboard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+.dashboard-card h1,
+.dashboard-card h2 { margin-bottom: 0.5rem; }
+.dashboard-card h1 { font-size: 1.6rem; }
+.dashboard-card h2 { font-size: 1.3rem; color: var(--navy); }
+
+/* Grey helper text under the headings. */
+.dashboard-note {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* The table can be wider than a phone screen, so it scrolls sideways
+   inside this box instead of making the whole page scroll. */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.trainee-table {
+  width: 100%;
+  border-collapse: collapse;   /* single lines between cells, not double */
+  font-size: 1rem;
+}
+.trainee-table th,
+.trainee-table td {
+  padding: 0.65rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.trainee-table th {
+  background: var(--navy-soft);
+  font-size: 0.9rem;
+  vertical-align: bottom;      /* line up headings that wrap onto two lines */
+}
+.trainee-table tbody tr:last-child td { border-bottom: none; }
+/* Line up the score columns' numbers. */
+.trainee-table .is-number { text-align: right; white-space: nowrap; }
+
+/* Coloured status labels: rounded "pills". */
+.status-label {
+  display: inline-block;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.status-label.is-on-track    { background: var(--success-bg); color: var(--success-text); }
+.status-label.is-attention   { background: var(--hint-bg);    color: var(--hint-text); }
+.status-label.is-not-started { background: var(--track);      color: var(--text-muted); }
+
+/* Class Summary: one row per module (name, average, optional label). */
+.summary-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.summary-list li {
+  display: flex;
+  flex-wrap: wrap;             /* the label drops to a new line on phones */
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.summary-module { font-weight: 600; flex: 1 1 14rem; }
+.summary-average { font-weight: 700; white-space: nowrap; }
+
+/* The Export Summary text box: monospace so the columns line up. */
+.export-text {
+  width: 100%;
+  min-height: 14rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--page-bg);
+  color: var(--text);
+}
+
+/* Row of dashboard buttons; they wrap onto new lines on small screens. */
+.dashboard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* "Copied" confirmation beside the Copy button. */
+.copy-status { color: var(--success-text); font-weight: 600; }
+
+@media (max-width: 520px) {
+  /* Small screens: less padding, as for the learning area. */
+  .dashboard { padding: 1rem; }
+  .dashboard-card { padding: 1.1rem; }
+}

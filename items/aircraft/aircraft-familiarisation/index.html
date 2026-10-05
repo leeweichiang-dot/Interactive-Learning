@@ -7,10 +7,14 @@
     - style.css decides how it LOOKS.
     - app.js decides how it BEHAVES (what happens when you click things).
 
-  The page has two "screens" that live in this one file:
-    1. The welcome screen (shown first).
-    2. The main learning area (hidden until "Start Learning" is clicked).
+  The page has three "screens" that live in this one file:
+    1. The login screen (shown first, to a trainee who has not signed in).
+    2. The welcome screen (shown after signing in).
+    3. The main learning area (hidden until "Start Learning" is clicked).
+  A trainee who has signed in before goes straight to the learning area.
   app.js switches between them by adding or removing the "hidden" attribute.
+
+  dashboard.html (in this folder) is the instructor dashboard.
   ===========================================================================
 -->
 <html lang="en">
@@ -45,14 +49,68 @@
   <header class="top-bar">
     <a class="back-link" href="../../../module.html?m=aircraft">&larr; Aircraft Familiarisation</a>
     <span class="top-bar-title">Aircraft Familiarisation Training</span>
+
+    <!-- TRAINEE BADGE (new)
+         Shows who is signed in, e.g. "Jane Tan (S1234)", with a button to
+         switch trainee (useful on a shared computer). app.js fills in the
+         name and shows the badge once a trainee has signed in. -->
+    <span id="trainee-badge" class="trainee-badge" hidden>
+      <span id="trainee-badge-name"></span>
+      <button type="button" id="switch-trainee-button" class="switch-trainee">Not you? Switch trainee</button>
+    </span>
   </header>
 
 
   <!-- =====================================================================
-       SCREEN 1: WELCOME SCREEN
-       Shown when the page first opens.
+       LOGIN SCREEN (new)
+       Shown first to a trainee who has not signed in on this device.
+       It reuses the welcome card's look (class="welcome" and
+       "welcome-card"), with extra styles at the bottom of style.css.
+
+       A <form> is used so pressing Enter in a box also submits it.
+       app.js checks the boxes, saves the trainee and moves on.
        ===================================================================== -->
-  <main id="welcome-screen" class="welcome">
+  <main id="login-screen" class="welcome">
+    <div class="welcome-card login-card">
+      <p class="welcome-eyebrow">Trainee Sign-in</p>
+      <h1 class="welcome-title">Aircraft Familiarisation Training</h1>
+
+      <!-- novalidate: app.js shows its own friendly error messages instead
+           of the browser's built-in pop-ups. -->
+      <form id="login-form" class="login-form" novalidate>
+        <!-- Each <label for="..."> is linked to the box with that id, so
+             clicking the label puts the cursor in the box. -->
+        <label class="login-label" for="trainee-name">Full name</label>
+        <input class="login-input" id="trainee-name" name="trainee-name" type="text"
+               autocomplete="name" maxlength="80" required>
+
+        <label class="login-label" for="trainee-id">Trainee ID number</label>
+        <input class="login-input" id="trainee-id" name="trainee-id" type="text"
+               autocomplete="off" autocapitalize="characters" spellcheck="false"
+               maxlength="30" required>
+
+        <!-- Error message, hidden until something is missing.
+             role="alert" makes screen readers read it out straight away. -->
+        <p id="login-error" class="login-error" role="alert" hidden></p>
+
+        <button type="submit" class="button button-primary button-large login-button">
+          Begin Training
+        </button>
+      </form>
+
+      <p class="welcome-note">Your name, trainee ID, progress and scores are saved in this browser on this device only.
+        Signing in again with the same trainee ID brings back your progress.</p>
+    </div>
+  </main>
+
+
+  <!-- =====================================================================
+       SCREEN 1: WELCOME SCREEN
+       Shown after the trainee signs in.
+       "hidden" keeps it out of sight until app.js has checked who is
+       signed in (the login screen comes first).
+       ===================================================================== -->
+  <main id="welcome-screen" class="welcome" hidden>
     <div class="welcome-card">
       <!-- Small label above the title. -->
       <p class="welcome-eyebrow">Interactive Learning Module</p>
@@ -82,8 +140,8 @@
         Start Learning
       </button>
 
-      <!-- What is saved: Parts Check results go to My progress on the portal. -->
-      <p class="welcome-note">Reloading the page starts again from the beginning. Your Parts Check results are saved on this device under My progress.</p>
+      <!-- What is saved: progress and best scores under the trainee's ID, and Parts Check results on My progress. -->
+      <p class="welcome-note">Your completed modules and best Parts Check scores are saved on this device under your trainee ID, so you can carry on where you left off. Your Parts Check results also appear under My progress.</p>
     </div>
   </main>
 
@@ -104,8 +162,8 @@
     <section class="progress-section" aria-label="Overall progress">
       <div class="progress-label">
         <span>Your progress</span>
-        <!-- app.js writes the percentage into this span. -->
-        <span id="progress-percent">0%</span>
+        <!-- app.js writes e.g. "1 of 3 modules completed, 33%" into this span. -->
+        <span id="progress-percent">0 of 3 modules completed, 0%</span>
       </div>
       <div id="progress-track" class="progress-track"
            role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
@@ -207,6 +265,12 @@
 
       <!-- Feedback after an answer in the parts check (hints and "Correct!"). -->
       <p class="activity-feedback" data-role="feedback" hidden></p>
+
+      <!-- SCORE MESSAGE (new)
+           Shown when the Parts Check is finished: the score as a percentage
+           and a green "Well done" (80% or more) or amber "Please review"
+           message. app.js fills it in. -->
+      <div class="score-message" data-role="score-message" role="status" hidden></div>
 
       <!-- Name buttons for every part (explore step only), in groups such
            as "Main parts" and "Control surfaces". app.js builds them. They

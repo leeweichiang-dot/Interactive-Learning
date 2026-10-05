@@ -5,7 +5,7 @@
      - switching from the welcome screen to the learning area
      - building the module buttons and locking/unlocking them
      - showing each module's content and updating the learning panel
-     - running the Module 1 activity (Aircraft Parts, section 11)
+     - running the diagram activities for Modules 1 and 2 (sections 11-13)
      - updating the progress bar and footer
 
    Nothing is saved. All progress lives in memory, so reloading the page
@@ -27,9 +27,9 @@
      explanation  a plain-English summary shown in the learning panel
    and then ONE of these:
      activity     a function that builds the module's interactive activity
-                  inside the main content area (Module 1 has one)
+                  inside the main content area (Modules 1 and 2 have one)
      placeholder  text shown in the main content area until an activity
-                  is built (Modules 2 and 3, for now)
+                  is built (Module 3, for now)
    --------------------------------------------------------------------------- */
 const MODULES = [
   {
@@ -39,17 +39,19 @@ const MODULES = [
       "the fuselage. The wings stick out from each side. The engines push the " +
       "aircraft forward, and the tail at the back keeps it steady. Hinged " +
       "panels called control surfaces move to steer the aircraft.",
-    // buildAircraftPartsActivity is written further down this file (section 11).
+    // buildAircraftPartsActivity is written further down this file (section 12).
     // JavaScript lets you refer to a function before the line that defines it.
     activity: buildAircraftPartsActivity
   },
   {
-    title: "Wing Structure",
-    placeholder: "Wing Structure learning activity will load here.",
+    title: "Fuselage and Wing Structure",
     explanation:
-      "A wing is not solid. Inside, long beams called spars run from the body " +
-      "to the wing tip, and ribs shaped like the wing cross them. A thin metal " +
-      "skin covers this frame, a bit like fabric stretched over a tent."
+      "The fuselage and wings are not solid. Inside each is a light " +
+      "\"skeleton\": frames and stringers in the fuselage, spars and ribs in " +
+      "the wing. A thin skin is fixed over the skeleton and shares the load " +
+      "with it. This way of building is called semi-monocoque construction.",
+    // buildStructureActivity is in section 13.
+    activity: buildStructureActivity
   },
   {
     title: "Engine and Tail",
@@ -321,25 +323,393 @@ function startLearning() {
 
 
 /* ===========================================================================
-   11. MODULE 1 ACTIVITY: AIRCRAFT PARTS
+   11. SHARED DIAGRAM ACTIVITY (used by Modules 1 and 2)
 
-   The trainee works through two steps:
-     Step 1, Explore:     click each part of the aircraft diagram to read what
-                          it is. Every part must be explored before moving on.
-     Step 2, Parts check: the app names a part ("Find the engine") and the
-                          trainee clicks it on the diagram. A wrong click gives
+   Modules 1 and 2 work the same way, so they share this code. Only their
+   pictures and their list of parts are different. The trainee works
+   through two steps:
+     Step 1, Explore:     click each part on the pictures to read what it is.
+                          Every part must be explored before moving on.
+     Step 2, Parts Check: the app names a part ("Find the ribs") and the
+                          trainee clicks it on a picture. A wrong click gives
                           a hint; a right click gives an encouraging message.
-   Finishing the check completes Module 1, which unlocks Module 2.
+   Finishing the check completes the module, which unlocks the next one.
 
-   The diagram's HTML is the <template id="aircraft-parts-template"> in
-   index.html. Its colours and highlights are in section 10 of style.css.
+   The shared HTML is <template id="diagram-activity-template"> in
+   index.html; each module's pictures have their own template. The colours
+   and highlights are in section 10 of style.css.
+   =========================================================================== */
+
+// Return a shuffled copy of a list (the "Fisher-Yates" shuffle), so the
+// parts check asks its questions in a different order each time.
+function shuffled(list) {
+  const copy = list.slice();   // slice() makes a copy; the original stays as is
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const temp = copy[i];
+    copy[i] = copy[j];
+    copy[j] = temp;
+  }
+  return copy;
+}
+
+/* ---------------------------------------------------------------------------
+   buildDiagramActivity(container, config)
+   Builds the activity inside "container" (the main content area).
+   "config" is an object describing one module's activity:
+     moduleIndex          which module this is (0 = Module 1, 1 = Module 2)
+     diagramsTemplateId   id of the <template> holding the pictures
+     parts                the list of parts (see the module sections below)
+     groups               the groups of name buttons, in order. Each has an
+                          id, a title, and optionally swatch: true to show a
+                          colour swatch (used for control surfaces)
+     exploreInstructions  text shown above the pictures in Step 1
+     checkInstructions    text shown above the pictures in Step 2
+     checkExplanation     learning-panel text during Step 2
+     summary              learning-panel text when the activity is finished
+
+   Everything the activity needs lives inside this one function, so its
+   variables start fresh each time the module is opened.
+   --------------------------------------------------------------------------- */
+function buildDiagramActivity(container, config) {
+  const parts = config.parts;
+  const module = MODULES[config.moduleIndex];
+
+  // Find a part's data object from its id, e.g. findPart("ribs").
+  function findPart(id) {
+    return parts.find(function (part) { return part.id === id; });
+  }
+
+  // --- Copy the shared template into the content area, then copy this
+  //     module's pictures into its empty "diagrams" box ---
+  const shell = document.getElementById("diagram-activity-template");
+  container.appendChild(shell.content.cloneNode(true));
+  const pictures = document.getElementById(config.diagramsTemplateId);
+  container.querySelector('[data-role="diagrams"]').appendChild(pictures.content.cloneNode(true));
+
+  // Find an element in the copy by its data-role="..." name.
+  function getRole(name) {
+    return container.querySelector('[data-role="' + name + '"]');
+  }
+
+  const stepLabel     = getRole("step");
+  const instructions  = getRole("instructions");
+  const prompt        = getRole("prompt");
+  const feedback      = getRole("feedback");
+  const chipList      = getRole("chips");
+  const countText     = getRole("count");
+  const startCheckBtn = getRole("start-check");
+  const exploreBtn    = getRole("explore-again");
+  const retryBtn      = getRole("retry");
+  const nextModuleBtn = getRole("next-module");
+  // Every clickable part in every picture. Most parts appear in more than
+  // one picture, with the same data-part name each time.
+  const partShapes    = container.querySelectorAll(".part");
+
+  // The "next module" button names the module that follows, if there is one.
+  const nextModule = MODULES[config.moduleIndex + 1];
+  if (nextModule) {
+    nextModuleBtn.textContent =
+      "Go to Module " + (config.moduleIndex + 2) + ": " + nextModule.title;
+  }
+
+  // --- Activity state ---
+  let mode = "explore";        // "explore", "check" or "finished"
+  let selectedId = null;       // part selected in explore mode
+  const explored = new Set();  // a Set is a list that ignores duplicates
+  let questions = [];          // shuffled parts still to ask about
+  let currentQuestion = null;  // the part the trainee is asked to find
+  const found = new Set();     // parts found so far in this check
+  let firstTryCorrect = 0;     // answers right without a wrong click first
+  let missedThisQuestion = false;
+
+
+  // --- Build the name buttons ("chips"), one group at a time ---
+  config.groups.forEach(function (group) {
+    // A heading for the group, e.g. "Main parts".
+    const title = document.createElement("p");
+    title.className = "chip-group-title";
+    title.textContent = group.title;
+    if (group.swatch) {
+      // Add a small colour swatch matching the control surfaces' colour.
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      title.prepend(swatch);
+    }
+
+    // A list holding one button per part in this group.
+    const list = document.createElement("ul");
+    list.className = "part-chips";
+    parts.forEach(function (part) {
+      if (part.group !== group.id) {
+        return;   // skip parts that belong to another group
+      }
+      const item = document.createElement("li");
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "part-chip";
+      chip.dataset.part = part.id;
+      chip.textContent = part.name;
+      chip.addEventListener("click", function () { handlePartChosen(part.id); });
+      item.appendChild(chip);
+      list.appendChild(item);
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(title);
+    wrapper.appendChild(list);
+    chipList.appendChild(wrapper);
+  });
+
+
+  // Add or remove the "is-hover" class on every copy of a part, so
+  // pointing at a part in one picture also lights it up in the others.
+  function setHover(id, isHovering) {
+    partShapes.forEach(function (other) {
+      if (other.dataset.part === id) {
+        other.classList.toggle("is-hover", isHovering);
+      }
+    });
+  }
+
+  // --- Clicking or pressing a part on any picture ---
+  partShapes.forEach(function (shape) {
+    shape.addEventListener("click", function () {
+      handlePartChosen(shape.dataset.part);
+    });
+    // Mouse moves onto / off a part: light up its copies in the other pictures.
+    shape.addEventListener("mouseenter", function () { setHover(shape.dataset.part, true); });
+    shape.addEventListener("mouseleave", function () { setHover(shape.dataset.part, false); });
+    // Keyboard: Enter or Space presses a part, just like a real button.
+    shape.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();   // stop Space from scrolling the page
+        handlePartChosen(shape.dataset.part);
+      }
+    });
+  });
+
+  // One place that decides what a click means in the current step.
+  function handlePartChosen(id) {
+    if (mode === "explore") {
+      explorePart(id);
+    } else if (mode === "check") {
+      answerQuestion(id);
+    }
+    // In "finished" mode clicks do nothing.
+  }
+
+
+  /* ---------------- STEP 1: EXPLORE ---------------- */
+
+  function startExplore() {
+    mode = "explore";
+    selectedId = null;
+    explored.clear();
+
+    stepLabel.textContent = "Step 1 of 2: Explore";
+    instructions.textContent = config.exploreInstructions;
+    prompt.hidden = true;
+    feedback.hidden = true;
+    chipList.hidden = false;
+    startCheckBtn.hidden = true;
+    exploreBtn.hidden = true;
+    retryBtn.hidden = true;
+    nextModuleBtn.hidden = true;
+
+    refresh();
+  }
+
+  function explorePart(id) {
+    const part = findPart(id);
+    selectedId = id;
+    explored.add(id);
+
+    // Show the part in the learning panel.
+    showPanelTopic(part.name, part.explanation);
+
+    if (explored.size < parts.length) {
+      showPanelMessage(
+        "Good. You have explored " + explored.size + " of " +
+        parts.length + " parts."
+      );
+    } else {
+      showPanelMessage(
+        "Great work! You have explored every part. When you are ready, start " +
+        "the Parts Check to test yourself."
+      );
+      startCheckBtn.hidden = false;
+    }
+
+    refresh();
+  }
+
+
+  /* ---------------- STEP 2: PARTS CHECK ---------------- */
+
+  function startCheck() {
+    mode = "check";
+    selectedId = null;
+    found.clear();
+    firstTryCorrect = 0;
+    questions = shuffled(parts);
+
+    stepLabel.textContent = "Step 2 of 2: Parts Check";
+    instructions.textContent = config.checkInstructions;
+    chipList.hidden = true;    // hide the names, or the check would be too easy
+    feedback.hidden = true;
+    startCheckBtn.hidden = true;
+    exploreBtn.hidden = true;
+    retryBtn.hidden = true;
+    nextModuleBtn.hidden = true;
+
+    showPanelTopic("Parts Check", config.checkExplanation);
+    hidePanelMessage();
+
+    askNextQuestion();
+    prompt.focus();            // move keyboard focus to the question
+  }
+
+  function askNextQuestion() {
+    currentQuestion = questions.shift();   // take the first part off the list
+    missedThisQuestion = false;
+    prompt.hidden = false;
+    prompt.textContent = "Find the " + currentQuestion.name.toLowerCase() + ".";
+    refresh();
+  }
+
+  function answerQuestion(id) {
+    // Ignore clicks on parts that have already been found.
+    if (found.has(id)) {
+      return;
+    }
+
+    if (id === currentQuestion.id) {
+      // ---- Correct ----
+      found.add(id);
+      if (!missedThisQuestion) {
+        firstTryCorrect = firstTryCorrect + 1;
+      }
+      feedback.hidden = false;
+      feedback.className = "activity-feedback is-correct";
+      feedback.textContent = "Correct! You found the " + currentQuestion.name.toLowerCase() + ".";
+      showPanelMessage(
+        "Well done! The " + currentQuestion.name.toLowerCase() + ": " + currentQuestion.short
+      );
+
+      if (questions.length > 0) {
+        askNextQuestion();
+      } else {
+        finishCheck();
+      }
+    } else {
+      // ---- Not quite: give a hint, but don't name the part they clicked ----
+      missedThisQuestion = true;
+      feedback.hidden = false;
+      feedback.className = "activity-feedback is-hint";
+      feedback.textContent = "Not quite. " + currentQuestion.hint;
+      hidePanelMessage();
+    }
+  }
+
+  function finishCheck() {
+    mode = "finished";
+    currentQuestion = null;
+    prompt.hidden = true;
+
+    stepLabel.textContent = "Activity complete";
+    instructions.textContent =
+      "You found all " + parts.length + " parts. " +
+      firstTryCorrect + " of " + parts.length + " were right first time.";
+    feedback.hidden = true;
+    exploreBtn.hidden = false;
+    retryBtn.hidden = false;
+
+    showPanelTopic(module.title, config.summary);
+
+    // Complete the module the first time; afterwards this is just revision.
+    // (completedCount equals this module's index until the module is done.)
+    if (completedCount === config.moduleIndex) {
+      completeCurrentModule();   // unlocks the next module and shows "Well done!"
+    } else {
+      showPanelMessage("Great revision! You found every part again.");
+    }
+
+    refresh();
+    if (nextModule) {
+      nextModuleBtn.hidden = false;
+      nextModuleBtn.focus();
+    } else {
+      exploreBtn.focus();
+    }
+  }
+
+
+  /* ---------------- KEEP THE PICTURES UP TO DATE ---------------- */
+
+  // Recolour the parts and name buttons, and update the count text, to
+  // match the current state. Called after every change.
+  function refresh() {
+    partShapes.forEach(function (shape) {
+      const id = shape.dataset.part;
+      const isDone = mode === "explore" ? explored.has(id) : found.has(id);
+      shape.classList.toggle("is-done", isDone);
+      shape.classList.toggle("is-selected", mode === "explore" && id === selectedId);
+
+      // Screen readers read this label. In the check it says "Part 3"
+      // instead of the real name, so it doesn't give the answer away.
+      // (The number is the part's position in the parts list, so a part
+      // has the same number in every picture.)
+      const number = parts.indexOf(findPart(id)) + 1;
+      const label = mode === "explore" ? findPart(id).name : "Part " + number;
+      shape.setAttribute("aria-label", label + (isDone ? " (done)" : ""));
+    });
+
+    chipList.querySelectorAll(".part-chip").forEach(function (chip) {
+      const id = chip.dataset.part;
+      chip.classList.toggle("is-done", explored.has(id));
+      chip.setAttribute("aria-pressed", id === selectedId ? "true" : "false");
+      chip.textContent = (explored.has(id) ? "✓ " : "") + findPart(id).name;
+    });
+
+    if (mode === "explore") {
+      countText.textContent = explored.size + " of " + parts.length + " parts explored";
+    } else if (mode === "check") {
+      countText.textContent = "Question " + (found.size + 1) + " of " + parts.length;
+    } else {
+      countText.textContent = "";
+    }
+  }
+
+
+  /* ---------------- BUTTONS ---------------- */
+  startCheckBtn.addEventListener("click", startCheck);
+  retryBtn.addEventListener("click", startCheck);
+  exploreBtn.addEventListener("click", function () {
+    startExplore();
+    showPanelTopic(module.title, module.explanation);
+    hidePanelMessage();
+  });
+  nextModuleBtn.addEventListener("click", function () {
+    openModule(config.moduleIndex + 1);
+  });
+
+  // Begin with Step 1.
+  startExplore();
+}
+
+
+/* ===========================================================================
+   12. MODULE 1 ACTIVITY: AIRCRAFT PARTS
+   Pictures: <template id="aircraft-parts-diagrams"> in index.html.
    =========================================================================== */
 
 /* ---------------------------------------------------------------------------
-   11a. PART DATA
+   PART DATA
    One object per part. The id must match a data-part="..." in index.html.
-     group        "main" for the fixed main parts, or "control" for the
-                  control surfaces (the hinged parts that move to steer)
+     group        which group of name buttons it goes in: here "main" for
+                  the fixed main parts, or "control" for the control
+                  surfaces (the hinged parts that move to steer)
      name         shown in the learning panel and on the name buttons
      explanation  what the part is and does, in plain English
      short        a one-line reminder, used in the "Correct!" message
@@ -478,364 +848,182 @@ const AIRCRAFT_PARTS = [
   }
 ];
 
-// The two groups of name buttons, in the order they are shown.
-const PART_GROUPS = [
+const AIRCRAFT_PART_GROUPS = [
   { id: "main", title: "Main parts" },
-  { id: "control", title: "Control surfaces (hinged panels that move)" }
+  { id: "control", title: "Control surfaces (hinged panels that move)", swatch: true }
 ];
 
-
-/* ---------------------------------------------------------------------------
-   11b. SMALL HELPERS
-   --------------------------------------------------------------------------- */
-
-// Find a part's data object from its id, e.g. findPart("wing").
-function findPart(id) {
-  return AIRCRAFT_PARTS.find(function (part) { return part.id === id; });
-}
-
-// Return a shuffled copy of a list (the "Fisher-Yates" shuffle), so the
-// parts check asks its questions in a different order each time.
-function shuffled(list) {
-  const copy = list.slice();   // slice() makes a copy; the original stays as is
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = copy[i];
-    copy[i] = copy[j];
-    copy[j] = temp;
-  }
-  return copy;
-}
-
-
-/* ---------------------------------------------------------------------------
-   11c. BUILD THE ACTIVITY
-   openModule() calls this with the main content area as "container".
-   Everything the activity needs lives inside this one function, so its
-   variables are fresh each time Module 1 is opened.
-   --------------------------------------------------------------------------- */
 function buildAircraftPartsActivity(container) {
-
-  // --- Copy the template from index.html into the content area ---
-  const template = document.getElementById("aircraft-parts-template");
-  container.appendChild(template.content.cloneNode(true));
-
-  // Find an element in the copy by its data-role="..." name.
-  function getRole(name) {
-    return container.querySelector('[data-role="' + name + '"]');
-  }
-
-  const stepLabel     = getRole("step");
-  const instructions  = getRole("instructions");
-  const prompt        = getRole("prompt");
-  const feedback      = getRole("feedback");
-  const chipList      = getRole("chips");
-  const countText     = getRole("count");
-  const startCheckBtn = getRole("start-check");
-  const exploreBtn    = getRole("explore-again");
-  const retryBtn      = getRole("retry");
-  const nextModuleBtn = getRole("next-module");
-  // Every clickable part in both views. Most parts appear twice (once in
-  // the side view, once in the top view) with the same data-part name.
-  const partShapes    = container.querySelectorAll(".part");
-
-  // --- Activity state ---
-  let mode = "explore";        // "explore", "check" or "finished"
-  let selectedId = null;       // part selected in explore mode
-  const explored = new Set();  // a Set is a list that ignores duplicates
-  let questions = [];          // shuffled parts still to ask about
-  let currentQuestion = null;  // the part the trainee is asked to find
-  const found = new Set();     // parts found so far in this check
-  let firstTryCorrect = 0;     // answers right without a wrong click first
-  let missedThisQuestion = false;
-
-
-  // --- Build the name buttons ("chips"), one group at a time ---
-  PART_GROUPS.forEach(function (group) {
-    // A heading for the group, e.g. "Main parts".
-    const title = document.createElement("p");
-    title.className = "chip-group-title";
-    title.textContent = group.title;
-    if (group.id === "control") {
-      // Add a small colour swatch matching the control surfaces' colour.
-      const swatch = document.createElement("span");
-      swatch.className = "swatch";
-      title.prepend(swatch);
-    }
-
-    // A list holding one button per part in this group.
-    const list = document.createElement("ul");
-    list.className = "part-chips";
-    AIRCRAFT_PARTS.forEach(function (part) {
-      if (part.group !== group.id) {
-        return;   // skip parts that belong to the other group
-      }
-      const item = document.createElement("li");
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.className = "part-chip";
-      chip.dataset.part = part.id;
-      chip.textContent = part.name;
-      chip.addEventListener("click", function () { handlePartChosen(part.id); });
-      item.appendChild(chip);
-      list.appendChild(item);
-    });
-
-    const wrapper = document.createElement("div");
-    wrapper.appendChild(title);
-    wrapper.appendChild(list);
-    chipList.appendChild(wrapper);
-  });
-
-
-  // Add or remove the "is-hover" class on every copy of a part, so
-  // pointing at a part in one view also lights it up in the other.
-  function setHover(id, isHovering) {
-    partShapes.forEach(function (other) {
-      if (other.dataset.part === id) {
-        other.classList.toggle("is-hover", isHovering);
-      }
-    });
-  }
-
-  // --- Clicking or pressing a part on either diagram ---
-  partShapes.forEach(function (shape) {
-    shape.addEventListener("click", function () {
-      handlePartChosen(shape.dataset.part);
-    });
-    // Mouse moves onto / off a part: light up its partner in the other view.
-    shape.addEventListener("mouseenter", function () { setHover(shape.dataset.part, true); });
-    shape.addEventListener("mouseleave", function () { setHover(shape.dataset.part, false); });
-    // Keyboard: Enter or Space presses a part, just like a real button.
-    shape.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();   // stop Space from scrolling the page
-        handlePartChosen(shape.dataset.part);
-      }
-    });
-  });
-
-  // One place that decides what a click means in the current step.
-  function handlePartChosen(id) {
-    if (mode === "explore") {
-      explorePart(id);
-    } else if (mode === "check") {
-      answerQuestion(id);
-    }
-    // In "finished" mode clicks do nothing.
-  }
-
-
-  /* ---------------- STEP 1: EXPLORE ---------------- */
-
-  function startExplore() {
-    mode = "explore";
-    selectedId = null;
-    explored.clear();
-
-    stepLabel.textContent = "Step 1 of 2: Explore";
-    instructions.textContent =
+  buildDiagramActivity(container, {
+    moduleIndex: 0,
+    diagramsTemplateId: "aircraft-parts-diagrams",
+    parts: AIRCRAFT_PARTS,
+    groups: AIRCRAFT_PART_GROUPS,
+    exploreInstructions:
       "Click or tap each part of the aircraft to find out what it is and what " +
       "it does. You can use either the side view or the top view, or the name " +
-      "buttons under the pictures. Parts you have explored turn green.";
-    prompt.hidden = true;
-    feedback.hidden = true;
-    chipList.hidden = false;
-    startCheckBtn.hidden = true;
-    exploreBtn.hidden = true;
-    retryBtn.hidden = true;
-    nextModuleBtn.hidden = true;
-
-    refresh();
-  }
-
-  function explorePart(id) {
-    const part = findPart(id);
-    selectedId = id;
-    explored.add(id);
-
-    // Show the part in the learning panel.
-    showPanelTopic(part.name, part.explanation);
-
-    if (explored.size < AIRCRAFT_PARTS.length) {
-      showPanelMessage(
-        "Good. You have explored " + explored.size + " of " +
-        AIRCRAFT_PARTS.length + " parts."
-      );
-    } else {
-      showPanelMessage(
-        "Great work! You have explored every part. When you are ready, start " +
-        "the Parts Check to test yourself."
-      );
-      startCheckBtn.hidden = false;
-    }
-
-    refresh();
-  }
-
-
-  /* ---------------- STEP 2: PARTS CHECK ---------------- */
-
-  function startCheck() {
-    mode = "check";
-    selectedId = null;
-    found.clear();
-    firstTryCorrect = 0;
-    questions = shuffled(AIRCRAFT_PARTS);
-
-    stepLabel.textContent = "Step 2 of 2: Parts Check";
-    instructions.textContent =
+      "buttons under the pictures. Parts you have explored turn green.",
+    checkInstructions:
       "Find each part on either picture. If you pick the wrong one, you will " +
-      "get a hint. Nothing is saved.";
-    chipList.hidden = true;    // hide the names, or the check would be too easy
-    feedback.hidden = true;
-    startCheckBtn.hidden = true;
-    exploreBtn.hidden = true;
-    retryBtn.hidden = true;
-    nextModuleBtn.hidden = true;
-
-    showPanelTopic(
-      "Parts Check",
-      "Use what you learned in Step 1. Find each part on the side view or the top view."
-    );
-    hidePanelMessage();
-
-    askNextQuestion();
-    prompt.focus();            // move keyboard focus to the question
-  }
-
-  function askNextQuestion() {
-    currentQuestion = questions.shift();   // take the first part off the list
-    missedThisQuestion = false;
-    prompt.hidden = false;
-    prompt.textContent = "Find the " + currentQuestion.name.toLowerCase() + ".";
-    refresh();
-  }
-
-  function answerQuestion(id) {
-    // Ignore clicks on parts that have already been found.
-    if (found.has(id)) {
-      return;
-    }
-
-    if (id === currentQuestion.id) {
-      // ---- Correct ----
-      found.add(id);
-      if (!missedThisQuestion) {
-        firstTryCorrect = firstTryCorrect + 1;
-      }
-      feedback.hidden = false;
-      feedback.className = "activity-feedback is-correct";
-      feedback.textContent = "Correct! You found the " + currentQuestion.name.toLowerCase() + ".";
-      showPanelMessage(
-        "Well done! The " + currentQuestion.name.toLowerCase() + ": " + currentQuestion.short
-      );
-
-      if (questions.length > 0) {
-        askNextQuestion();
-      } else {
-        finishCheck();
-      }
-    } else {
-      // ---- Not quite: give a hint, but don't name the part they clicked ----
-      missedThisQuestion = true;
-      feedback.hidden = false;
-      feedback.className = "activity-feedback is-hint";
-      feedback.textContent = "Not quite. " + currentQuestion.hint;
-      hidePanelMessage();
-    }
-  }
-
-  function finishCheck() {
-    mode = "finished";
-    currentQuestion = null;
-    prompt.hidden = true;
-
-    stepLabel.textContent = "Activity complete";
-    instructions.textContent =
-      "You found all " + AIRCRAFT_PARTS.length + " parts of the aircraft. " +
-      firstTryCorrect + " of " + AIRCRAFT_PARTS.length +
-      " were right first time.";
-    feedback.hidden = true;
-    exploreBtn.hidden = false;
-    retryBtn.hidden = false;
-
-    showPanelTopic(
-      "Aircraft Parts",
+      "get a hint. Nothing is saved.",
+    checkExplanation:
+      "Use what you learned in Step 1. Find each part on the side view or the top view.",
+    summary:
       "You can now name the seven main parts of an aircraft (fuselage, " +
       "cockpit, wings, engines, horizontal stabiliser, vertical stabiliser " +
       "and landing gear) and its four main control surfaces (flaps, " +
       "ailerons, elevators and rudder)."
-    );
-
-    // Complete Module 1 the first time; afterwards this is just revision.
-    // (Index 0 is Module 1, so it is complete once completedCount > 0.)
-    if (completedCount === 0) {
-      completeCurrentModule();   // unlocks Module 2 and shows "Well done!"
-    } else {
-      showPanelMessage("Great revision! You found every part again.");
-    }
-    nextModuleBtn.hidden = false;
-
-    refresh();
-    nextModuleBtn.focus();
-  }
-
-
-  /* ---------------- KEEP THE DIAGRAM UP TO DATE ---------------- */
-
-  // Recolour the parts and name buttons, and update the count text, to
-  // match the current state. Called after every change.
-  function refresh() {
-    partShapes.forEach(function (shape) {
-      const id = shape.dataset.part;
-      const isDone = mode === "explore" ? explored.has(id) : found.has(id);
-      shape.classList.toggle("is-done", isDone);
-      shape.classList.toggle("is-selected", mode === "explore" && id === selectedId);
-
-      // Screen readers read this label. In the check it says "Part 3"
-      // instead of the real name, so it doesn't give the answer away.
-      // (The number is the part's position in AIRCRAFT_PARTS, so a part
-      // has the same number in both views.)
-      const number = AIRCRAFT_PARTS.indexOf(findPart(id)) + 1;
-      const label = mode === "explore" ? findPart(id).name : "Part " + number;
-      shape.setAttribute("aria-label", label + (isDone ? " (done)" : ""));
-    });
-
-    chipList.querySelectorAll(".part-chip").forEach(function (chip) {
-      const id = chip.dataset.part;
-      chip.classList.toggle("is-done", explored.has(id));
-      chip.setAttribute("aria-pressed", id === selectedId ? "true" : "false");
-      chip.textContent = (explored.has(id) ? "✓ " : "") + findPart(id).name;
-    });
-
-    if (mode === "explore") {
-      countText.textContent = explored.size + " of " + AIRCRAFT_PARTS.length + " parts explored";
-    } else if (mode === "check") {
-      countText.textContent = "Question " + (found.size + 1) + " of " + AIRCRAFT_PARTS.length;
-    } else {
-      countText.textContent = "";
-    }
-  }
-
-
-  /* ---------------- BUTTONS ---------------- */
-  startCheckBtn.addEventListener("click", startCheck);
-  retryBtn.addEventListener("click", startCheck);
-  exploreBtn.addEventListener("click", function () {
-    startExplore();
-    showPanelTopic(MODULES[0].title, MODULES[0].explanation);
-    hidePanelMessage();
   });
-  nextModuleBtn.addEventListener("click", function () { openModule(1); });
+}
 
-  // Begin with Step 1.
-  startExplore();
+
+/* ===========================================================================
+   13. MODULE 2 ACTIVITY: FUSELAGE AND WING STRUCTURE
+   Pictures: <template id="structure-diagrams"> in index.html.
+   Same fields as AIRCRAFT_PARTS in section 12.
+   =========================================================================== */
+const STRUCTURE_PARTS = [
+  // ----- Fuselage structure -----
+  {
+    id: "frames",
+    group: "fuselage",
+    name: "Frames",
+    explanation:
+      "Frames are ring-shaped hoops spaced along the fuselage, a bit like the " +
+      "ribs in your chest. They give the fuselage its round shape and stop it " +
+      "being squashed. Doors and windows are cut out between them.",
+    short: "ring-shaped hoops that give the fuselage its shape.",
+    hint: "Look for the ring shapes that go round the body: upright strips in the side view, the inner ring in the cross-section."
+  },
+  {
+    id: "stringers",
+    group: "fuselage",
+    name: "Stringers",
+    explanation:
+      "Stringers are long, thin strips that run from the front of the " +
+      "fuselage to the back. They join the frames together and stiffen the " +
+      "skin so it does not buckle (crumple) under load.",
+    short: "long strips running front to back that stiffen the skin.",
+    hint: "Look for long thin strips running front to back: lines along the side view, small dots in the cross-section."
+  },
+  {
+    id: "fuselage-skin",
+    group: "fuselage",
+    name: "Fuselage skin",
+    explanation:
+      "The skin is the thin outer covering, usually aluminium alloy or a " +
+      "composite material. It is riveted or bonded to the frames and " +
+      "stringers. It is not just a cover: it carries a large share of the " +
+      "load and holds in the cabin air pressure.",
+    short: "the thin outer covering that also carries load.",
+    hint: "Look for the smooth outer covering of the body."
+  },
+  {
+    id: "floor-beams",
+    group: "fuselage",
+    name: "Floor beams",
+    explanation:
+      "Floor beams run across the fuselage from side to side, fixed to the " +
+      "frames. They hold up the cabin floor and everything on it: seats, " +
+      "passengers and galleys. The space underneath is the cargo hold.",
+    short: "beams across the body that hold up the cabin floor.",
+    hint: "In the cross-section, look for the beam across the inside, between the cabin and the cargo hold."
+  },
+  {
+    id: "pressure-bulkhead",
+    group: "fuselage",
+    name: "Pressure bulkhead",
+    explanation:
+      "The rear pressure bulkhead is a strong, dome-shaped wall at the back " +
+      "of the cabin. When flying high, air is pumped into the cabin so people " +
+      "can breathe normally. The bulkhead seals the back end so that air " +
+      "stays in.",
+    short: "the dome-shaped wall that keeps the cabin air in.",
+    hint: "In the side view, look for the dome-shaped wall at the back end."
+  },
+
+  // ----- Wing structure -----
+  {
+    id: "front-spar",
+    group: "wing",
+    name: "Front spar",
+    explanation:
+      "Spars are the main beams of the wing. They run from the root (where " +
+      "the wing joins the fuselage) out to the tip. The front spar is near " +
+      "the leading (front) edge. The spars carry most of the bending load as " +
+      "the wing lifts the aircraft.",
+    short: "the main beam near the front edge of the wing.",
+    hint: "Look for the long beam running along the wing, near its front edge."
+  },
+  {
+    id: "rear-spar",
+    group: "wing",
+    name: "Rear spar",
+    explanation:
+      "The rear spar is the second main beam, nearer the trailing (back) edge " +
+      "of the wing. The flaps and ailerons are hinged behind it. Together, " +
+      "the two spars and the skin form a strong box that often holds the " +
+      "aircraft's fuel.",
+    short: "the second main beam, nearer the back edge of the wing.",
+    hint: "Look for the long beam running along the wing, nearer its back edge."
+  },
+  {
+    id: "ribs",
+    group: "wing",
+    name: "Ribs",
+    explanation:
+      "Ribs run from the front of the wing to the back, spaced along its " +
+      "length. Each rib is cut to the wing's curved shape (called an " +
+      "aerofoil), so the ribs hold the skin in the right shape. Holes are " +
+      "cut in them to save weight.",
+    short: "wing-shaped pieces that hold the skin in shape.",
+    hint: "Look for the cross-pieces running from the front edge to the back edge, or the curved shape in the cross-section."
+  },
+  {
+    id: "wing-skin",
+    group: "wing",
+    name: "Wing skin",
+    explanation:
+      "The wing skin covers the top and bottom of the wing. Like the fuselage " +
+      "skin, it carries load: as the wing bends upward in flight, the top " +
+      "skin is squeezed and the bottom skin is stretched.",
+    short: "the outer covering of the wing, which also carries load.",
+    hint: "Look for the smooth covering near the wing root, or the thick outline around the cross-section."
+  }
+];
+
+const STRUCTURE_PART_GROUPS = [
+  { id: "fuselage", title: "Fuselage structure" },
+  { id: "wing", title: "Wing structure" }
+];
+
+function buildStructureActivity(container) {
+  buildDiagramActivity(container, {
+    moduleIndex: 1,
+    diagramsTemplateId: "structure-diagrams",
+    parts: STRUCTURE_PARTS,
+    groups: STRUCTURE_PART_GROUPS,
+    exploreInstructions:
+      "Part of the skin has been removed so you can see the structure inside. " +
+      "Click or tap each part on any picture, or use the name buttons, to " +
+      "find out what it does. Parts you have explored turn green.",
+    checkInstructions:
+      "Find each part on any of the pictures. If you pick the wrong one, you " +
+      "will get a hint. Nothing is saved.",
+    checkExplanation:
+      "Use what you learned in Step 1. Find each part of the fuselage and " +
+      "wing structure on the pictures.",
+    summary:
+      "You can now name the parts that make up the fuselage (frames, " +
+      "stringers, skin, floor beams and pressure bulkhead) and the wing " +
+      "(front and rear spars, ribs and skin). Together they form a strong, " +
+      "light skeleton with a skin that shares the load."
+  });
 }
 
 
 /* ---------------------------------------------------------------------------
-   12. CONNECT EVERYTHING (runs once when the page loads)
+   14. CONNECT EVERYTHING (runs once when the page loads)
    "addEventListener" means: when this event happens, run this function.
    --------------------------------------------------------------------------- */
 startButton.addEventListener("click", startLearning);

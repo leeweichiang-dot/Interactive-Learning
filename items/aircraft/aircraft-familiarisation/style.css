@@ -506,6 +506,16 @@ h1, h2 { line-height: 1.25; margin: 0; }
   gap: 0.75rem;
 }
 
+/* Module 2 puts two pictures side by side in each row: a wide view
+   (two parts of the width) and a smaller cross-section (one part).
+   On narrow screens they stack instead (see section 12). */
+.diagram-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
 /* The box around each aircraft picture. (<figure> has default margins,
    so we set margin: 0.) */
 .diagram {
@@ -530,6 +540,13 @@ h1, h2 { line-height: 1.25; margin: 0; }
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* A square picture (the fuselage cross-section) shouldn't grow too big
+   when it gets the full width on a narrow screen. */
+.aircraft-svg.is-compact {
+  max-width: 240px;
+  margin: 0 auto;
 }
 
 /* --- Parts of the aircraft --- */
@@ -591,6 +608,67 @@ h1, h2 { line-height: 1.25; margin: 0; }
 .windows circle, .windscreen { fill: var(--window); }
 .intake { fill: var(--part-line); }
 .ground { stroke: var(--border); stroke-width: 3; stroke-dasharray: 10 8; }
+
+/* Module 2 decoration */
+/* Rows of rivets: a dotted line made of round dots (dash length 0). */
+.rivets line {
+  stroke: var(--part-line);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 0 9;
+  opacity: 0.6;
+}
+/* The cut end of the fuselage tube, and the outline of the wing. */
+.cut-edge,
+.wing-outline {
+  fill: none;
+  stroke: var(--part-line);
+  stroke-width: 2;
+  stroke-dasharray: 6 5;
+}
+/* Weight-saving holes in the rib: filled with the background colour. */
+.holes circle {
+  fill: var(--sky);
+  stroke: var(--part-line);
+  stroke-width: 1.5;
+}
+/* The section line A-A on the wing top view: a long-dash, short-dash line,
+   as used on technical drawings, with a letter at each end. */
+.section-line line {
+  stroke: var(--text-muted);
+  stroke-width: 2;
+  stroke-dasharray: 14 4 3 4;
+}
+.section-line text {
+  fill: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+/* The flap's hinge point in the wing cross-section. */
+.hinge { fill: var(--control-line); }
+
+/* "Cabin" and "Cargo" labels in the fuselage cross-section. */
+.section-label {
+  fill: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* An "outline" shape (the wing skin in the cross-section) is only a thick
+   line with no fill, whatever state it is in, so the rib inside it stays
+   visible. This rule must stay AFTER the is-done and is-selected rules. */
+.part .shape.outline {
+  fill: none;
+  stroke-width: 5;
+}
+/* A wide, see-through line around an outline, to make it easier to tap.
+   pointer-events: stroke means only the line itself reacts to clicks. */
+.part .hit-line {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+  pointer-events: stroke;
+}
 
 /* --- Part name buttons ("chips") under the diagram --- */
 
@@ -700,6 +778,11 @@ h1, h2 { line-height: 1.25; margin: 0; }
 @media (max-width: 860px) {
   /* Stack the learning panel underneath the content area. */
   .workspace { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  /* Module 2: stack each pair of pictures instead of side by side. */
+  .diagram-row { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 520px) {

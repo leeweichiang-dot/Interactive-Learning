@@ -33,6 +33,11 @@ window.CATALOGUE = {
       id: "flight",
       title: "Principles of Flight",
       description: "How lift, weight, thrust and drag work together, explained in plain English for maintenance trainees."
+    },
+    {
+      id: "aircraft",
+      title: "Aircraft Familiarisation",
+      description: "Learn the main parts of an aircraft, how a wing is built, and the engine and tail, in plain English."
     }
   ],
 
@@ -64,6 +69,13 @@ window.CATALOGUE = {
       type: "tool",
       title: "Cut the Thrust: Clean vs Defective Aircraft",
       summary: "Add hangar defects, reduce the thrust, and see how the aircraft slows, descends or holds altitude, with live force arrows, gauges and energy. Switch to Helicopter to explore hover power, ground effect and rotor defects. Includes three training activities: Predict First, Mystery Aircraft and Fix & Verify."
+    },
+    {
+      id: "aircraft-familiarisation",
+      module: "aircraft",
+      type: "lesson",
+      title: "Aircraft Familiarisation Training",
+      summary: "Three short modules in order: aircraft parts, wing structure, and engine and tail."
     }
   ]
 };

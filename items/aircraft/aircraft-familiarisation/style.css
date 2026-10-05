@@ -492,13 +492,31 @@ h1, h2 { line-height: 1.25; margin: 0; }
   border-radius: 6px;
 }
 
-/* The box around the aircraft picture. */
+/* The side view and top view, one above the other. */
+.diagrams {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* The box around each aircraft picture. (<figure> has default margins,
+   so we set margin: 0.) */
 .diagram {
+  margin: 0;
   background: var(--sky);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 0.5rem;
 }
+
+/* "Side view" / "Top view" label at the top of each picture. */
+.diagram-caption {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 0 0.25rem 0.25rem;
+}
+.diagram-note { font-weight: 400; }
 
 /* Make the SVG fill the box width; its height follows automatically. */
 .aircraft-svg {
@@ -525,8 +543,10 @@ h1, h2 { line-height: 1.25; margin: 0; }
 /* See-through tap areas around thin parts (landing gear). */
 .part .hit { fill: transparent; stroke: none; }
 
-/* Hover, or keyboard focus: a thicker navy outline. */
+/* Hover, or keyboard focus: a thicker navy outline. "is-hover" is added
+   by app.js to the same part in the OTHER view, so both light up together. */
 .part:hover .shape,
+.part.is-hover .shape,
 .part:focus-visible .shape {
   stroke: var(--navy);
   stroke-width: 4;

@@ -470,6 +470,8 @@ function buildAircraftPartsActivity(container) {
   const exploreBtn    = getRole("explore-again");
   const retryBtn      = getRole("retry");
   const nextModuleBtn = getRole("next-module");
+  // Every clickable part in both views. Most parts appear twice (once in
+  // the side view, once in the top view) with the same data-part name.
   const partShapes    = container.querySelectorAll(".part");
 
   // --- Activity state ---
@@ -497,11 +499,24 @@ function buildAircraftPartsActivity(container) {
   });
 
 
-  // --- Clicking or pressing a part on the diagram ---
+  // Add or remove the "is-hover" class on every copy of a part, so
+  // pointing at a part in one view also lights it up in the other.
+  function setHover(id, isHovering) {
+    partShapes.forEach(function (other) {
+      if (other.dataset.part === id) {
+        other.classList.toggle("is-hover", isHovering);
+      }
+    });
+  }
+
+  // --- Clicking or pressing a part on either diagram ---
   partShapes.forEach(function (shape) {
     shape.addEventListener("click", function () {
       handlePartChosen(shape.dataset.part);
     });
+    // Mouse moves onto / off a part: light up its partner in the other view.
+    shape.addEventListener("mouseenter", function () { setHover(shape.dataset.part, true); });
+    shape.addEventListener("mouseleave", function () { setHover(shape.dataset.part, false); });
     // Keyboard: Enter or Space presses a part, just like a real button.
     shape.addEventListener("keydown", function (event) {
       if (event.key === "Enter" || event.key === " ") {
@@ -532,8 +547,8 @@ function buildAircraftPartsActivity(container) {
     stepLabel.textContent = "Step 1 of 2: Explore";
     instructions.textContent =
       "Click or tap each part of the aircraft to find out what it is and what " +
-      "it does. You can also use the name buttons under the picture. Parts " +
-      "you have explored turn green.";
+      "it does. You can use either the side view or the top view, or the name " +
+      "buttons under the pictures. Parts you have explored turn green.";
     prompt.hidden = true;
     feedback.hidden = true;
     chipList.hidden = false;
@@ -581,8 +596,8 @@ function buildAircraftPartsActivity(container) {
 
     stepLabel.textContent = "Step 2 of 2: Parts Check";
     instructions.textContent =
-      "Find each part on the picture. If you pick the wrong one, you will get " +
-      "a hint. Nothing is saved.";
+      "Find each part on either picture. If you pick the wrong one, you will " +
+      "get a hint. Nothing is saved.";
     chipList.hidden = true;    // hide the names, or the check would be too easy
     feedback.hidden = true;
     startCheckBtn.hidden = true;
@@ -592,7 +607,7 @@ function buildAircraftPartsActivity(container) {
 
     showPanelTopic(
       "Parts Check",
-      "Use what you learned in Step 1. Find each part on the picture of the aircraft."
+      "Use what you learned in Step 1. Find each part on the side view or the top view."
     );
     hidePanelMessage();
 
@@ -682,7 +697,7 @@ function buildAircraftPartsActivity(container) {
   // Recolour the parts and name buttons, and update the count text, to
   // match the current state. Called after every change.
   function refresh() {
-    partShapes.forEach(function (shape, index) {
+    partShapes.forEach(function (shape) {
       const id = shape.dataset.part;
       const isDone = mode === "explore" ? explored.has(id) : found.has(id);
       shape.classList.toggle("is-done", isDone);
@@ -690,7 +705,10 @@ function buildAircraftPartsActivity(container) {
 
       // Screen readers read this label. In the check it says "Part 3"
       // instead of the real name, so it doesn't give the answer away.
-      const label = mode === "explore" ? findPart(id).name : "Part " + (index + 1);
+      // (The number is the part's position in AIRCRAFT_PARTS, so a part
+      // has the same number in both views.)
+      const number = AIRCRAFT_PARTS.indexOf(findPart(id)) + 1;
+      const label = mode === "explore" ? findPart(id).name : "Part " + number;
       shape.setAttribute("aria-label", label + (isDone ? " (done)" : ""));
     });
 

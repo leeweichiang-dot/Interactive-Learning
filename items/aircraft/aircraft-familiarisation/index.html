@@ -186,10 +186,15 @@
       <p class="check-prompt" data-role="prompt" tabindex="-1" hidden></p>
 
       <!-- ---------------------------------------------------------------
-           THE AIRCRAFT DIAGRAM (SVG)
-           SVG draws pictures with shapes. The shapes use a drawing area 800
-           units wide and 300 tall, and viewBox="70 34 720 262" shows just
-           the part with the aircraft in it. The picture scales to fit any screen.
+           THE AIRCRAFT DIAGRAMS (SVG): SIDE VIEW AND TOP VIEW
+           SVG draws pictures with shapes. Each picture's viewBox sets which
+           area of the drawing is shown, and the picture scales to fit any
+           screen.
+
+           The two views are lined up like a technical drawing: the nose is
+           on the left in both, and both use the same left-to-right scale
+           (x from 70 to 790), so the wing and tail sit at the same place
+           across the page in each view.
 
            Each clickable part is a <g> (group) with class="part" and a
            data-part name that matches an id in AIRCRAFT_PARTS in app.js.
@@ -199,8 +204,14 @@
            Shapes are drawn in order, so later shapes sit on top of
            earlier ones (the fin is drawn first, behind the body).
            Shapes with class="deco" are decoration only and ignore clicks.
+           A part appears in both views with the same data-part name, so
+           clicking it in either view does the same thing.
            --------------------------------------------------------------- -->
-      <div class="diagram">
+      <div class="diagrams">
+
+      <!-- ===== SIDE VIEW ===== -->
+      <figure class="diagram">
+        <figcaption class="diagram-caption">Side view</figcaption>
         <svg class="aircraft-svg" viewBox="70 34 720 262" role="group" aria-label="Side view of an aircraft">
 
           <!-- The ground (decoration). -->
@@ -267,6 +278,56 @@
             <circle class="shape" cx="512" cy="272" r="13" />
           </g>
         </svg>
+      </figure>
+
+      <!-- ===== TOP VIEW =====
+           Looking down on the aircraft from above. The centre line of the
+           fuselage runs along y = 165, and each shape on one side has a
+           mirror-image partner on the other (y becomes 330 - y). -->
+      <figure class="diagram">
+        <figcaption class="diagram-caption">Top view <span class="diagram-note">(the landing gear is underneath, so it only shows in the side view)</span></figcaption>
+        <svg class="aircraft-svg" viewBox="70 8 720 314" role="group" aria-label="Top view of an aircraft">
+
+          <!-- ENGINES: drawn first, because from above each engine hangs
+               underneath its wing, so the wing hides the back of the pod. -->
+          <g class="part" data-part="engine" tabindex="0" role="button">
+            <rect class="shape" x="300" y="76" width="104" height="28" rx="12" />
+            <rect class="shape" x="300" y="226" width="104" height="28" rx="12" />
+          </g>
+
+          <!-- WINGS: one on each side, swept back toward the tips. -->
+          <g class="part" data-part="wing" tabindex="0" role="button">
+            <path class="shape" d="M 320 137 L 500 18 L 530 18 L 460 137 Z" />
+            <path class="shape" d="M 320 193 L 500 312 L 530 312 L 460 193 Z" />
+          </g>
+
+          <!-- HORIZONTAL STABILISERS: the two small wings at the tail. -->
+          <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
+            <path class="shape" d="M 670 146 L 735 80 L 758 80 L 744 152 Z" />
+            <path class="shape" d="M 670 184 L 735 250 L 758 250 L 744 178 Z" />
+          </g>
+
+          <!-- FUSELAGE: the long body, narrowing toward the tail. -->
+          <g class="part" data-part="fuselage" tabindex="0" role="button">
+            <path class="shape" d="M 195 137 L 640 137 Q 720 145 756 159 L 756 171 Q 720 185 640 193 L 195 193 Z" />
+          </g>
+
+          <!-- COCKPIT: the rounded nose section at the front. -->
+          <g class="part" data-part="cockpit" tabindex="0" role="button">
+            <path class="shape" d="M 195 137 L 150 137 Q 92 140 82 165 Q 92 190 150 193 L 195 193 Z" />
+          </g>
+          <!-- Windscreen seen from above (decoration). -->
+          <path class="deco windscreen" d="M 116 152 L 148 146 L 148 184 L 116 178 Z" />
+
+          <!-- VERTICAL STABILISER (FIN): from above it is only a thin strip
+               along the centre of the tail. The see-through "hit" rectangle
+               makes it easier to click. -->
+          <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
+            <rect class="hit" x="626" y="155" width="126" height="20" />
+            <path class="shape" d="M 628 165 L 690 159 L 750 161 L 750 169 L 690 171 Z" />
+          </g>
+        </svg>
+      </figure>
       </div>
 
       <!-- Feedback after an answer in the parts check (hints and "Correct!"). -->

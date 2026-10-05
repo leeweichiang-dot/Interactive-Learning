@@ -51,4 +51,5 @@ items/<module-id>/<item-id>/  One self-contained folder per item; entry point is
 ### Adding a module
 
 Add an entry to `modules` in `catalogue.js` (`id`, `code`, `title`, `description`) and create `items/<module-id>/`.
-Once a real module exists, the `sample` module can be marked hidden or removed.
+Use `hidden: true` on a module to keep it off the home page (its module page and items still open by direct link).
+The `sample` module is hidden this way; keep its folder, since its items are the templates above.

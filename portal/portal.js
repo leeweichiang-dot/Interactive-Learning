@@ -26,13 +26,14 @@
 
   function renderHome() {
     const list = document.getElementById("modules");
+    const shown = modules.filter(function (mod) { return !mod.hidden; });
 
-    if (modules.length === 0) {
+    if (shown.length === 0) {
       list.replaceWith(notice("No modules yet."));
       return;
     }
 
-    modules.forEach(function (mod) {
+    shown.forEach(function (mod) {
       const count = visibleItems(mod.id).length;
       const card = el("a", { className: "card", href: moduleHref(mod) }, [
         mod.code ? el("span", { className: "eyebrow", text: mod.code }) : null,

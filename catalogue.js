@@ -9,6 +9,8 @@
  *   code         Module code shown on its card (optional).
  *   title        Module name.
  *   description  One or two sentences (optional).
+ *   hidden       Optional. true keeps it off the home page; its module page
+ *                and items still open by direct link.
  *
  * Item fields:
  *   id       Folder name: the item lives at items/<module>/<id>/index.html.
@@ -27,7 +29,8 @@ window.CATALOGUE = {
       id: "sample",
       code: "DEMO 101",
       title: "Sample Module",
-      description: "Example items showing each kind of content. Copy one as the starting point for a new item."
+      description: "Example items showing each kind of content. Copy one as the starting point for a new item.",
+      hidden: true
     },
     {
       id: "flight",

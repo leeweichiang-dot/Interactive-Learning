@@ -553,7 +553,8 @@
            One wing seen from above. The root (where it joins the fuselage)
            is on the left, the tip on the right, and the leading (front) edge
            at the top. The skin is left on near the root; further out it has
-           been removed to show the spars and ribs. -->
+           been removed to show the spars and ribs. The flaps and ailerons
+           are hinged along the trailing (back) edge. -->
       <figure class="diagram">
         <figcaption class="diagram-caption">Wing <span class="diagram-note">(top view, part of the skin removed)</span></figcaption>
         <svg class="aircraft-svg" viewBox="10 26 580 188" role="group" aria-label="Top view of a wing with part of the skin removed">
@@ -601,27 +602,44 @@
           <line x1="130" y1="54.3" x2="130" y2="187.6" />
           <line x1="190" y1="59.8" x2="190" y2="183.1" />
         </g>
+
+        <!-- FLAPS (control surface): hinged along the back edge, on the inner part of the wing. -->
+        <g class="part control" data-part="flaps" tabindex="0" role="button">
+          <polygon class="shape" points="40,170.8 330,158 330,177.8 40,199.3" />
+        </g>
+
+        <!-- AILERONS (control surface): hinged along the back edge, on the outer part of the wing. -->
+        <g class="part control" data-part="ailerons" tabindex="0" role="button">
+          <polygon class="shape" points="350,157.1 550,148.3 550,161.5 350,176.3" />
+        </g>
+
+        <!-- Section line A-A (decoration): shows where the cross-section on the right is cut. -->
+        <g class="deco section-line">
+          <line x1="140" y1="42.2" x2="140" y2="199.9" />
+          <text x="140" y="39.2" text-anchor="middle">A</text>
+          <text x="140" y="212.9" text-anchor="middle">A</text>
+        </g>
         </svg>
       </figure>
 
       <!-- ===== WING: CROSS-SECTION THROUGH A RIB =====
-           The wing sliced from front (left) to back (right). The rib is cut
-           to this curved "aerofoil" shape, with holes to save weight. The
-           two upright bars are where the front and rear spars pass through,
-           and the thick outline is the skin. -->
+           The wing sliced from front (left) to back (right) along the line
+           A-A on the top view. The rib is cut to this curved "aerofoil"
+           shape, with holes to save weight. The two upright bars are where
+           the front and rear spars pass through, and the thick outline is
+           the skin. Behind the main wing is the flap, on its hinge. -->
       <figure class="diagram">
-        <figcaption class="diagram-caption">Wing <span class="diagram-note">(cross-section through a rib)</span></figcaption>
+        <figcaption class="diagram-caption">Wing <span class="diagram-note">(section A&ndash;A, through a rib and the flap)</span></figcaption>
         <svg class="aircraft-svg" viewBox="5 8 295 84" role="group" aria-label="Cross-section of a wing through a rib">
 
         <!-- RIB: the aerofoil-shaped piece. -->
         <g class="part" data-part="ribs" tabindex="0" role="button">
-          <path class="shape" d="M 15 58 C 15 30 90 16 150 20 C 210 24 270 44 292 56 C 262 62 200 70 150 74 C 90 78 15 82 15 58 Z" />
+          <path class="shape" d="M 15 58 C 15 30 90 16 150 20 C 175.7 21.7 201.3 26.3 224 32 L 224 66.3 C 199.7 69.3 173.5 72.1 150 74 C 90 78 15 82 15 58 Z" />
         </g>
         <!-- Lightening holes in the rib (decoration): holes cut to save weight. -->
         <g class="deco holes">
           <circle cx="44" cy="56" r="8" />
           <circle cx="132" cy="47" r="13" />
-          <circle cx="240" cy="53" r="6" />
         </g>
 
         <!-- FRONT SPAR and REAR SPAR, where they pass through the rib. -->
@@ -638,9 +656,16 @@
              the thick line itself can be clicked; the see-through "hit-line" is a
              wider line around it that makes it easier to tap. -->
         <g class="part" data-part="wing-skin" tabindex="0" role="button">
-          <path class="hit-line" d="M 15 58 C 15 30 90 16 150 20 C 210 24 270 44 292 56 C 262 62 200 70 150 74 C 90 78 15 82 15 58 Z" />
-          <path class="shape outline" d="M 15 58 C 15 30 90 16 150 20 C 210 24 270 44 292 56 C 262 62 200 70 150 74 C 90 78 15 82 15 58 Z" />
+          <path class="hit-line" d="M 15 58 C 15 30 90 16 150 20 C 175.7 21.7 201.3 26.3 224 32 L 224 66.3 C 199.7 69.3 173.5 72.1 150 74 C 90 78 15 82 15 58 Z" />
+          <path class="shape outline" d="M 15 58 C 15 30 90 16 150 20 C 175.7 21.7 201.3 26.3 224 32 L 224 66.3 C 199.7 69.3 173.5 72.1 150 74 C 90 78 15 82 15 58 Z" />
         </g>
+
+        <!-- FLAPS: the flap section, hinged behind the main wing. It has its own skin
+             and rib inside; the small circle is the hinge point (decoration). -->
+        <g class="part control" data-part="flaps" tabindex="0" role="button">
+          <path class="shape" d="M 230 33.6 C 257.6 40.9 280.2 49.6 292 56 C 277.3 58.9 254.9 62.4 230 65.6 Q 221 49.6 230 33.6 Z" />
+        </g>
+        <circle class="deco hinge" cx="227" cy="49.6" r="2.5" />
         </svg>
       </figure>
     </div>

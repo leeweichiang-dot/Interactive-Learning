@@ -989,12 +989,41 @@ const STRUCTURE_PARTS = [
       "skin is squeezed and the bottom skin is stretched.",
     short: "the outer covering of the wing, which also carries load.",
     hint: "Look for the smooth covering near the wing root, or the thick outline around the cross-section."
+  },
+
+  // ----- Wing control surfaces: hinged panels on the back edge -----
+  {
+    id: "flaps",
+    group: "wing-control",
+    name: "Flaps",
+    explanation:
+      "Flaps are hinged panels along the back edge of the wing, on the inner " +
+      "part near the root. Each flap is built like a small wing, with its own " +
+      "spar, ribs and skin. It is attached behind the rear spar on hinges or " +
+      "tracks, so it can slide back and down for take-off and landing to " +
+      "give extra lift at low speed.",
+    short: "hinged panels on the inner back edge, attached behind the rear spar.",
+    hint: "Look along the back edge of the wing, on the inner part near the root, or behind the main wing in the cross-section."
+  },
+  {
+    id: "ailerons",
+    group: "wing-control",
+    name: "Ailerons",
+    explanation:
+      "Ailerons are hinged panels along the back edge of the wing, on the " +
+      "outer part near the tip. Like flaps, they have their own small spar, " +
+      "ribs and skin, and they are hinged to brackets behind the rear spar. " +
+      "They move up and down, one wing's aileron up while the other's goes " +
+      "down, to roll the aircraft into a turn.",
+    short: "hinged panels on the outer back edge that roll the aircraft.",
+    hint: "Look along the back edge of the wing, on the outer part near the tip."
   }
 ];
 
 const STRUCTURE_PART_GROUPS = [
   { id: "fuselage", title: "Fuselage structure" },
-  { id: "wing", title: "Wing structure" }
+  { id: "wing", title: "Wing structure" },
+  { id: "wing-control", title: "Wing control surfaces (hinged panels)", swatch: true }
 ];
 
 function buildStructureActivity(container) {
@@ -1016,8 +1045,9 @@ function buildStructureActivity(container) {
     summary:
       "You can now name the parts that make up the fuselage (frames, " +
       "stringers, skin, floor beams and pressure bulkhead) and the wing " +
-      "(front and rear spars, ribs and skin). Together they form a strong, " +
-      "light skeleton with a skin that shares the load."
+      "(front and rear spars, ribs and skin, with the flaps and ailerons " +
+      "hinged behind the rear spar). Together they form a strong, light " +
+      "skeleton with a skin that shares the load."
   });
 }
 

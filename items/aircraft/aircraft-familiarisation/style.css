@@ -44,6 +44,7 @@
   --control-done: #b5dcc2;  /* explored control surface: a deeper green than
                                the wing, so the two stay easy to tell apart */
   --window: #46526a;        /* passenger windows and windscreen */
+  --flame: #e0701f;         /* flame in the engine's combustion chamber */
 
   --radius: 10px;           /* how rounded the corners are */
 }
@@ -78,6 +79,7 @@
     --control-line: #e0b867;
     --control-done: #2b6142;
     --window: #9aa6b8;
+    --flame: #ff9a4d;
   }
 
   /* The top bar keeps a deep navy in dark mode so it still feels "navy". */
@@ -506,7 +508,7 @@ h1, h2 { line-height: 1.25; margin: 0; }
   gap: 0.75rem;
 }
 
-/* Module 2 puts two pictures side by side in each row: a wide view
+/* Module 2 (and Module 3) put two pictures side by side in a row: a wide view
    (two parts of the width) and a smaller cross-section (one part).
    On narrow screens they stack instead (see section 12). */
 .diagram-row {
@@ -515,6 +517,9 @@ h1, h2 { line-height: 1.25; margin: 0; }
   gap: 0.75rem;
   align-items: start;
 }
+
+/* Module 3's two tail views share the width equally. */
+.diagram-row.is-even { grid-template-columns: 1fr 1fr; }
 
 /* The box around each aircraft picture. (<figure> has default margins,
    so we set margin: 0.) */
@@ -646,6 +651,38 @@ h1, h2 { line-height: 1.25; margin: 0; }
 }
 /* The flap's hinge point in the wing cross-section. */
 .hinge { fill: var(--control-line); }
+
+/* Module 3 decoration */
+/* The underside of the wing above the engine. */
+.wing-stub {
+  fill: var(--part-fill);
+  stroke: var(--part-line);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 5;
+}
+/* The rows of blades drawn over the compressor and turbine. */
+.blades line {
+  stroke: var(--part-line);
+  stroke-width: 2;
+  opacity: 0.7;
+}
+/* The flame in the combustion chamber. */
+.flame {
+  fill: var(--flame);
+  opacity: 0.85;
+}
+/* The cone in the middle of the exhaust nozzle. */
+.plug {
+  fill: var(--part-line);
+  opacity: 0.35;
+}
+/* The spars and ribs inside the fin, shown as dashed lines. */
+.inner-structure line {
+  stroke: var(--part-line);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  opacity: 0.8;
+}
 
 /* "Cabin" and "Cargo" labels in the fuselage cross-section. */
 .section-label {
@@ -781,8 +818,9 @@ h1, h2 { line-height: 1.25; margin: 0; }
 }
 
 @media (max-width: 600px) {
-  /* Module 2: stack each pair of pictures instead of side by side. */
-  .diagram-row { grid-template-columns: 1fr; }
+  /* Modules 2 and 3: stack each pair of pictures instead of side by side. */
+  .diagram-row,
+  .diagram-row.is-even { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 520px) {

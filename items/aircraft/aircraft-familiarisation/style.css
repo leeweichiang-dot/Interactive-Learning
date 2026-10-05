@@ -1101,3 +1101,59 @@ h1, h2 { line-height: 1.25; margin: 0; }
   .dashboard { padding: 1rem; }
   .dashboard-card { padding: 1.1rem; }
 }
+
+
+/* --- 13f. DASHBOARD: ADD TRAINEE PROGRESS FILES --------------------------
+   The dashed drop area, like the empty content box on the training page. */
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--page-bg);
+  text-align: center;
+}
+.dropzone p { margin: 0; }
+.dropzone .dashboard-actions { justify-content: center; }
+
+/* While files are dragged over it: a navy outline and a pale navy tint. */
+.dropzone.is-dragging {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+}
+
+/* The Choose Files label looks like a button. Its real file box is hidden
+   (below), so show the keyboard outline on the label instead. */
+.file-button { display: inline-flex; align-items: center; }
+.file-button:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Hide something from view but keep it usable by keyboards and screen
+   readers (the file box inside Choose Files). */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.file-status { margin: 1rem 0 0; }
+.file-status:empty { display: none; }
+
+/* Files that could not be read: amber, like the hint messages. */
+.file-errors {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+  color: var(--hint-text);
+  font-weight: 600;
+  font-size: 1rem;
+  overflow-wrap: anywhere;     /* long file names wrap instead of widening the page */
+}
+.file-errors:empty { display: none; }

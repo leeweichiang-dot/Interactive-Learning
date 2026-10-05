@@ -1405,6 +1405,16 @@ function signIn(name, id) {
   saveCurrentTrainee();
   restoreProgress();
 
+  // Put the name and trainee ID on the portal's progress file too (the file
+  // the trainee downloads from My progress), so the instructor dashboard
+  // can match the file to this trainee. The group (class) is left as it is.
+  // "if (window.Tracker ...)" skips this if the portal's tracker didn't load.
+  if (window.Tracker && window.Tracker.setTraineeId) {
+    const portalTrainee = window.Tracker.load().trainee || {};
+    window.Tracker.setTrainee(name, portalTrainee.group);
+    window.Tracker.setTraineeId(id);
+  }
+
   // Show "Jane Tan (S1234)" in the top bar. textContent (not innerHTML)
   // shows the name exactly as typed, safely.
   traineeBadgeName.textContent = name + " (" + id + ")";

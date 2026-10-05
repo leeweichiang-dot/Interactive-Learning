@@ -4,12 +4,16 @@
    This file controls how dashboard.html BEHAVES:
      1. checks the password
      2. reads every trainee's saved progress from localStorage
-     3. builds the trainee table, the Class Summary and the Export Summary
+     3. reads trainee progress files the instructor adds (section 4b)
+     4. builds the trainee table, the Class Summary and the Export Summary
 
-   IMPORTANT: localStorage belongs to one browser on one device. This page
-   can only see trainees who used the training in this same browser on this
-   same computer (for example a shared classroom PC). It cannot see
-   trainees who trained on their own phones or laptops.
+   IMPORTANT: localStorage belongs to one browser on one device, so on its
+   own this page only sees trainees who used the training in this same
+   browser on this same computer (for example a shared classroom PC).
+   Trainees who trained on their own phones or laptops download a progress
+   file from My progress on the portal and hand it in; the instructor adds
+   those files here. Files are read in memory only: they are never saved
+   or uploaded, and they are gone when the page is reloaded or closed.
    =========================================================================== */
 
 "use strict";
@@ -40,6 +44,18 @@ const MODULE_TITLES = [
 // The pass mark, as a percentage (the same as PASS_MARK in app.js).
 const PASS_MARK = 80;
 
+// Progress files (made by the portal's tracker.js) start with this "app"
+// name, and keep this training's results under this item key.
+const PORTAL_APP = "interactive-learning";
+const ITEM_KEY = "aircraft/aircraft-familiarisation";
+
+// Ignore files bigger than 2 MB: a real progress file is far smaller.
+const MAX_FILE_BYTES = 2 * 1024 * 1024;
+
+// Trainees read from the progress files added so far. This list lives in
+// memory only, so it is empty again after a reload.
+let fileTrainees = [];
+
 
 /* ---------------------------------------------------------------------------
    2. FIND THE PAGE ELEMENTS
@@ -61,6 +77,12 @@ const copyButton      = document.getElementById("copy-button");
 const copyStatus      = document.getElementById("copy-status");
 const exportLabel     = document.getElementById("export-label");
 const exportText      = document.getElementById("export-text");
+
+const dropzone        = document.getElementById("dropzone");
+const fileInput       = document.getElementById("file-input");
+const clearFilesBtn   = document.getElementById("clear-files-button");
+const fileStatus      = document.getElementById("file-status");
+const fileErrors      = document.getElementById("file-errors");
 
 
 /* ---------------------------------------------------------------------------
@@ -88,11 +110,11 @@ function handlePasswordSubmit(event) {
 
 /* ---------------------------------------------------------------------------
    4. READ THE TRAINEES FROM localStorage
-   Returns a list (array) of trainees, sorted by name. Each one is tidied
-   so the rest of this file can trust its shape:
+   Returns a list (array) of trainees. Each one is tidied so the rest of
+   this file can trust its shape:
      { id, name, scores: { "Aircraft Parts": 91, ... }, completed: [...] }
    --------------------------------------------------------------------------- */
-function loadTrainees() {
+function loadBrowserTrainees() {
   let saved = {};
   try {
     // localStorage stores text; JSON.parse turns it back into an object.
@@ -129,9 +151,190 @@ function loadTrainees() {
     });
   });
 
-  // Sort A to Z by name. localeCompare compares text the way a dictionary does.
-  trainees.sort(function (a, b) { return a.name.localeCompare(b.name); });
   return trainees;
+}
+
+
+/* ---------------------------------------------------------------------------
+   4b. READ TRAINEE PROGRESS FILES (new)
+
+   A progress file is the .json file a trainee downloads from My progress
+   on the portal. It holds everything the portal's tracker saved, e.g.
+     {
+       "app": "interactive-learning",
+       "trainee": { "name": "Jane Tan", "group": "AMT-1", "id": "S1234" },
+       "items": {
+         "aircraft/aircraft-familiarisation": {
+           "attempts": [
+             { "score": 9, "total": 11,
+               "answers": [ { "q": "Aircraft Parts: find the fuselage", ... } ] }
+           ]
+         }
+       }
+     }
+   Each attempt is one Parts Check. The file doesn't say which module an
+   attempt was for, but every question starts with the module title
+   ("Aircraft Parts: find the ..."), so we read the module from there.
+
+   "id" is only there if the trainee signed in to this training on that
+   device (app.js copies the trainee ID into the file); otherwise the ID
+   column shows a dash and the trainee is matched by name.
+   --------------------------------------------------------------------------- */
+
+// Turn one progress file (already turned from text into an object) into a
+// trainee in the same shape as loadBrowserTrainees uses.
+// "throw" stops with an error message, which readFiles shows to the user.
+function traineeFromFile(data, fileName) {
+  if (!data || data.app !== PORTAL_APP || !data.items || typeof data.items !== "object") {
+    throw new Error("not a progress file from this portal");
+  }
+
+  const about = (data.trainee && typeof data.trainee === "object") ? data.trainee : {};
+  // String(...) turns anything into text; slice keeps it a sensible length.
+  const name = String(about.name || "").trim().slice(0, 80) || "Unnamed (" + fileName + ")";
+  // Tidy the ID the same way app.js does: no spaces, capital letters.
+  const id = String(about.id || "").replace(/\s+/g, "").toUpperCase().slice(0, 30);
+  const group = String(about.group || "").trim().slice(0, 40);
+
+  const scores = {};
+  const completed = [];
+  const record = data.items[ITEM_KEY];
+  const attempts = (record && Array.isArray(record.attempts)) ? record.attempts : [];
+
+  attempts.forEach(function (attempt) {
+    // Skip anything that doesn't look like a real attempt.
+    if (!attempt || !Array.isArray(attempt.answers) || attempt.answers.length === 0 ||
+        !(attempt.total > 0) || !(attempt.score >= 0) || attempt.score > attempt.total) {
+      return;
+    }
+
+    // "Aircraft Parts: find the fuselage" -> "Aircraft Parts".
+    const question = String(attempt.answers[0] && attempt.answers[0].q || "");
+    const title = question.split(": find the ")[0];
+    if (MODULE_TITLES.indexOf(title) === -1) {
+      return;   // not one of this training's Parts Checks
+    }
+
+    // Same score as app.js: right first time / total, as a whole percentage.
+    // Keep only the highest score for each module.
+    const percent = Math.round((attempt.score / attempt.total) * 100);
+    if (typeof scores[title] !== "number" || percent > scores[title]) {
+      scores[title] = percent;
+    }
+    // Finishing a Parts Check completes its module (as in app.js).
+    if (completed.indexOf(title) === -1) {
+      completed.push(title);
+    }
+  });
+
+  return { id: id, name: name, group: group, scores: scores, completed: completed };
+}
+
+// Read the files chosen or dropped by the instructor, one by one.
+function readFiles(fileList) {
+  // Array.from turns the browser's FileList into a normal list.
+  const files = Array.from(fileList || []);
+  if (files.length === 0) {
+    return;
+  }
+  fileErrors.textContent = "";
+
+  // file.text() reads a file's text. It finishes later (it returns a
+  // "Promise"), so Promise.all waits until every file has been read.
+  Promise.all(files.map(function (file) {
+    if (file.size > MAX_FILE_BYTES) {
+      return Promise.resolve({ file: file, error: "too large to be a progress file" });
+    }
+    return file.text().then(function (text) {
+      try {
+        return { file: file, trainee: traineeFromFile(JSON.parse(text), file.name) };
+      } catch (error) {
+        // JSON.parse fails with a SyntaxError if the text isn't JSON at all.
+        return { file: file, error: error instanceof SyntaxError ? "not a progress file" : error.message };
+      }
+    }, function () {
+      return { file: file, error: "could not be read" };
+    });
+  })).then(function (results) {
+    let added = 0;
+    results.forEach(function (result) {
+      if (result.error) {
+        // List the problem file by name; textContent keeps the name as plain text.
+        fileErrors.appendChild(makeElement("li", "", result.file.name + ": " + result.error));
+      } else {
+        fileTrainees.push(result.trainee);
+        added = added + 1;
+      }
+    });
+
+    fileStatus.textContent = "Added " + added + (added === 1 ? " file" : " files") +
+      ". Trainees from files are shown until you reload or close this page.";
+    clearFilesBtn.hidden = fileTrainees.length === 0;
+    refreshDashboard();
+  });
+}
+
+// Forget every loaded file (trainees saved in this browser stay).
+function clearFiles() {
+  fileTrainees = [];
+  fileStatus.textContent = "Removed the loaded files.";
+  fileErrors.textContent = "";
+  clearFilesBtn.hidden = true;
+  refreshDashboard();
+}
+
+
+/* ---------------------------------------------------------------------------
+   4c. ALL TRAINEES: THIS BROWSER + FILES (new)
+   The same trainee can appear more than once: saved in this browser AND in
+   a file, or in two files handed in on different days. We join them into
+   one row, keeping the highest score for each module and every completed
+   module. Trainees are matched by trainee ID, or by name (and group) when
+   a file has no ID.
+   --------------------------------------------------------------------------- */
+function loadTrainees() {
+  const byKey = {};   // one entry per trainee, found by its matching "key"
+  const all = [];
+
+  loadBrowserTrainees().concat(fileTrainees).forEach(function (trainee) {
+    const key = trainee.id
+      ? "id:" + trainee.id
+      : "name:" + trainee.name.toLowerCase() + "|" + (trainee.group || "").toLowerCase();
+    const existing = byKey[key];
+
+    if (!existing) {
+      // First time we see this trainee: copy them (so the original lists
+      // are never changed) and add them to the results.
+      const copy = {
+        id: trainee.id,
+        name: trainee.name,
+        scores: Object.assign({}, trainee.scores),
+        completed: trainee.completed.slice()
+      };
+      byKey[key] = copy;
+      all.push(copy);
+      return;
+    }
+
+    // Seen before: keep the higher score for each module...
+    MODULE_TITLES.forEach(function (title) {
+      const score = trainee.scores[title];
+      if (typeof score === "number" &&
+          (typeof existing.scores[title] !== "number" || score > existing.scores[title])) {
+        existing.scores[title] = score;
+      }
+    });
+    // ...and every module completed in either place.
+    trainee.completed.forEach(function (title) {
+      if (existing.completed.indexOf(title) === -1) {
+        existing.completed.push(title);
+      }
+    });
+  });
+
+  // Sort A to Z by name. localeCompare compares text the way a dictionary does.
+  all.sort(function (a, b) { return a.name.localeCompare(b.name); });
+  return all;
 }
 
 
@@ -258,7 +461,8 @@ function buildTable(trainees) {
     const row = document.createElement("tr");
 
     row.appendChild(makeElement("td", "", trainee.name));
-    row.appendChild(makeElement("td", "", trainee.id));
+    // A trainee from a file without an ID shows a dash.
+    row.appendChild(makeElement("td", "", trainee.id || "–"));
 
     MODULE_TITLES.forEach(function (title) {
       row.appendChild(makeElement("td", "is-number", formatScore(trainee.scores[title])));
@@ -322,7 +526,7 @@ function buildExportText() {
     lines.push("No trainee data found.");
   }
   trainees.forEach(function (trainee) {
-    lines.push(trainee.name + " (" + trainee.id + ")");
+    lines.push(trainee.name + (trainee.id ? " (" + trainee.id + ")" : ""));
     MODULE_TITLES.forEach(function (title) {
       const score = trainee.scores[title];
       lines.push("  " + title + ": " + (typeof score === "number" ? score + "%" : "not attempted"));
@@ -391,11 +595,48 @@ function handleCopy() {
 
 
 /* ---------------------------------------------------------------------------
+   8b. REFRESH AFTER FILES ARE ADDED OR REMOVED (new)
+   Rebuilds the table and Class Summary, and the export text if it is
+   showing, so nothing on the page is out of date.
+   --------------------------------------------------------------------------- */
+function refreshDashboard() {
+  showDashboard();
+  if (!exportText.hidden) {
+    exportText.value = buildExportText();
+    copyStatus.textContent = "";
+  }
+}
+
+
+/* ---------------------------------------------------------------------------
    9. CONNECT EVERYTHING (runs once when the page loads)
    --------------------------------------------------------------------------- */
 passwordForm.addEventListener("submit", handlePasswordSubmit);
 exportButton.addEventListener("click", handleExport);
 copyButton.addEventListener("click", handleCopy);
+
+// New: adding progress files with the Choose Files button...
+fileInput.addEventListener("change", function () {
+  readFiles(fileInput.files);
+  // Empty the box, so choosing the same file again still counts as a change.
+  fileInput.value = "";
+});
+clearFilesBtn.addEventListener("click", clearFiles);
+
+// ...or by dragging them onto the drop area. "preventDefault" stops the
+// browser from simply opening the dropped file instead.
+dropzone.addEventListener("dragover", function (event) {
+  event.preventDefault();
+  dropzone.classList.add("is-dragging");   // highlight the drop area
+});
+dropzone.addEventListener("dragleave", function () {
+  dropzone.classList.remove("is-dragging");
+});
+dropzone.addEventListener("drop", function (event) {
+  event.preventDefault();
+  dropzone.classList.remove("is-dragging");
+  readFiles(event.dataTransfer.files);
+});
 
 // Put the cursor in the password box, ready to type.
 passwordInput.focus();

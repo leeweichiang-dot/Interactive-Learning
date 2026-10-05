@@ -4,7 +4,9 @@
   AIRCRAFT FAMILIARISATION TRAINING: dashboard.html (instructor dashboard)
 
   This page shows the instructor every trainee who has used the training
-  in THIS browser on THIS device: their best score per module, overall
+  in THIS browser on THIS device, plus any trainee progress files the
+  instructor adds (read in memory only, never saved or uploaded): their
+  best score per module, overall
   progress and a status label, plus class averages and a text summary to
   copy into a report or email.
 
@@ -70,19 +72,52 @@
        ===================================================================== -->
   <main id="dashboard-screen" class="dashboard" hidden>
 
+    <!-- ----- ADD TRAINEE PROGRESS FILES (new) -----
+         For trainees who trained on their own phone or laptop: they
+         download a progress file from My progress on the portal and hand
+         it in. dashboard.js reads the files in this browser only. -->
+    <section class="dashboard-card" aria-labelledby="files-heading">
+      <h2 id="files-heading">Add Trainee Progress Files</h2>
+      <p class="dashboard-note">
+        Trainees who trained on their own device can download their progress file
+        from <strong>My progress</strong> on the portal and hand it in. Add the files
+        here to include them below. Files are read in this browser only: nothing is
+        uploaded or saved, and they are removed when you reload or close this page.
+      </p>
+
+      <!-- The drop area: files can be dragged onto it or chosen with the button. -->
+      <div id="dropzone" class="dropzone">
+        <p><strong>Drop progress files here</strong> or</p>
+        <div class="dashboard-actions">
+          <!-- A <label> wrapped round a hidden file box: clicking the label
+               opens the file picker. "multiple" allows several files at once,
+               and "accept" suggests .json files. -->
+          <label class="button button-primary file-button">
+            Choose Files
+            <input type="file" id="file-input" class="visually-hidden" accept=".json,application/json" multiple>
+          </label>
+          <button type="button" id="clear-files-button" class="button button-secondary" hidden>Remove Loaded Files</button>
+        </div>
+      </div>
+
+      <!-- How many files were added, and any that could not be read. -->
+      <p id="file-status" class="dashboard-note file-status" role="status"></p>
+      <ul id="file-errors" class="file-errors"></ul>
+    </section>
+
     <!-- ----- TRAINEE TABLE: one row per trainee ----- -->
     <section class="dashboard-card" aria-labelledby="table-heading">
       <h1 id="table-heading">Trainee Progress</h1>
       <p class="dashboard-note">
         Trainees who have signed in to Aircraft Familiarisation Training in this
-        browser on this device. Scores are each trainee's highest Parts Check
-        score per module; the pass mark is 80%.
+        browser on this device, plus any progress files added above. Scores are
+        each trainee's highest Parts Check score per module; the pass mark is 80%.
       </p>
 
       <!-- Shown instead of the table when no trainee data is found. -->
       <p id="no-trainees" class="placeholder" hidden>
-        No trainee data found in this browser yet. Trainees appear here once
-        they have signed in on this device.
+        No trainee data found yet. Trainees appear here once they have signed
+        in on this device, or when you add their progress files above.
       </p>
 
       <!-- The box lets the table scroll sideways on a phone. -->

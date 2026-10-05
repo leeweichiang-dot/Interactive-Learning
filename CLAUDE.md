@@ -18,9 +18,11 @@ A portal where students browse and try a growing collection of small learning it
   - `tracker.js` saves progress and quiz results in `localStorage` only. This is the main place student data is stored.
   - Exception: `items/aircraft/aircraft-familiarisation/` also has a trainee sign-in (name + trainee ID) and saves each
     trainee's completed modules and best Parts Check scores in its own `localStorage` keys (`aircraft-training-*`).
-    Its `dashboard.html` (password-gated, client-side only, so not real security) reads those keys, so it only sees
-    trainees who used that same browser on that same device. Keep module titles and keys in sync between its `app.js`
-    and `dashboard.js`.
+    Its `dashboard.html` (password-gated, client-side only, so not real security) reads those keys (trainees who used
+    that same browser and device) and also reads trainees' portal progress files in memory only, working out per-module
+    scores from the `"<module title>: find the …"` question prefix. Sign-in also writes the trainee ID into the
+    tracker (`Tracker.setTraineeId`, an optional `trainee.id` in the progress file). Keep module titles, question
+    wording and keys in sync between its `app.js` and `dashboard.js`.
   - A trainee shares progress by downloading a file from `progress.html` and handing it in (e.g. via the LMS).
   - `instructor.html` reads those files in the browser and keeps them in memory only: it never saves or uploads them.
   - Render names and other file content with `textContent`, never `innerHTML`.

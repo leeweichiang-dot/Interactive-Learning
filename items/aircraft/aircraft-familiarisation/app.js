@@ -3,7 +3,7 @@
 
    This file controls how the page BEHAVES:
      - switching from the welcome screen to the learning area
-     - building the module buttons and locking/unlocking them
+     - building the module buttons and showing which modules are done
      - showing each module's content and updating the learning panel
      - running the diagram activities for Modules 1, 2 and 3 (sections 11-14)
      - updating the progress bar and footer
@@ -35,10 +35,9 @@ const MODULES = [
   {
     title: "Aircraft Parts",
     explanation:
-      "An aircraft is made of a few main parts. The long body in the middle is " +
-      "the fuselage. The wings stick out from each side. The engines push the " +
-      "aircraft forward, and the tail at the back keeps it steady. Hinged " +
-      "panels called control surfaces move to steer the aircraft.",
+      "A fighter jet is made of a few main parts: the fuselage with the " +
+      "cockpit and air intakes, the wings, the engines inside the back of the " +
+      "body, and the tail. Parts called control surfaces move to steer it.",
     // buildAircraftPartsActivity is written further down this file (section 12).
     // JavaScript lets you refer to a function before the line that defines it.
     activity: buildAircraftPartsActivity
@@ -47,20 +46,21 @@ const MODULES = [
     title: "Fuselage and Wing Structure",
     explanation:
       "The fuselage and wings are not solid. Inside each is a light " +
-      "\"skeleton\": frames and stringers in the fuselage, spars and ribs in " +
-      "the wing. A thin skin is fixed over the skeleton and shares the load " +
-      "with it. This way of building is called semi-monocoque construction.",
+      "\"skeleton\" with a skin fixed over it that shares the load: this is " +
+      "called semi-monocoque construction. Because a fighter bends and " +
+      "twists hard in tight turns, it uses heavy longerons, strong " +
+      "bulkheads and wings with several spars.",
     // buildStructureActivity is in section 13.
     activity: buildStructureActivity
   },
   {
     title: "Engine and Empennage",
     explanation:
-      "The engine makes the push (thrust) that moves the aircraft forward. A " +
-      "jet engine works in four steps: suck, squeeze, bang, blow. The " +
-      "empennage (say \"em-PEN-ij\") is the whole tail: the fixed fin and " +
-      "horizontal stabilisers keep the aircraft steady, and the hinged " +
-      "rudder and elevators steer it.",
+      "A fighter's engines sit inside the rear fuselage. Like every jet " +
+      "engine, they work in four steps: suck, squeeze, bang, blow, and most " +
+      "fighters add an afterburner for extra thrust. The empennage (say " +
+      "\"em-PEN-ij\") is the whole tail: here, two fins with rudders and " +
+      "an all-moving horizontal tail called the stabilators.",
     // buildEngineActivity is in section 14.
     activity: buildEngineActivity
   }
@@ -79,10 +79,11 @@ const GET_READY_MESSAGE = "Get ready to explore this topic.";
 // (Arrays count from 0, so Module 1 is index 0, Module 2 is index 1, etc.)
 let currentIndex = -1;
 
-// How many modules have been completed. Because modules must be done in
-// order, this number also tells us which modules are unlocked:
-// a module is unlocked if its index is less than or equal to completedCount.
-let completedCount = 0;
+// Which modules have been completed, as a Set of module indexes (a Set is
+// a list that ignores duplicates). Trainees can open the modules in any
+// order, so this records exactly which ones are done, e.g. {0, 2} means
+// Modules 1 and 3 are complete.
+const completedModules = new Set();
 
 
 /* ---------------------------------------------------------------------------
@@ -148,20 +149,18 @@ function buildModuleButtons() {
 
 
 /* ---------------------------------------------------------------------------
-   5. UPDATE THE MODULE BUTTONS (locked / unlocked / active / complete)
+   5. UPDATE THE MODULE BUTTONS (active / complete)
    Called whenever something changes, so the buttons always match the state.
    --------------------------------------------------------------------------- */
 function updateModuleButtons() {
   // querySelectorAll finds every element matching a CSS selector.
   const buttons = moduleList.querySelectorAll(".module-button");
 
+  // Every module is always available, so no button is ever disabled
+  // (locked); the buttons only show which module is open and which are done.
   buttons.forEach(function (button, index) {
-    const isComplete = index < completedCount;
-    const isUnlocked = index <= completedCount;
+    const isComplete = completedModules.has(index);
     const isActive   = index === currentIndex;
-
-    // A disabled button can't be clicked; this is how we "lock" a module.
-    button.disabled = !isUnlocked;
 
     // classList.toggle(name, true/false) adds or removes a CSS class.
     // style.css uses these classes to change the button's appearance.
@@ -179,10 +178,10 @@ function updateModuleButtons() {
     const status = button.querySelector(".module-status");
     if (isComplete) {
       status.textContent = "✓ Completed";            // ✓ is a tick mark
-    } else if (isUnlocked) {
-      status.textContent = "Available";
+    } else if (isActive) {
+      status.textContent = "In progress";
     } else {
-      status.textContent = "🔒 Locked: complete Module " + index + " first"; // padlock
+      status.textContent = "Not started";
     }
   });
 }
@@ -190,14 +189,10 @@ function updateModuleButtons() {
 
 /* ---------------------------------------------------------------------------
    6. OPEN A MODULE
-   Runs when the trainee clicks an unlocked module button.
+   Runs when the trainee clicks a module button. Any module can be opened
+   at any time, in any order.
    --------------------------------------------------------------------------- */
 function openModule(index) {
-  // Safety check: ignore clicks on locked modules.
-  if (index > completedCount) {
-    return;
-  }
-
   currentIndex = index;
   const module = MODULES[index];
 
@@ -221,11 +216,11 @@ function openModule(index) {
 
   // Show the "Mark complete" button only for a module that has no activity
   // yet and isn't done. (An activity completes its module by itself.)
-  completeButton.hidden = Boolean(module.activity) || index < completedCount;
+  completeButton.hidden = Boolean(module.activity) || completedModules.has(index);
 
   // Learning panel: topic name, explanation and the "get ready" message.
   showPanelTopic(module.title, module.explanation);
-  showPanelMessage(index < completedCount
+  showPanelMessage(completedModules.has(index)
     ? "You have already completed this module. Feel free to review it."
     : GET_READY_MESSAGE);
 
@@ -237,23 +232,27 @@ function openModule(index) {
 
 /* ---------------------------------------------------------------------------
    7. COMPLETE THE CURRENT MODULE
-   Runs when the trainee clicks "Mark Module as Complete".
+   Runs when an activity is finished (or "Mark Module as Complete" is
+   clicked, for a module without an activity).
    --------------------------------------------------------------------------- */
 function completeCurrentModule() {
-  // Only the next module in order can be completed.
-  if (currentIndex !== completedCount) {
+  // Nothing to do if this module was already completed.
+  if (completedModules.has(currentIndex)) {
     return;
   }
 
-  completedCount = completedCount + 1;
+  completedModules.add(currentIndex);
   completeButton.hidden = true;
 
   // Pick an encouraging message depending on whether there is more to do.
-  if (completedCount < MODULES.length) {
-    const nextTitle = MODULES[completedCount].title;
+  if (completedModules.size < MODULES.length) {
+    // Suggest the first module (in order) that isn't done yet.
+    const nextIndex = MODULES.findIndex(function (m, i) { return !completedModules.has(i); });
     showPanelMessage(
-      "Well done! You have completed " + MODULES[currentIndex].title +
-      ". Module " + (completedCount + 1) + ": " + nextTitle + " is now unlocked."
+      "Well done! You have completed " + MODULES[currentIndex].title + ". " +
+      "That is " + completedModules.size + " of " + MODULES.length +
+      " modules. Next, try Module " + (nextIndex + 1) + ": " +
+      MODULES[nextIndex].title + "."
     );
   } else {
     showPanelMessage(
@@ -297,7 +296,7 @@ function hidePanelMessage() {
    --------------------------------------------------------------------------- */
 function updateProgress() {
   // Math.round removes the decimals (e.g. 33.333... becomes 33).
-  const percent = Math.round((completedCount / MODULES.length) * 100);
+  const percent = Math.round((completedModules.size / MODULES.length) * 100);
 
   // Progress bar: set the fill width and the number beside it.
   progressFill.style.width = percent + "%";
@@ -336,7 +335,7 @@ function startLearning() {
      Step 2, Parts Check: the app names a part ("Find the ribs") and the
                           trainee clicks it on a picture. A wrong click gives
                           a hint; a right click gives an encouraging message.
-   Finishing the check completes the module, which unlocks the next one.
+   Finishing the check completes the module.
 
    The shared HTML is <template id="diagram-activity-template"> in
    index.html; each module's pictures have their own template. The colours
@@ -632,9 +631,8 @@ function buildDiagramActivity(container, config) {
     showPanelTopic(module.title, config.summary);
 
     // Complete the module the first time; afterwards this is just revision.
-    // (completedCount equals this module's index until the module is done.)
-    if (completedCount === config.moduleIndex) {
-      completeCurrentModule();   // unlocks the next module and shows "Well done!"
+    if (!completedModules.has(config.moduleIndex)) {
+      completeCurrentModule();   // updates progress and shows "Well done!"
     } else {
       showPanelMessage("Great revision! You found every part again.");
     }
@@ -713,7 +711,7 @@ function buildDiagramActivity(container, config) {
    One object per part. The id must match a data-part="..." in index.html.
      group        which group of name buttons it goes in: here "main" for
                   the fixed main parts, or "control" for the control
-                  surfaces (the hinged parts that move to steer)
+                  surfaces (the parts that move to steer)
      name         shown in the learning panel and on the name buttons
      explanation  what the part is and does, in plain English
      short        a one-line reminder, used in the "Correct!" message
@@ -725,71 +723,71 @@ const AIRCRAFT_PARTS = [
     group: "main",
     name: "Fuselage",
     explanation:
-      "The fuselage is the main body of the aircraft: a long tube that carries " +
-      "the crew, passengers and cargo. All the other main parts are attached " +
-      "to it. It is built from ring-shaped frames and long strips called " +
-      "stringers, covered by a thin skin.",
-    short: "the main body that carries people and cargo.",
-    hint: "Look for the long main body that runs from front to back."
+      "The fuselage is the main body of the fighter. It holds the cockpit at " +
+      "the front, fuel tanks and equipment in the middle, and the engines at " +
+      "the back. All the other main parts are attached to it.",
+    short: "the main body that holds the cockpit, fuel and engines.",
+    hint: "Look for the long main body that runs from the pointed nose to the tail."
   },
   {
     id: "cockpit",
     group: "main",
     name: "Cockpit",
     explanation:
-      "The cockpit, also called the flight deck, is at the very front of the " +
-      "aircraft. This is where the pilots sit and control the aircraft. The " +
-      "rounded tip in front of it, called the nose, covers the weather radar.",
-    short: "where the pilots sit and fly the aircraft.",
-    hint: "Look right at the front, where the pilots look out of the windscreen."
+      "The cockpit is where the pilot sits, under a clear bubble called the " +
+      "canopy. The canopy gives the pilot an all-round view and opens to let " +
+      "them get in and out. The pointed nose in front of it, called the " +
+      "radome, covers the radar.",
+    short: "where the pilot sits, under the clear canopy.",
+    hint: "Look near the front for the clear bubble the pilot sits under."
+  },
+  {
+    id: "air-intake",
+    group: "main",
+    name: "Air intakes",
+    explanation:
+      "The air intakes are the openings on each side of the fuselage that " +
+      "feed air to the engines. Behind each opening, a long duct leads the " +
+      "air smoothly back to the front of an engine.",
+    short: "the openings on the sides that feed air to the engines.",
+    hint: "Look on the side of the body, just ahead of the wing, for the box-shaped openings."
   },
   {
     id: "wing",
     group: "main",
-    name: "Wing",
+    name: "Wings",
     explanation:
       "The wings stick out from each side of the fuselage. As the aircraft " +
-      "moves forward, air flowing over the wings creates lift: the upward " +
-      "force that holds the aircraft in the air. Most airliners also carry " +
-      "their fuel inside the wings. Hinged panels on the back edge, the " +
-      "flaps and ailerons, help control the aircraft. You will look inside a " +
-      "wing in Module 2.",
-    short: "it creates the lift that holds the aircraft up.",
-    hint: "Look for the large surface that sticks out from the side of the body."
+      "moves forward, air flowing over them creates lift: the upward force " +
+      "that holds it in the air. Fighter wings are thin and swept back for " +
+      "high speed. They hold fuel, and have mounting points underneath for " +
+      "extra fuel tanks and weapons. You will look inside a wing in Module 2.",
+    short: "they create the lift that holds the aircraft up.",
+    hint: "Look for the large surfaces that stick out from the sides of the body."
   },
   {
     id: "engine",
     group: "main",
-    name: "Engine",
+    name: "Engines",
     explanation:
-      "The engines push the aircraft forward. This push is called thrust. On " +
-      "most airliners each engine hangs under a wing, held by a strong mount " +
-      "called a pylon.",
-    short: "it pushes the aircraft forward (thrust).",
-    hint: "Look for the round pod hanging underneath the wing."
-  },
-  {
-    id: "horizontal-stabiliser",
-    group: "main",
-    name: "Horizontal stabiliser",
-    explanation:
-      "The horizontal stabilisers are the two small flat wings at the tail. " +
-      "They stop the nose bobbing up and down, keeping the aircraft steady. " +
-      "The hinged panels on their back edge are the elevators.",
-    short: "it stops the nose bobbing up and down.",
-    hint: "Look at the very back for a small, flat, wing-like surface."
+      "A fighter's engines are buried inside the rear fuselage (shown dashed), " +
+      "not hung under the wings. Air comes in through the intakes, and the " +
+      "hot gas leaves through the exhaust nozzles at the tail, pushing the " +
+      "aircraft forward. You will look inside an engine in Module 3.",
+    short: "they push the aircraft forward (thrust), from inside the rear body.",
+    hint: "Look at the very back for the exhaust nozzles, and the dashed outline inside the rear body."
   },
   {
     id: "vertical-stabiliser",
     group: "main",
-    name: "Vertical stabiliser (fin)",
+    name: "Vertical stabilisers (fins)",
     explanation:
-      "The vertical stabiliser, usually called the fin, is the tall upright " +
-      "surface at the tail. It stops the aircraft swinging from side to side, " +
-      "like the feathers on an arrow. The hinged panel on its back edge is " +
-      "the rudder.",
-    short: "it stops the aircraft swinging from side to side.",
-    hint: "Look at the back for the tall surface that points straight up."
+      "This fighter has two fins, side by side at the tail; in the side view " +
+      "they overlap and look like one. They keep the aircraft pointing " +
+      "straight and stop it swinging from side to side, like the feathers " +
+      "on an arrow. The hinged panel on each fin is a rudder.",
+    short: "the upright tail surfaces that keep the aircraft pointing straight.",
+    hint: "Look at the back for the upright surfaces: big in the side view, thin strips in the top view."
   },
   {
     id: "landing-gear",
@@ -797,22 +795,21 @@ const AIRCRAFT_PARTS = [
     name: "Landing gear",
     explanation:
       "The landing gear is the set of wheels, legs and shock absorbers the " +
-      "aircraft stands on. It supports the aircraft on the ground and absorbs " +
-      "the bump of landing. After take-off it folds up into the aircraft.",
+      "aircraft stands on. A fighter's gear is short and very strong, to take " +
+      "hard landings. After take-off it folds up into the aircraft.",
     short: "the wheels and legs the aircraft stands and lands on.",
     hint: "Look underneath the aircraft for the wheels."
   },
 
-  // ----- Control surfaces: hinged panels the pilot moves to steer -----
+  // ----- Control surfaces: parts that move to steer -----
   {
     id: "flaps",
     group: "control",
     name: "Flaps",
     explanation:
       "Flaps are hinged panels on the back edge of each wing, close to the " +
-      "body. For take-off and landing they slide back and down. This makes " +
-      "the wing bigger and more curved, so it gives more lift at low speed " +
-      "and the aircraft can fly slowly without dropping.",
+      "body. For take-off and landing they move down, making the wing more " +
+      "curved so it gives more lift at low speed.",
     short: "they give extra lift at low speed, for take-off and landing.",
     hint: "Look along the back edge of the wing, on the inner part close to the body."
   },
@@ -829,32 +826,34 @@ const AIRCRAFT_PARTS = [
     hint: "Look along the back edge of the wing, on the outer part near the wing tip."
   },
   {
-    id: "elevators",
+    id: "stabilators",
     group: "control",
-    name: "Elevators",
+    name: "Stabilators",
     explanation:
-      "The elevators are hinged panels on the back edge of the horizontal " +
-      "stabilisers. When they move up, the nose points up; when they move " +
-      "down, the nose points down. This up-and-down movement is called pitch.",
-    short: "they point the nose up or down (pitch).",
-    hint: "In the top view, look along the back edge of the small wings at the tail."
+      "On most fighters the whole horizontal tail moves, instead of having a " +
+      "fixed part with a hinged elevator as airliners do. This all-moving " +
+      "tail is called a stabilator (stabiliser + elevator). Tilting both " +
+      "together points the nose up or down (pitch); moving them in opposite " +
+      "directions helps the aircraft roll.",
+    short: "the all-moving tail surfaces that point the nose up or down (pitch).",
+    hint: "Look at the very back for the flat tail surfaces: clearest in the top view."
   },
   {
     id: "rudder",
     group: "control",
-    name: "Rudder",
+    name: "Rudders",
     explanation:
-      "The rudder is the hinged panel on the back edge of the fin. Moving it " +
-      "left or right swings the nose left or right, like the rudder on a " +
-      "boat. This side-to-side movement is called yaw.",
-    short: "it swings the nose left or right (yaw).",
-    hint: "In the side view, look along the back edge of the tall fin."
+      "Each fin has a rudder: a hinged panel on its back edge. Moving the " +
+      "rudders left or right swings the nose left or right, like the rudder " +
+      "on a boat. This side-to-side movement is called yaw.",
+    short: "they swing the nose left or right (yaw).",
+    hint: "In the side view, look along the back edge of the fin."
   }
 ];
 
 const AIRCRAFT_PART_GROUPS = [
   { id: "main", title: "Main parts" },
-  { id: "control", title: "Control surfaces (hinged panels that move)", swatch: true }
+  { id: "control", title: "Control surfaces (parts that move to steer)", swatch: true }
 ];
 
 function buildAircraftPartsActivity(container) {
@@ -864,19 +863,19 @@ function buildAircraftPartsActivity(container) {
     parts: AIRCRAFT_PARTS,
     groups: AIRCRAFT_PART_GROUPS,
     exploreInstructions:
-      "Click or tap each part of the aircraft to find out what it is and what " +
-      "it does. You can use either the side view or the top view, or the name " +
-      "buttons under the pictures. Parts you have explored turn green.",
+      "Click or tap each part of the fighter jet to find out what it is and " +
+      "what it does. You can use either the side view or the top view, or the " +
+      "name buttons under the pictures. Parts you have explored turn green.",
     checkInstructions:
       "Find each part on either picture. If you pick the wrong one, you will " +
       "get a hint. Nothing is saved.",
     checkExplanation:
       "Use what you learned in Step 1. Find each part on the side view or the top view.",
     summary:
-      "You can now name the seven main parts of an aircraft (fuselage, " +
-      "cockpit, wings, engines, horizontal stabiliser, vertical stabiliser " +
-      "and landing gear) and its four main control surfaces (flaps, " +
-      "ailerons, elevators and rudder)."
+      "You can now name the seven main parts of a fighter jet (fuselage, " +
+      "cockpit, air intakes, wings, engines, vertical stabilisers and landing " +
+      "gear) and its four main control surfaces (flaps, ailerons, " +
+      "stabilators and rudders)."
   });
 }
 
@@ -893,120 +892,109 @@ const STRUCTURE_PARTS = [
     group: "fuselage",
     name: "Frames",
     explanation:
-      "Frames are ring-shaped hoops spaced along the fuselage, a bit like the " +
-      "ribs in your chest. They give the fuselage its round shape and stop it " +
-      "being squashed. Doors and windows are cut out between them.",
-    short: "ring-shaped hoops that give the fuselage its shape.",
-    hint: "Look for the ring shapes that go round the body: upright strips in the side view, the inner ring in the cross-section."
+      "Frames are hoops spaced along the fuselage, a bit like the ribs in " +
+      "your chest. They give the fuselage its shape and stop it being " +
+      "squashed. Openings such as access panels are cut out between them.",
+    short: "hoops spaced along the body that give it its shape.",
+    hint: "Look for the light upright strips in the side view, or the ring just inside the skin in the cross-section."
   },
   {
-    id: "stringers",
+    id: "bulkheads",
     group: "fuselage",
-    name: "Stringers",
+    name: "Bulkheads",
     explanation:
-      "Stringers are long, thin strips that run from the front of the " +
-      "fuselage to the back. They join the frames together and stiffen the " +
-      "skin so it does not buckle (crumple) under load.",
-    short: "long strips running front to back that stiffen the skin.",
-    hint: "Look for long thin strips running front to back: lines along the side view, small dots in the cross-section."
+      "Bulkheads are much heavier frames, made as solid walls. They are put " +
+      "where big loads come into the fuselage, such as where the wings, " +
+      "landing gear or engines are attached, and they also separate areas " +
+      "such as the cockpit from the equipment bays.",
+    short: "heavy, solid frames placed where big loads come in.",
+    hint: "In the side view, look for the two thick, solid upright walls."
+  },
+  {
+    id: "longerons",
+    group: "fuselage",
+    name: "Longerons",
+    explanation:
+      "Longerons are heavy beams that run from the front of the fuselage to " +
+      "the back, joining the frames and bulkheads. A fighter twists and " +
+      "bends hard in tight turns, so it relies on strong longerons to carry " +
+      "those loads along the body.",
+    short: "heavy beams running front to back along the body.",
+    hint: "Look for the thick beams running front to back in the side view, or the blocks in the corners of the cross-section."
   },
   {
     id: "fuselage-skin",
     group: "fuselage",
     name: "Fuselage skin",
     explanation:
-      "The skin is the thin outer covering, usually aluminium alloy or a " +
-      "composite material. It is riveted or bonded to the frames and " +
-      "stringers. It is not just a cover: it carries a large share of the " +
-      "load and holds in the cabin air pressure.",
-    short: "the thin outer covering that also carries load.",
-    hint: "Look for the smooth outer covering of the body."
+      "The skin is the outer covering, made of aluminium alloy, titanium or " +
+      "composite panels and fastened to the frames and longerons. It is not " +
+      "just a cover: it carries a large share of the load. Many panels can " +
+      "be removed to reach equipment inside.",
+    short: "the outer covering that also carries load.",
+    hint: "Look for the smooth outer covering of the body, or the outer ring of the cross-section."
   },
   {
-    id: "floor-beams",
+    id: "fuel-tank",
     group: "fuselage",
-    name: "Floor beams",
+    name: "Fuel tank",
     explanation:
-      "Floor beams run across the fuselage from side to side, fixed to the " +
-      "frames. They hold up the cabin floor and everything on it: seats, " +
-      "passengers and galleys. The space underneath is the cargo hold.",
-    short: "beams across the body that hold up the cabin floor.",
-    hint: "In the cross-section, look for the beam across the inside, between the cabin and the cargo hold."
-  },
-  {
-    id: "pressure-bulkhead",
-    group: "fuselage",
-    name: "Pressure bulkhead",
-    explanation:
-      "The rear pressure bulkhead is a strong, dome-shaped wall at the back " +
-      "of the cabin. When flying high, air is pumped into the cabin so people " +
-      "can breathe normally. The bulkhead seals the back end so that air " +
-      "stays in.",
-    short: "the dome-shaped wall that keeps the cabin air in.",
-    hint: "In the side view, look for the dome-shaped wall at the back end."
+      "Much of the space inside a fighter's fuselage is used for fuel tanks, " +
+      "here above the two engines. Often the structure itself is sealed so " +
+      "that the space between frames and skin holds the fuel directly.",
+    short: "the space inside the body that holds fuel.",
+    hint: "In the cross-section, look at the top, above the two engines."
   },
 
   // ----- Wing structure -----
   {
-    id: "front-spar",
+    id: "spars",
     group: "wing",
-    name: "Front spar",
+    name: "Spars",
     explanation:
-      "Spars are the main beams of the wing. They run from the root (where " +
-      "the wing joins the fuselage) out to the tip. The front spar is near " +
-      "the leading (front) edge. The spars carry most of the bending load as " +
-      "the wing lifts the aircraft.",
-    short: "the main beam near the front edge of the wing.",
-    hint: "Look for the long beam running along the wing, near its front edge."
-  },
-  {
-    id: "rear-spar",
-    group: "wing",
-    name: "Rear spar",
-    explanation:
-      "The rear spar is the second main beam, nearer the trailing (back) edge " +
-      "of the wing. The flaps and ailerons are hinged behind it. Together, " +
-      "the two spars and the skin form a strong box that often holds the " +
-      "aircraft's fuel.",
-    short: "the second main beam, nearer the back edge of the wing.",
-    hint: "Look for the long beam running along the wing, nearer its back edge."
+      "Spars are the main beams of the wing, running from the root (where " +
+      "it joins the fuselage) out to the tip. Because a fighter wing is very " +
+      "thin but must be very strong, it has several spars close together " +
+      "(a multi-spar wing). They carry most of the bending load.",
+    short: "several main beams running from root to tip.",
+    hint: "Look for the long beams running along the wing from root to tip, or the upright bars in the cross-section."
   },
   {
     id: "ribs",
     group: "wing",
     name: "Ribs",
     explanation:
-      "Ribs run from the front of the wing to the back, spaced along its " +
-      "length. Each rib is cut to the wing's curved shape (called an " +
-      "aerofoil), so the ribs hold the skin in the right shape. Holes are " +
-      "cut in them to save weight.",
+      "Ribs run from the front of the wing to the back. Each one is cut to " +
+      "the wing's thin curved shape, so they hold the skin in the right " +
+      "shape. A multi-spar fighter wing needs only a few ribs. Holes are cut " +
+      "in them to save weight.",
     short: "wing-shaped pieces that hold the skin in shape.",
-    hint: "Look for the cross-pieces running from the front edge to the back edge, or the curved shape in the cross-section."
+    hint: "Look for the cross-pieces running from the front edge to the back edge, or the wing shape in the cross-section."
   },
   {
     id: "wing-skin",
     group: "wing",
     name: "Wing skin",
     explanation:
-      "The wing skin covers the top and bottom of the wing. Like the fuselage " +
-      "skin, it carries load: as the wing bends upward in flight, the top " +
-      "skin is squeezed and the bottom skin is stretched.",
-    short: "the outer covering of the wing, which also carries load.",
-    hint: "Look for the smooth covering near the wing root, or the thick outline around the cross-section."
+      "The wing skin covers the top and bottom of the wing. On a fighter it " +
+      "is thick and very strong, often machined from one solid piece of " +
+      "metal or made of composite. The skin and spars together form a " +
+      "sealed box that holds fuel.",
+    short: "the thick outer covering of the wing, which also carries load.",
+    hint: "Look for the covering near the wing root, or the thick outline around the cross-section."
   },
 
-  // ----- Wing control surfaces: hinged panels on the back edge -----
+  // ----- Wing control surfaces -----
   {
     id: "flaps",
     group: "wing-control",
     name: "Flaps",
     explanation:
       "Flaps are hinged panels along the back edge of the wing, on the inner " +
-      "part near the root. Each flap is built like a small wing, with its own " +
-      "spar, ribs and skin. It is attached behind the rear spar on hinges or " +
-      "tracks, so it can slide back and down for take-off and landing to " +
-      "give extra lift at low speed.",
-    short: "hinged panels on the inner back edge, attached behind the rear spar.",
+      "part near the root. Each flap has its own small spar, ribs and skin, " +
+      "and is hinged to fittings behind the last spar. It moves down for " +
+      "take-off and landing to give extra lift at low speed.",
+    short: "hinged panels on the inner back edge, attached behind the last spar.",
     hint: "Look along the back edge of the wing, on the inner part near the root, or behind the main wing in the cross-section."
   },
   {
@@ -1016,9 +1004,8 @@ const STRUCTURE_PARTS = [
     explanation:
       "Ailerons are hinged panels along the back edge of the wing, on the " +
       "outer part near the tip. Like flaps, they have their own small spar, " +
-      "ribs and skin, and they are hinged to brackets behind the rear spar. " +
-      "They move up and down, one wing's aileron up while the other's goes " +
-      "down, to roll the aircraft into a turn.",
+      "ribs and skin, and are hinged behind the last spar. They move up and " +
+      "down in opposite directions on each wing to roll the aircraft.",
     short: "hinged panels on the outer back edge that roll the aircraft.",
     hint: "Look along the back edge of the wing, on the outer part near the tip."
   }
@@ -1047,11 +1034,11 @@ function buildStructureActivity(container) {
       "Use what you learned in Step 1. Find each part of the fuselage and " +
       "wing structure on the pictures.",
     summary:
-      "You can now name the parts that make up the fuselage (frames, " +
-      "stringers, skin, floor beams and pressure bulkhead) and the wing " +
-      "(front and rear spars, ribs and skin, with the flaps and ailerons " +
-      "hinged behind the rear spar). Together they form a strong, light " +
-      "skeleton with a skin that shares the load."
+      "You can now name the parts that make up a fighter's fuselage " +
+      "(frames, bulkheads, longerons, skin and fuel tank) and wing (spars, " +
+      "ribs and skin, with the flaps and ailerons hinged behind the last " +
+      "spar). Together they form a strong, light skeleton with a skin that " +
+      "shares the load."
   });
 }
 
@@ -1062,42 +1049,30 @@ function buildStructureActivity(container) {
    Same fields as AIRCRAFT_PARTS in section 12.
    =========================================================================== */
 const ENGINE_PARTS = [
-  // ----- Engine (a turbofan, the type used on most airliners) -----
+  // ----- Engine (a fighter's afterburning turbofan) -----
   {
-    id: "pylon",
+    id: "air-intake",
     group: "engine",
-    name: "Pylon",
+    name: "Air intake",
     explanation:
-      "The pylon is the strong mount that hangs the engine under the wing. " +
-      "It carries the engine's weight and its push (thrust) into the wing " +
-      "structure. Fuel pipes, wiring and controls pass through it between " +
-      "the wing and the engine.",
-    short: "the strong mount that hangs the engine from the wing.",
-    hint: "Look above the engine for the mount that joins it to the wing."
-  },
-  {
-    id: "nacelle",
-    group: "engine",
-    name: "Nacelle",
-    explanation:
-      "The nacelle is the smooth, streamlined casing around the engine. Its " +
-      "panels, called cowlings, open on hinges so engineers can reach the " +
-      "engine for inspection and maintenance. Here it is cut open so you can " +
-      "see inside.",
-    short: "the streamlined casing (cowlings) around the engine.",
-    hint: "Look for the outer casing wrapped around the whole engine, above and below."
+      "The air intake is the opening on the side of the fuselage and the " +
+      "duct behind it, which leads air to the front of the engine. The duct " +
+      "slows the air down and smooths it, so the engine gets an even flow " +
+      "of air even when the aircraft is flying faster than sound.",
+    short: "the duct that leads air to the front of the engine.",
+    hint: "Look at the very front, where the air comes in."
   },
   {
     id: "fan",
     group: "engine",
     name: "Fan",
     explanation:
-      "The fan is the large set of blades at the front. It sucks in a huge " +
-      "amount of air: this is \"suck\". Most of that air flows around the " +
-      "outside of the engine's core and makes most of the thrust; the rest " +
-      "goes into the core.",
-    short: "the big front blades that suck air in (suck).",
-    hint: "Look at the very front of the engine for the large blades and the pointed spinner."
+      "The fan is the first few rows of blades at the front of the engine. " +
+      "It sucks air in: this is \"suck\". A fighter's fan is much smaller " +
+      "than an airliner's, so most of the air goes on through the core of " +
+      "the engine. This suits high speed.",
+    short: "the front blades that suck air in (suck).",
+    hint: "Look just behind the air intake for the first blades and the small spinner."
   },
   {
     id: "compressor",
@@ -1108,7 +1083,7 @@ const ENGINE_PARTS = [
       "squeeze the air into a smaller and smaller space, so it becomes high " +
       "pressure: this is \"squeeze\".",
     short: "rows of blades that squeeze the air (squeeze).",
-    hint: "Look just behind the fan for rows of blades that get smaller toward the back."
+    hint: "Look behind the fan for rows of blades that get smaller toward the back."
   },
   {
     id: "combustion-chamber",
@@ -1116,10 +1091,9 @@ const ENGINE_PARTS = [
     name: "Combustion chamber",
     explanation:
       "In the combustion chamber, fuel is sprayed into the squeezed air and " +
-      "burned. This makes very hot gas that expands fast: this is \"bang\". " +
-      "It is the hottest part of the engine.",
+      "burned. This makes very hot gas that expands fast: this is \"bang\".",
     short: "where fuel is burned in the squeezed air (bang).",
-    hint: "Look in the middle of the engine core, where the flame is."
+    hint: "Look in the middle of the engine for the small chamber with the flame."
   },
   {
     id: "turbine",
@@ -1127,10 +1101,22 @@ const ENGINE_PARTS = [
     name: "Turbine",
     explanation:
       "The hot gas rushes through the turbine blades and spins them, like " +
-      "wind spinning a windmill. The turbine is joined by a shaft to the fan " +
-      "and compressor at the front, so it keeps them turning.",
+      "wind spinning a windmill. The turbine is joined by shafts to the fan " +
+      "and compressor, so it keeps them turning.",
     short: "blades spun by the hot gas, which drive the fan and compressor.",
     hint: "Look behind the combustion chamber for rows of blades that get bigger again."
+  },
+  {
+    id: "afterburner",
+    group: "engine",
+    name: "Afterburner",
+    explanation:
+      "The afterburner is a long pipe behind the turbine. For take-off or in " +
+      "combat, extra fuel is sprayed into the hot exhaust and burned again, " +
+      "giving a big boost in thrust, but using fuel very quickly. It is the " +
+      "long flame you see coming out of a fighter's nozzle.",
+    short: "the long pipe where extra fuel is burned for more thrust.",
+    hint: "Look for the long pipe between the turbine and the nozzle, with the long flame."
   },
   {
     id: "exhaust-nozzle",
@@ -1138,80 +1124,71 @@ const ENGINE_PARTS = [
     name: "Exhaust nozzle",
     explanation:
       "The exhaust nozzle at the back shapes the hot gas into a fast jet as " +
-      "it leaves the engine: this is \"blow\". Pushing the gas backwards " +
-      "pushes the aircraft forwards.",
-    short: "where the hot gas leaves the engine as a fast jet (blow).",
+      "it leaves: this is \"blow\". On a fighter it is made of overlapping " +
+      "metal flaps (petals) that open wider when the afterburner is on and " +
+      "close down for normal flight.",
+    short: "the adjustable nozzle where the hot gas leaves (blow).",
     hint: "Look at the very back of the engine, where the hot gas leaves."
   },
 
   // ----- Empennage (the whole tail): fixed parts -----
   {
-    id: "tail-cone",
+    id: "rear-fuselage",
     group: "empennage",
-    name: "Tail cone",
+    name: "Rear fuselage",
     explanation:
-      "The tail cone is the narrowing back end of the fuselage. The fin and " +
-      "the horizontal stabilisers are attached to it. On many airliners it " +
-      "also holds a small extra engine, the APU (auxiliary power unit), " +
-      "which supplies power on the ground.",
-    short: "the narrowing back end of the fuselage that carries the tail.",
-    hint: "Look for the narrowing back end of the body."
+      "The rear fuselage is the back end of the body, around the engines. " +
+      "Strong frames here carry the fins and the stabilators, and many " +
+      "panels open to give access to the engines. On some fighters a " +
+      "hook for stopping on a carrier or emergency cable is fitted here too.",
+    short: "the back end of the body, which carries the tail and holds the engines.",
+    hint: "Look for the back end of the body."
   },
   {
     id: "vertical-stabiliser",
     group: "empennage",
-    name: "Vertical stabiliser (fin)",
+    name: "Vertical stabilisers (fins)",
     explanation:
-      "The vertical stabiliser, or fin, is the tall upright surface. It keeps " +
-      "the aircraft pointing straight and stops it swinging from side to " +
-      "side. Inside, it is built like a wing: spars run up it, ribs run " +
-      "across it, and skin covers them (the dashed lines in the side view).",
-    short: "the tall upright surface that keeps the aircraft pointing straight.",
-    hint: "Look for the tall upright surface: big in the side view, a thin strip in the top view."
-  },
-  {
-    id: "horizontal-stabiliser",
-    group: "empennage",
-    name: "Horizontal stabiliser",
-    explanation:
-      "The horizontal stabilisers are the two small wings at the tail. They " +
-      "stop the nose bobbing up and down. Like the fin, each one is built " +
-      "like a small wing, with spars, ribs and skin, and is attached to the " +
-      "tail cone.",
-    short: "the small flat wings that stop the nose bobbing up and down.",
-    hint: "Look for the small flat wings at the tail: clearest in the top view."
+      "Many fighters have two fins, which keep the aircraft pointing " +
+      "straight and stop it swinging from side to side. Inside, each fin is " +
+      "built like a small wing, with spars running up it and ribs across " +
+      "it (the dashed lines in the side view), covered with skin that is " +
+      "often made of composite.",
+    short: "the upright tail surfaces that keep the aircraft pointing straight.",
+    hint: "Look for the tall upright surface in the side view, or the two thin strips in the top view."
   },
 
-  // ----- Empennage control surfaces: hinged panels -----
+  // ----- Empennage control surfaces -----
   {
     id: "rudder",
     group: "empennage-control",
-    name: "Rudder",
+    name: "Rudders",
     explanation:
-      "The rudder is the hinged panel on the back edge of the fin, attached " +
-      "to the fin's rear spar. Moving it left or right swings the nose left " +
-      "or right (yaw). On airliners it is moved by hydraulic actuators: " +
-      "rams pushed by high-pressure fluid.",
-    short: "it swings the nose left or right (yaw).",
+      "Each fin has a rudder: a hinged panel on its back edge, attached to " +
+      "the fin's rear spar. Moving the rudders left or right swings the nose " +
+      "left or right (yaw). They are moved by hydraulic actuators: rams " +
+      "pushed by high-pressure fluid.",
+    short: "they swing the nose left or right (yaw).",
     hint: "In the side view, look along the back edge of the fin."
   },
   {
-    id: "elevators",
+    id: "stabilators",
     group: "empennage-control",
-    name: "Elevators",
+    name: "Stabilators",
     explanation:
-      "The elevators are the hinged panels on the back edge of the horizontal " +
-      "stabilisers, attached to their rear spars. Moving them up points the " +
-      "nose up; moving them down points the nose down (pitch).",
-    short: "they point the nose up or down (pitch).",
-    hint: "In the top view, look along the back edge of the small flat wings."
+      "The stabilators are the all-moving horizontal tail. Each one turns " +
+      "as a whole on a strong pivot shaft, driven by a powerful hydraulic " +
+      "actuator. Moving both together points the nose up or down (pitch); " +
+      "moving them in opposite directions helps the aircraft roll.",
+    short: "the all-moving tail surfaces that point the nose up or down (pitch).",
+    hint: "Look for the flat tail surfaces: clearest in the top view."
   }
 ];
 
 const ENGINE_PART_GROUPS = [
-  { id: "engine", title: "Engine (turbofan)" },
+  { id: "engine", title: "Engine (afterburning turbofan)" },
   { id: "empennage", title: "Empennage (tail)" },
-  { id: "empennage-control", title: "Empennage control surfaces (hinged panels)", swatch: true }
+  { id: "empennage-control", title: "Empennage control surfaces (parts that move to steer)", swatch: true }
 ];
 
 function buildEngineActivity(container) {
@@ -1231,11 +1208,10 @@ function buildEngineActivity(container) {
       "Use what you learned in Step 1. Find each part of the engine and the " +
       "empennage on the pictures.",
     summary:
-      "You can now name the parts of a turbofan engine in the order the air " +
-      "meets them (fan, compressor, combustion chamber, turbine and exhaust " +
-      "nozzle: suck, squeeze, bang, blow), the pylon and nacelle around it, " +
-      "and the parts of the empennage: tail cone, fin, horizontal " +
-      "stabilisers, rudder and elevators."
+      "You can now name the parts of a fighter's engine in the order the air " +
+      "meets them (air intake, fan, compressor, combustion chamber, turbine, " +
+      "afterburner and exhaust nozzle) and the parts of its empennage: rear " +
+      "fuselage, fins, rudders and stabilators."
   });
 }
 
@@ -1248,5 +1224,5 @@ startButton.addEventListener("click", startLearning);
 completeButton.addEventListener("click", completeCurrentModule);
 
 buildModuleButtons();   // create the three module buttons
-updateModuleButtons();  // lock Modules 2 and 3 at the start
+updateModuleButtons();  // show every module as "Not started"
 updateProgress();       // show 0% in the progress bar and footer

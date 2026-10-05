@@ -361,14 +361,6 @@ h1, h2 { line-height: 1.25; margin: 0; }
   font-weight: 600;
 }
 
-/* A locked module: greyed out, and the cursor shows it can't be clicked.
-   (The button is also "disabled" in app.js, so clicks do nothing.) */
-.module-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-  border-style: dashed;
-}
-.module-button:disabled:hover { border-color: var(--border); }
 
 
 /* ---------------------------------------------------------------------------
@@ -614,6 +606,20 @@ h1, h2 { line-height: 1.25; margin: 0; }
 .intake { fill: var(--part-line); }
 .ground { stroke: var(--border); stroke-width: 3; stroke-dasharray: 10 8; }
 
+/* An "inside" shape shows a part hidden inside the body (the engines in
+   Module 1): see-through, with a dashed outline. It still reacts to
+   clicks and changes colour like any other part. */
+.part .shape.inside {
+  fill-opacity: 0.45;
+  stroke-dasharray: 6 4;
+}
+/* The frame line on the fighter's canopy. */
+.canopy-frame {
+  fill: none;
+  stroke: var(--part-line);
+  stroke-width: 2;
+}
+
 /* Module 2 decoration */
 /* Rows of rivets: a dotted line made of round dots (dash length 0). */
 .rivets line {
@@ -676,6 +682,28 @@ h1, h2 { line-height: 1.25; margin: 0; }
   fill: var(--part-line);
   opacity: 0.35;
 }
+/* The engines in the fighter fuselage cross-section, and the fuselage
+   outline around the engine cutaway. */
+.engine-bays circle,
+.engine-bay-outline {
+  fill: var(--part-fill);
+  fill-opacity: 0.5;
+  stroke: var(--part-line);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+.engine-bay-outline { fill: none; }
+/* The engine nozzles behind the tail, and the lines between the nozzle petals. */
+.nozzle {
+  fill: var(--part-line);
+  opacity: 0.45;
+}
+.petals line {
+  stroke: var(--part-line);
+  stroke-width: 1.5;
+  opacity: 0.7;
+}
+
 /* The spars and ribs inside the fin, shown as dashed lines. */
 .inner-structure line {
   stroke: var(--part-line);

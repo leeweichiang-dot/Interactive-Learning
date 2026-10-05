@@ -60,11 +60,11 @@
 
       <!-- Short explanation of what the trainee will learn. -->
       <p class="welcome-text">
-        Welcome, trainee. This module introduces the main parts of an aircraft
-        in plain English. No aviation background is needed. You will work
-        through three short modules in order: the main aircraft parts, how the
-        fuselage and wings are built, and the engine and empennage (tail).
-        Each module unlocks when you complete the one before it.
+        Welcome, trainee. This module introduces the main parts of a fighter
+        jet in plain English. No aviation background is needed. There are
+        three short modules: the main aircraft parts, how the fuselage and
+        wings are built, and the engine and empennage (tail). You can open
+        them in any order; working through them from 1 to 3 is recommended.
       </p>
 
       <!-- A short list of what is coming, so the trainee knows what to expect. -->
@@ -226,186 +226,172 @@
   </template>
 
 
-  <!-- ===== MODULE 1 DIAGRAMS: AIRCRAFT PARTS ===== -->
+  <!-- ===== MODULE 1 DIAGRAMS: FIGHTER JET PARTS =====
+       A generic twin-engine, twin-tail fighter jet, seen from the side and
+       from above. SVG draws pictures with shapes; each picture's viewBox
+       sets which area of the drawing is shown, and the picture scales to
+       fit any screen.
+
+       The two views are lined up like a technical drawing: the nose is on
+       the left in both, and both use the same left-to-right scale (x from
+       70 to 790), so the wings and tail sit at the same place across the
+       page in each view.
+
+       Each clickable part is a <g> (group) with class="part" and a
+       data-part name that matches an id in AIRCRAFT_PARTS in app.js.
+       tabindex="0" and role="button" let keyboard users reach and press
+       each part too. Control surfaces also have class="control" so they
+       get their own colour.
+
+       Shapes are drawn in order, so later shapes sit on top of earlier
+       ones. Shapes with class="deco" are decoration and ignore clicks;
+       "hit" shapes are see-through tap areas around thin parts; "inside"
+       shapes are drawn dashed to show something hidden inside the body.
+       A part appears in both views with the same data-part name, so
+       clicking it in either view does the same thing. -->
   <template id="aircraft-parts-diagrams">
-    <!-- ---------------------------------------------------------------
-         THE AIRCRAFT DIAGRAMS (SVG): SIDE VIEW AND TOP VIEW
-         SVG draws pictures with shapes. Each picture's viewBox sets which
-         area of the drawing is shown, and the picture scales to fit any
-         screen.
-
-         The two views are lined up like a technical drawing: the nose is
-         on the left in both, and both use the same left-to-right scale
-         (x from 70 to 790), so the wing and tail sit at the same place
-         across the page in each view.
-
-         Each clickable part is a <g> (group) with class="part" and a
-         data-part name that matches an id in AIRCRAFT_PARTS in app.js.
-         tabindex="0" and role="button" let keyboard users reach and
-         press each part too.
-
-         Shapes are drawn in order, so later shapes sit on top of
-         earlier ones (the fin is drawn first, behind the body).
-         Shapes with class="deco" are decoration only and ignore clicks.
-         A part appears in both views with the same data-part name, so
-         clicking it in either view does the same thing.
-         --------------------------------------------------------------- -->
 
     <!-- ===== SIDE VIEW ===== -->
     <figure class="diagram">
-      <figcaption class="diagram-caption">Side view <span class="diagram-note">(the elevators only show in the top view)</span></figcaption>
-      <svg class="aircraft-svg" viewBox="70 34 720 262" role="group" aria-label="Side view of an aircraft">
+      <figcaption class="diagram-caption">Side view <span class="diagram-note">(the two fins overlap, so they look like one)</span></figcaption>
+      <svg class="aircraft-svg" viewBox="70 34 720 262" role="group" aria-label="Side view of a fighter jet">
 
         <!-- The ground (decoration). -->
         <line class="deco ground" x1="80" y1="288" x2="780" y2="288" />
 
-        <!-- VERTICAL STABILISER (FIN): the tall upright surface at the back. -->
+        <!-- VERTICAL STABILISERS (FINS): drawn first, so the body covers their roots. -->
         <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
-          <path class="shape" d="M 628 144 L 690 42 L 734 42 L 748 126 Z" />
+          <path class="shape" d="M 640 156 L 700 62 L 736 62 L 752 157 Z" />
         </g>
 
-        <!-- RUDDER (control surface): the hinged strip along the back edge
-             of the fin. Control surfaces have class="part control" so
-             style.css can give them their own colour. -->
+        <!-- RUDDERS (control surface): hinged along the back edge of the fins. -->
         <g class="part control" data-part="rudder" tabindex="0" role="button">
-          <path class="shape" d="M 719 50 L 735 50 L 747 118 L 731 120 Z" />
+          <polygon class="shape" points="725.4,92 741.1,92 750.8,150 723,150" />
         </g>
 
-        <!-- FUSELAGE: the long main body. The back end (tail cone) curves upward. -->
+        <!-- FUSELAGE: the long body, from the pointed nose to the tail. -->
         <g class="part" data-part="fuselage" tabindex="0" role="button">
-          <path class="shape" d="M 195 142 L 630 142 Q 690 140 746 118 L 754 136 Q 712 196 620 198 L 195 198 Z" />
+          <path class="shape" d="M 82 182 C 110 172 160 164 220 162 L 700 156 L 744 160 L 744 186 L 700 192 L 320 198 L 220 198 C 150 197 105 192 82 182 Z" />
         </g>
 
-        <!-- Passenger windows (decoration): a row of small circles. -->
-        <g class="deco windows">
-          <circle cx="220" cy="162" r="4" /><circle cx="244" cy="162" r="4" />
-          <circle cx="268" cy="162" r="4" /><circle cx="292" cy="162" r="4" />
-          <circle cx="316" cy="162" r="4" /><circle cx="340" cy="162" r="4" />
-          <circle cx="364" cy="162" r="4" /><circle cx="388" cy="162" r="4" />
-          <circle cx="412" cy="162" r="4" /><circle cx="436" cy="162" r="4" />
-          <circle cx="460" cy="162" r="4" /><circle cx="484" cy="162" r="4" />
-          <circle cx="508" cy="162" r="4" /><circle cx="532" cy="162" r="4" />
-          <circle cx="556" cy="162" r="4" /><circle cx="580" cy="162" r="4" />
-          <circle cx="604" cy="162" r="4" />
-        </g>
-
-        <!-- COCKPIT: the rounded nose section where the pilots sit. -->
+        <!-- COCKPIT: the clear bubble canopy over the pilot. -->
         <g class="part" data-part="cockpit" tabindex="0" role="button">
-          <path class="shape" d="M 195 142 L 150 142 Q 92 144 82 172 Q 94 198 150 198 L 195 198 Z" />
+          <path class="shape" d="M 165 163 C 182 137 240 133 282 158 L 282 162 Z" />
         </g>
-        <!-- Cockpit windscreen (decoration). -->
-        <path class="deco windscreen" d="M 100 162 L 116 151 L 150 150 L 150 161 Z" />
+        <!-- Canopy frame (decoration). -->
+        <path class="deco canopy-frame" d="M 200 150 L 210 162" />
 
-        <!-- HORIZONTAL STABILISER: the small flat wing at the tail. -->
-        <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
-          <path class="shape" d="M 668 150 L 748 132 L 778 137 L 706 166 Z" />
+        <!-- AIR INTAKE: the box-shaped opening on the side of the body that feeds air to the engine. -->
+        <g class="part" data-part="air-intake" tabindex="0" role="button">
+          <polygon class="shape" points="300,176 392,174 392,206 300,210" />
         </g>
+        <!-- The dark mouth of the intake (decoration). -->
+        <polygon class="deco intake" points="300,177 308,177 308,209 300,209" />
 
         <!-- WING: the near-side wing, angled down and back toward us. -->
         <g class="part" data-part="wing" tabindex="0" role="button">
-          <path class="shape" d="M 320 182 L 460 182 L 580 262 L 545 268 Z" />
+          <polygon class="shape" points="392,168 612,166 626,226 580,226" />
         </g>
 
-        <!-- FLAPS (control surface): the inner part of the wing's back
-             (trailing) edge, closest to the body. -->
+        <!-- FLAPS (control surface): the inner part of the wing's back edge. -->
         <g class="part control" data-part="flaps" tabindex="0" role="button">
-          <path class="shape" d="M 466 186 L 520 222 L 513 232 L 459 196 Z" />
+          <polygon class="shape" points="612.8,169.6 619,196 601,196 594.8,169.6" />
         </g>
 
-        <!-- AILERONS (control surface): the outer part of the wing's back
-             edge, closest to the wing tip. -->
+        <!-- AILERONS (control surface): the outer part of the wing's back edge. -->
         <g class="part control" data-part="ailerons" tabindex="0" role="button">
-          <path class="shape" d="M 526 226 L 568 254 L 561 264 L 519 236 Z" />
+          <polygon class="shape" points="619.8,199.6 625.2,222.4 611.2,222.4 605.8,199.6" />
         </g>
 
-        <!-- ENGINE: the pod hanging under the wing, plus the pylon that holds it. -->
+        <!-- ENGINES: hidden inside the rear body (dashed outline), with the exhaust nozzle at the tail. -->
         <g class="part" data-part="engine" tabindex="0" role="button">
-          <rect class="shape" x="342" y="194" width="46" height="16" />
-          <rect class="shape" x="300" y="206" width="104" height="40" rx="18" />
+          <path class="shape inside" d="M 480 164 L 744 164 L 744 184 L 480 184 Z" />
+          <polygon class="shape" points="744,162 778,165 778,183 744,186" />
         </g>
-        <!-- Engine air intake at the front (decoration). -->
-        <ellipse class="deco intake" cx="304" cy="226" rx="6" ry="16" />
 
-        <!-- LANDING GEAR: the nose wheel and the main wheels.
-             The see-through "hit" rectangles make these thin parts
-             easier to tap on a tablet. The one around the main wheels
-             stays below the wing, so it doesn't cover the flaps and
-             ailerons. -->
+        <!-- STABILATORS (control surface): the all-moving horizontal tail, seen edge-on. -->
+        <g class="part control" data-part="stabilators" tabindex="0" role="button">
+          <polygon class="shape" points="664,186 760,180 776,184 700,196" />
+        </g>
+
+        <!-- LANDING GEAR: the nose wheel and the main wheels. The see-through "hit"
+             rectangles below the body make them easier to tap. -->
         <g class="part" data-part="landing-gear" tabindex="0" role="button">
-          <rect class="hit" x="138" y="196" width="44" height="80" />
-          <rect class="hit" x="472" y="254" width="56" height="34" />
-          <rect class="shape" x="156" y="198" width="8" height="50" />
-          <circle class="shape" cx="160" cy="262" r="12" />
-          <rect class="shape" x="496" y="198" width="8" height="60" />
-          <circle class="shape" cx="488" cy="272" r="13" />
-          <circle class="shape" cx="512" cy="272" r="13" />
+          <rect class="hit" x="168" y="236" width="44" height="40" />
+          <rect class="hit" x="496" y="240" width="48" height="48" />
+          <rect class="shape" x="186" y="197" width="8" height="54" />
+          <circle class="shape" cx="190" cy="262" r="11" />
+          <rect class="shape" x="516" y="194" width="8" height="62" />
+          <circle class="shape" cx="520" cy="268" r="14" />
         </g>
       </svg>
     </figure>
 
     <!-- ===== TOP VIEW =====
-         Looking down on the aircraft from above. The centre line of the
-         fuselage runs along y = 165, and each shape on one side has a
-         mirror-image partner on the other (y becomes 330 - y). -->
+         Looking down on the fighter. The centre line runs along y = 165,
+         and each shape on one side has a mirror-image partner on the other
+         (y becomes 330 - y). -->
     <figure class="diagram">
-      <figcaption class="diagram-caption">Top view <span class="diagram-note">(the landing gear and the rudder only show in the side view)</span></figcaption>
-      <svg class="aircraft-svg" viewBox="70 8 720 314" role="group" aria-label="Top view of an aircraft">
-
-        <!-- ENGINES: drawn first, because from above each engine hangs
-             underneath its wing, so the wing hides the back of the pod. -->
-        <g class="part" data-part="engine" tabindex="0" role="button">
-          <rect class="shape" x="300" y="76" width="104" height="28" rx="12" />
-          <rect class="shape" x="300" y="226" width="104" height="28" rx="12" />
-        </g>
+      <figcaption class="diagram-caption">Top view <span class="diagram-note">(the landing gear and rudders only show in the side view)</span></figcaption>
+      <svg class="aircraft-svg" viewBox="70 8 720 314" role="group" aria-label="Top view of a fighter jet">
 
         <!-- WINGS: one on each side, swept back toward the tips. -->
         <g class="part" data-part="wing" tabindex="0" role="button">
-          <path class="shape" d="M 320 137 L 500 18 L 530 18 L 460 137 Z" />
-          <path class="shape" d="M 320 193 L 500 312 L 530 312 L 460 193 Z" />
+          <polygon class="shape" points="392,134 590,32 628,32 612,134" />
+          <polygon class="shape" points="392,196 590,298 628,298 612,196" />
         </g>
 
         <!-- FLAPS (control surface): inner back edge of each wing. -->
         <g class="part control" data-part="flaps" tabindex="0" role="button">
-          <path class="shape" d="M 437 135 L 461 135 L 491 85 L 467 85 Z" />
-          <path class="shape" d="M 437 195 L 461 195 L 491 245 L 467 245 Z" />
+          <polygon class="shape" points="565.8,130 612.6,130 619.5,86 590,86" />
+          <polygon class="shape" points="565.8,200 612.6,200 619.5,244 590,244" />
         </g>
 
         <!-- AILERONS (control surface): outer back edge of each wing. -->
         <g class="part control" data-part="ailerons" tabindex="0" role="button">
-          <path class="shape" d="M 477 78 L 495 78 L 522 32 L 506 32 Z" />
-          <path class="shape" d="M 477 252 L 495 252 L 522 298 L 506 298 Z" />
+          <polygon class="shape" points="593.3,80 620.5,80 626.7,40 615.2,40" />
+          <polygon class="shape" points="593.3,250 620.5,250 626.7,290 615.2,290" />
         </g>
 
-        <!-- HORIZONTAL STABILISERS: the two small wings at the tail. -->
-        <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
-          <path class="shape" d="M 670 146 L 735 80 L 758 80 L 744 152 Z" />
-          <path class="shape" d="M 670 184 L 735 250 L 758 250 L 744 178 Z" />
+        <!-- STABILATORS (control surface): the two all-moving tail surfaces, drawn before
+             the body so it covers their roots. -->
+        <g class="part control" data-part="stabilators" tabindex="0" role="button">
+          <polygon class="shape" points="672,136 738,72 768,72 772,136" />
+          <polygon class="shape" points="672,194 738,258 768,258 772,194" />
         </g>
 
-        <!-- ELEVATORS (control surface): back edge of each horizontal stabiliser. -->
-        <g class="part control" data-part="elevators" tabindex="0" role="button">
-          <path class="shape" d="M 732 150 L 744 150 L 757 84 L 745 84 Z" />
-          <path class="shape" d="M 732 180 L 744 180 L 757 246 L 745 246 Z" />
+        <!-- AIR INTAKES: one on each side of the body, just ahead of the wings. -->
+        <g class="part" data-part="air-intake" tabindex="0" role="button">
+          <polygon class="shape" points="298,120 392,118 392,135 298,137" />
+          <polygon class="shape" points="298,210 392,212 392,195 298,193" />
         </g>
 
-        <!-- FUSELAGE: the long body, narrowing toward the tail. -->
+        <!-- FUSELAGE: the long body, wider at the back where the two engines sit side by side. -->
         <g class="part" data-part="fuselage" tabindex="0" role="button">
-          <path class="shape" d="M 195 137 L 640 137 Q 720 145 756 159 L 756 171 Q 720 185 640 193 L 195 193 Z" />
+          <path class="shape" d="M 82 165 C 100 156 150 148 210 147 L 300 145 L 300 136 L 700 134 L 742 140 L 742 190 L 700 196 L 300 194 L 300 185 L 210 183 C 150 182 100 174 82 165 Z" />
         </g>
 
-        <!-- COCKPIT: the rounded nose section at the front. -->
+        <!-- COCKPIT: the canopy seen from above. -->
         <g class="part" data-part="cockpit" tabindex="0" role="button">
-          <path class="shape" d="M 195 137 L 150 137 Q 92 140 82 165 Q 92 190 150 193 L 195 193 Z" />
+          <path class="shape" d="M 160 165 C 172 152 222 151 268 157 L 268 173 C 222 179 172 178 160 165 Z" />
         </g>
-        <!-- Windscreen seen from above (decoration). -->
-        <path class="deco windscreen" d="M 116 152 L 148 146 L 148 184 L 116 178 Z" />
 
-        <!-- VERTICAL STABILISER (FIN): from above it is only a thin strip
-             along the centre of the tail. The see-through "hit" rectangle
-             makes it easier to click. -->
+        <!-- ENGINES: two engines side by side inside the rear body (dashed), with their
+             exhaust nozzles at the tail. -->
+        <g class="part" data-part="engine" tabindex="0" role="button">
+          <path class="shape inside" d="M 470 142 L 742 142 L 742 160 L 470 160 Z" />
+          <path class="shape inside" d="M 470 170 L 742 170 L 742 188 L 470 188 Z" />
+          <rect class="shape" x="742" y="142" width="28" height="18" rx="4" />
+          <rect class="shape" x="742" y="170" width="28" height="18" rx="4" />
+        </g>
+
+        <!-- VERTICAL STABILISERS (FINS): from above, each fin is only a thin strip. The
+             see-through "hit" rectangles make them easier to click. -->
         <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
-          <rect class="hit" x="626" y="155" width="126" height="20" />
-          <path class="shape" d="M 628 165 L 690 159 L 750 161 L 750 169 L 690 171 Z" />
+          <rect class="hit" x="636" y="136" width="104" height="18" />
+          <rect class="hit" x="636" y="176" width="104" height="18" />
+          <polygon class="shape" points="640,146 735,141 737,146 642,150" />
+          <polygon class="shape" points="640,184 735,189 737,184 642,180" />
         </g>
       </svg>
     </figure>
@@ -413,7 +399,7 @@
 
 
   <!-- =====================================================================
-       MODULE 2 DIAGRAMS: FUSELAGE AND WING STRUCTURE
+       MODULE 2 DIAGRAMS: FIGHTER FUSELAGE AND WING STRUCTURE
        Four pictures in two rows. Each row has a wide view with part of the
        skin removed (so you can see the "skeleton" inside) and a smaller
        cross-section (as if the part had been sliced through).
@@ -429,122 +415,108 @@
     <div class="diagram-row">
 
       <!-- ===== FUSELAGE: SIDE VIEW, SKIN PARTLY REMOVED =====
-           A section of the fuselage tube. On the left the skin is still on;
-           on the right it has been removed to show the frames and stringers.
-           The dome at the right-hand end is the rear pressure bulkhead. -->
+           A section of the fighter's centre fuselage. On the left the skin
+           is still on; on the right it has been removed to show the frames,
+           the heavy bulkheads and the longerons running front to back. -->
       <figure class="diagram">
         <figcaption class="diagram-caption">Fuselage <span class="diagram-note">(side view, part of the skin removed)</span></figcaption>
-        <svg class="aircraft-svg" viewBox="20 24 560 192" role="group" aria-label="Side view of a fuselage section with part of the skin removed">
+        <svg class="aircraft-svg" viewBox="20 24 520 192" role="group" aria-label="Side view of a fighter fuselage section with part of the skin removed">
 
-        <!-- PRESSURE BULKHEAD: the dome-shaped wall that closes the back end. -->
-        <g class="part" data-part="pressure-bulkhead" tabindex="0" role="button">
-          <path class="shape" d="M 520 40 Q 580 120 520 200 Z" />
-        </g>
-
-        <!-- FRAMES: upright hoops spaced along the tube (seen side-on, a ring looks like an upright strip). -->
+        <!-- FRAMES: light upright hoops spaced along the body. -->
         <g class="part" data-part="frames" tabindex="0" role="button">
-          <rect class="hit" x="262" y="40" width="16" height="160" />
-          <rect class="hit" x="302" y="40" width="16" height="160" />
-          <rect class="hit" x="342" y="40" width="16" height="160" />
-          <rect class="hit" x="382" y="40" width="16" height="160" />
-          <rect class="hit" x="422" y="40" width="16" height="160" />
-          <rect class="hit" x="462" y="40" width="16" height="160" />
-          <rect class="hit" x="502" y="40" width="16" height="160" />
-          <rect class="shape" x="267" y="40" width="7" height="160" />
-          <rect class="shape" x="307" y="40" width="7" height="160" />
-          <rect class="shape" x="347" y="40" width="7" height="160" />
-          <rect class="shape" x="387" y="40" width="7" height="160" />
-          <rect class="shape" x="427" y="40" width="7" height="160" />
-          <rect class="shape" x="467" y="40" width="7" height="160" />
-          <rect class="shape" x="507" y="40" width="7" height="160" />
+          <rect class="hit" x="293" y="40" width="14" height="160" />
+          <rect class="hit" x="333" y="40" width="14" height="160" />
+          <rect class="hit" x="373" y="40" width="14" height="160" />
+          <rect class="hit" x="413" y="40" width="14" height="160" />
+          <rect class="hit" x="453" y="40" width="14" height="160" />
+          <rect class="shape" x="297" y="40" width="6" height="160" />
+          <rect class="shape" x="337" y="40" width="6" height="160" />
+          <rect class="shape" x="377" y="40" width="6" height="160" />
+          <rect class="shape" x="417" y="40" width="6" height="160" />
+          <rect class="shape" x="457" y="40" width="6" height="160" />
         </g>
 
-        <!-- STRINGERS: long thin strips running front to back, joining the frames. -->
-        <g class="part" data-part="stringers" tabindex="0" role="button">
-          <rect class="hit" x="250" y="38" width="270" height="12" />
-          <rect class="hit" x="250" y="66" width="270" height="12" />
-          <rect class="hit" x="250" y="94" width="270" height="12" />
-          <rect class="hit" x="250" y="134" width="270" height="12" />
-          <rect class="hit" x="250" y="162" width="270" height="12" />
-          <rect class="hit" x="250" y="190" width="270" height="12" />
-          <rect class="shape" x="250" y="42" width="270" height="5" />
-          <rect class="shape" x="250" y="70" width="270" height="5" />
-          <rect class="shape" x="250" y="98" width="270" height="5" />
-          <rect class="shape" x="250" y="138" width="270" height="5" />
-          <rect class="shape" x="250" y="166" width="270" height="5" />
-          <rect class="shape" x="250" y="194" width="270" height="5" />
+        <!-- BULKHEADS: much heavier frames, made as solid walls, where big loads come in
+             (for example where the wings attach). -->
+        <g class="part" data-part="bulkheads" tabindex="0" role="button">
+          <rect class="shape" x="254" y="40" width="16" height="160" />
+          <rect class="shape" x="490" y="40" width="16" height="160" />
+        </g>
+
+        <!-- LONGERONS: heavy beams running front to back, joining the frames and bulkheads. -->
+        <g class="part" data-part="longerons" tabindex="0" role="button">
+          <rect class="hit" x="250" y="37" width="270" height="15" />
+          <rect class="hit" x="250" y="75" width="270" height="15" />
+          <rect class="hit" x="250" y="151" width="270" height="15" />
+          <rect class="hit" x="250" y="189" width="270" height="15" />
+          <rect class="shape" x="250" y="40" width="270" height="9" />
+          <rect class="shape" x="250" y="78" width="270" height="9" />
+          <rect class="shape" x="250" y="154" width="270" height="9" />
+          <rect class="shape" x="250" y="192" width="270" height="9" />
         </g>
 
         <!-- FUSELAGE SKIN: the outer covering, left on over the front part. -->
         <g class="part" data-part="fuselage-skin" tabindex="0" role="button">
           <path class="shape" d="M 40 40 L 250 40 L 250 200 L 40 200 Z" />
         </g>
-        <!-- Rows of rivets (decoration): the skin is riveted to the frames and stringers underneath. -->
+        <!-- Rows of fasteners (decoration): the skin is fixed to the structure underneath. -->
         <g class="deco rivets">
-          <line x1="70" y1="46" x2="70" y2="194" />
-          <line x1="110" y1="46" x2="110" y2="194" />
-          <line x1="150" y1="46" x2="150" y2="194" />
-          <line x1="190" y1="46" x2="190" y2="194" />
-          <line x1="230" y1="46" x2="230" y2="194" />
-          <line x1="46" y1="72" x2="244" y2="72" />
-          <line x1="46" y1="100" x2="244" y2="100" />
-          <line x1="46" y1="140" x2="244" y2="140" />
-          <line x1="46" y1="168" x2="244" y2="168" />
+          <line x1="80" y1="46" x2="80" y2="194" />
+          <line x1="120" y1="46" x2="120" y2="194" />
+          <line x1="160" y1="46" x2="160" y2="194" />
+          <line x1="200" y1="46" x2="200" y2="194" />
+          <line x1="240" y1="46" x2="240" y2="194" />
+          <line x1="46" y1="82" x2="244" y2="82" />
+          <line x1="46" y1="158" x2="244" y2="158" />
         </g>
-        <!-- The cut end of the tube at the front (decoration). -->
+        <!-- The cut ends of the section (decoration). -->
         <ellipse class="deco cut-edge" cx="40" cy="120" rx="16" ry="80" />
+        <ellipse class="deco cut-edge" cx="520" cy="120" rx="16" ry="80" />
         </svg>
       </figure>
 
       <!-- ===== FUSELAGE: CROSS-SECTION =====
-           Looking straight along the tube, as if it had been sliced through.
-           From the outside in: skin, stringers (small dots), then the frame
-           ring. The floor beam runs across, with the cabin above and the
-           cargo hold below. Centre point: (120, 120). -->
+           Looking straight along the body, as if it had been sliced through.
+           A fighter's fuselage is packed: a fuel tank at the top and the two
+           engines side by side underneath. Centre point: (120, 120). -->
       <figure class="diagram">
         <figcaption class="diagram-caption">Fuselage <span class="diagram-note">(cross-section)</span></figcaption>
-        <svg class="aircraft-svg is-compact" viewBox="10 10 220 220" role="group" aria-label="Cross-section of a fuselage">
-
-        <!-- "Cabin" and "Cargo" (hold) labels (decoration). -->
-        <text class="deco section-label" x="120" y="112" text-anchor="middle">Cabin</text>
-        <text class="deco section-label" x="120" y="178" text-anchor="middle">Cargo</text>
+        <svg class="aircraft-svg is-compact" viewBox="6 22 228 196" role="group" aria-label="Cross-section of a fighter fuselage">
 
         <!-- FUSELAGE SKIN: the outer ring. -->
         <g class="part" data-part="fuselage-skin" tabindex="0" role="button">
-          <path class="shape" fill-rule="evenodd" d="M 19 120 a 101 101 0 1 0 202 0 a 101 101 0 1 0 -202 0 Z M 28 120 a 92 92 0 1 0 184 0 a 92 92 0 1 0 -184 0 Z" />
+          <path class="shape" fill-rule="evenodd" d="M 10 120 a 110 92 0 1 0 220 0 a 110 92 0 1 0 -220 0 Z M 18 120 a 102 84 0 1 0 204 0 a 102 84 0 1 0 -204 0 Z" />
         </g>
 
-        <!-- FRAMES: the inner ring that gives the fuselage its round shape. -->
+        <!-- FRAMES: the ring just inside the skin. -->
         <g class="part" data-part="frames" tabindex="0" role="button">
-          <path class="shape" fill-rule="evenodd" d="M 41 120 a 79 79 0 1 0 158 0 a 79 79 0 1 0 -158 0 Z M 52 120 a 68 68 0 1 0 136 0 a 68 68 0 1 0 -136 0 Z" />
+          <path class="shape" fill-rule="evenodd" d="M 18 120 a 102 84 0 1 0 204 0 a 102 84 0 1 0 -204 0 Z M 30 120 a 90 72 0 1 0 180 0 a 90 72 0 1 0 -180 0 Z" />
         </g>
 
-        <!-- STRINGERS: seen end-on, each strip is a small dot just inside the skin.
-             The see-through ring between frame and skin makes them easier to tap. -->
-        <g class="part" data-part="stringers" tabindex="0" role="button">
-          <path class="hit" fill-rule="evenodd" d="M 28 120 a 92 92 0 1 0 184 0 a 92 92 0 1 0 -184 0 Z M 41 120 a 79 79 0 1 0 158 0 a 79 79 0 1 0 -158 0 Z" />
-          <circle class="shape" cx="205.5" cy="120" r="4.5" />
-          <circle class="shape" cx="199" cy="152.7" r="4.5" />
-          <circle class="shape" cx="180.5" cy="180.5" r="4.5" />
-          <circle class="shape" cx="152.7" cy="199" r="4.5" />
-          <circle class="shape" cx="120" cy="205.5" r="4.5" />
-          <circle class="shape" cx="87.3" cy="199" r="4.5" />
-          <circle class="shape" cx="59.5" cy="180.5" r="4.5" />
-          <circle class="shape" cx="41" cy="152.7" r="4.5" />
-          <circle class="shape" cx="34.5" cy="120" r="4.5" />
-          <circle class="shape" cx="41" cy="87.3" r="4.5" />
-          <circle class="shape" cx="59.5" cy="59.5" r="4.5" />
-          <circle class="shape" cx="87.3" cy="41" r="4.5" />
-          <circle class="shape" cx="120" cy="34.5" r="4.5" />
-          <circle class="shape" cx="152.7" cy="41" r="4.5" />
-          <circle class="shape" cx="180.5" cy="59.5" r="4.5" />
-          <circle class="shape" cx="199" cy="87.3" r="4.5" />
+        <!-- FUEL TANK: fills the space at the top, above the engines. -->
+        <g class="part" data-part="fuel-tank" tabindex="0" role="button">
+          <path class="shape" d="M 70 66 Q 120 46 170 66 L 170 100 L 70 100 Z" />
         </g>
 
-        <!-- FLOOR BEAM: runs across the inside of the frame, holding up the cabin floor. -->
-        <g class="part" data-part="floor-beams" tabindex="0" role="button">
-          <rect class="hit" x="60" y="140" width="120" height="24" />
-          <rect class="shape" x="60" y="147" width="120" height="10" />
+        <!-- The two engines, side by side (decoration). -->
+        <g class="deco engine-bays">
+          <circle cx="84" cy="146" r="30" />
+          <circle cx="156" cy="146" r="30" />
+        </g>
+        <text class="deco section-label" x="84" y="150" text-anchor="middle">Engine</text>
+        <text class="deco section-label" x="156" y="150" text-anchor="middle">Engine</text>
+        <text class="deco section-label" x="120" y="90" text-anchor="middle">Fuel</text>
+
+        <!-- LONGERONS: seen end-on, each beam is a small block in a corner. -->
+        <g class="part" data-part="longerons" tabindex="0" role="button">
+          <rect class="hit" x="35" y="67" width="26" height="26" />
+          <rect class="hit" x="179" y="67" width="26" height="26" />
+          <rect class="hit" x="35" y="147" width="26" height="26" />
+          <rect class="hit" x="179" y="147" width="26" height="26" />
+          <rect class="shape" x="41" y="73" width="14" height="14" rx="2" />
+          <rect class="shape" x="185" y="73" width="14" height="14" rx="2" />
+          <rect class="shape" x="41" y="153" width="14" height="14" rx="2" />
+          <rect class="shape" x="185" y="153" width="14" height="14" rx="2" />
         </g>
         </svg>
       </figure>
@@ -554,122 +526,116 @@
     <div class="diagram-row">
 
       <!-- ===== WING: TOP VIEW, SKIN PARTLY REMOVED =====
-           One wing seen from above. The root (where it joins the fuselage)
-           is on the left, the tip on the right, and the leading (front) edge
-           at the top. The skin is left on near the root; further out it has
-           been removed to show the spars and ribs. The flaps and ailerons
-           are hinged along the trailing (back) edge. -->
+           One fighter wing seen from above: root (where it joins the body)
+           on the left, tip on the right, leading (front) edge at the top.
+           The skin is left on near the root; further out it has been
+           removed to show the spars and ribs. The flaps and ailerons are
+           hinged along the trailing (back) edge. -->
       <figure class="diagram">
         <figcaption class="diagram-caption">Wing <span class="diagram-note">(top view, part of the skin removed)</span></figcaption>
-        <svg class="aircraft-svg" viewBox="10 26 580 188" role="group" aria-label="Top view of a wing with part of the skin removed">
+        <svg class="aircraft-svg" viewBox="10 14 580 216" role="group" aria-label="Top view of a fighter wing with part of the skin removed">
 
         <!-- Wing outline (decoration). -->
-        <path class="deco wing-outline" d="M 30 40 L 570 90 L 570 160 L 30 200 Z" />
+        <path class="deco wing-outline" d="M 30 30 L 560 165 L 560 200 L 30 210 Z" />
 
-        <!-- RIBS: cross-pieces running from the front edge to the back edge. -->
+        <!-- RIBS: only a few cross-pieces, running from the front edge to the back edge. -->
         <g class="part" data-part="ribs" tabindex="0" role="button">
-          <polygon class="hit" points="242,59.6 258,61.1 258,183.1 242,184.3" />
-          <polygon class="hit" points="302,65.2 318,66.7 318,178.7 302,179.9" />
-          <polygon class="hit" points="362,70.7 378,72.2 378,174.2 362,175.4" />
-          <polygon class="hit" points="422,76.3 438,77.8 438,169.8 422,171" />
-          <polygon class="hit" points="482,81.9 498,83.3 498,165.3 482,166.5" />
-          <polygon class="hit" points="542,87.4 558,88.9 558,160.9 542,162.1" />
-          <polygon class="shape" points="247,60.1 253,60.6 253,183.5 247,183.9" />
-          <polygon class="shape" points="307,65.6 313,66.2 313,179 307,179.5" />
-          <polygon class="shape" points="367,71.2 373,71.8 373,174.6 367,175" />
-          <polygon class="shape" points="427,76.8 433,77.3 433,170.1 427,170.6" />
-          <polygon class="shape" points="487,82.3 493,82.9 493,165.7 487,166.1" />
-          <polygon class="shape" points="547,87.9 553,88.4 553,161.3 547,161.7" />
+          <polygon class="hit" points="292,96.7 308,100.8 308,204.8 292,205.1" />
+          <polygon class="hit" points="392,122.2 408,126.3 408,202.9 392,203.2" />
+          <polygon class="hit" points="492,147.7 508,151.8 508,201 492,201.3" />
+          <polygon class="shape" points="297,98 303,99.5 303,204.8 297,205" />
+          <polygon class="shape" points="397,123.5 403,125 403,203 397,203.1" />
+          <polygon class="shape" points="497,149 503,150.5 503,201.1 497,201.2" />
         </g>
 
-        <!-- FRONT SPAR: the main beam near the leading (front) edge, running root to tip. -->
-        <g class="part" data-part="front-spar" tabindex="0" role="button">
-          <polygon class="hit" points="250,80.2 570,96.5 570,118.5 250,102.2" />
-          <polygon class="shape" points="250,86.2 570,102.5 570,112.5 250,96.2" />
-        </g>
-
-        <!-- REAR SPAR: the second main beam, nearer the trailing (back) edge. -->
-        <g class="part" data-part="rear-spar" tabindex="0" role="button">
-          <polygon class="hit" points="250,135.7 570,128 570,150 250,157.7" />
-          <polygon class="shape" points="250,141.7 570,134 570,144 250,151.7" />
+        <!-- SPARS: several main beams close together, running from root to tip. -->
+        <g class="part" data-part="spars" tabindex="0" role="button">
+          <polygon class="hit" points="250,96 560,162.2 560,178.2 250,112" />
+          <polygon class="hit" points="250,122.4 560,169.9 560,185.9 250,138.4" />
+          <polygon class="hit" points="250,147.5 560,177.3 560,193.3 250,163.5" />
+          <polygon class="hit" points="250,171.5 560,184.3 560,200.3 250,187.5" />
+          <polygon class="shape" points="250,100 560,166.2 560,174.2 250,108" />
+          <polygon class="shape" points="250,126.4 560,173.9 560,181.9 250,134.4" />
+          <polygon class="shape" points="250,151.5 560,181.3 560,189.3 250,159.5" />
+          <polygon class="shape" points="250,175.5 560,188.3 560,196.3 250,183.5" />
         </g>
 
         <!-- WING SKIN: left on over the part nearest the root. -->
         <g class="part" data-part="wing-skin" tabindex="0" role="button">
-          <path class="shape" d="M 30 40 L 250 60.4 L 250 183.7 L 30 200 Z" />
+          <path class="shape" d="M 30 30 L 250 86 L 250 205.8 L 30 210 Z" />
         </g>
-        <!-- Rivet rows on the skin (decoration), over the spars and ribs underneath. -->
+        <!-- Rows of fasteners on the skin (decoration), over the spars underneath. -->
         <g class="deco rivets">
-          <line x1="34" y1="80.2" x2="246" y2="91" />
-          <line x1="34" y1="151.9" x2="246" y2="146.8" />
-          <line x1="70" y1="48.7" x2="70" y2="192" />
-          <line x1="130" y1="54.3" x2="130" y2="187.6" />
-          <line x1="190" y1="59.8" x2="190" y2="183.1" />
+          <line x1="34" y1="57.9" x2="246" y2="103.2" />
+          <line x1="34" y1="97.2" x2="246" y2="129.8" />
+          <line x1="34" y1="134.8" x2="246" y2="155.1" />
+          <line x1="34" y1="170.6" x2="246" y2="179.3" />
         </g>
 
         <!-- FLAPS (control surface): hinged along the back edge, on the inner part of the wing. -->
         <g class="part control" data-part="flaps" tabindex="0" role="button">
-          <polygon class="shape" points="40,170.8 330,158 330,177.8 40,199.3" />
+          <polygon class="shape" points="40,185 300,190 300,204.9 40,209.8" />
         </g>
 
         <!-- AILERONS (control surface): hinged along the back edge, on the outer part of the wing. -->
         <g class="part control" data-part="ailerons" tabindex="0" role="button">
-          <polygon class="shape" points="350,157.1 550,148.3 550,161.5 350,176.3" />
+          <polygon class="shape" points="320,190.4 520,194.3 520,200.8 320,204.5" />
         </g>
 
         <!-- Section line A-A (decoration): shows where the cross-section on the right is cut. -->
         <g class="deco section-line">
-          <line x1="140" y1="42.2" x2="140" y2="199.9" />
-          <text x="140" y="39.2" text-anchor="middle">A</text>
-          <text x="140" y="212.9" text-anchor="middle">A</text>
+          <line x1="140" y1="50" x2="140" y2="215.9" />
+          <text x="140" y="47" text-anchor="middle">A</text>
+          <text x="140" y="228.9" text-anchor="middle">A</text>
         </g>
         </svg>
       </figure>
 
-      <!-- ===== WING: CROSS-SECTION THROUGH A RIB =====
+      <!-- ===== WING: SECTION A-A =====
            The wing sliced from front (left) to back (right) along the line
-           A-A on the top view. The rib is cut to this curved "aerofoil"
-           shape, with holes to save weight. The two upright bars are where
-           the front and rear spars pass through, and the thick outline is
-           the skin. Behind the main wing is the flap, on its hinge. -->
+           A-A. A fighter wing is very thin (drawn thicker here so you can
+           see inside). Several spars stand close together, the thick
+           outline is the skin, and the flap is hinged at the back. -->
       <figure class="diagram">
-        <figcaption class="diagram-caption">Wing <span class="diagram-note">(section A&ndash;A, through a rib and the flap)</span></figcaption>
-        <svg class="aircraft-svg" viewBox="5 8 295 84" role="group" aria-label="Cross-section of a wing through a rib">
+        <figcaption class="diagram-caption">Wing <span class="diagram-note">(section A&ndash;A, drawn thicker than real life)</span></figcaption>
+        <svg class="aircraft-svg" viewBox="2 26 296 50" role="group" aria-label="Cross-section of a fighter wing">
 
-        <!-- RIB: the aerofoil-shaped piece. -->
+        <!-- RIB: the thin wing-shaped piece. -->
         <g class="part" data-part="ribs" tabindex="0" role="button">
-          <path class="shape" d="M 15 58 C 15 30 90 16 150 20 C 175.7 21.7 201.3 26.3 224 32 L 224 66.3 C 199.7 69.3 173.5 72.1 150 74 C 90 78 15 82 15 58 Z" />
+          <path class="shape" d="M 8 50 L 17.6 40.8 L 27.2 37.4 L 36.8 35.1 L 46.3 33.5 L 55.9 32.2 L 65.5 31.3 L 75.1 30.7 L 84.7 30.3 L 94.2 30 L 103.8 30 L 113.4 30.1 L 123 30.3 L 132.6 30.7 L 142.2 31.1 L 151.8 31.7 L 161.3 32.4 L 170.9 33.2 L 180.5 34.1 L 190.1 35.1 L 199.7 36.1 L 209.2 37.2 L 218.8 38.5 L 228.4 39.7 L 238 41.1 L 238 56.7 L 228.4 57.7 L 218.8 58.7 L 209.2 59.6 L 199.7 60.4 L 190.1 61.2 L 180.5 61.9 L 170.9 62.6 L 161.3 63.2 L 151.8 63.7 L 142.2 64.1 L 132.6 64.5 L 123 64.8 L 113.4 64.9 L 103.8 65 L 94.2 65 L 84.7 64.8 L 75.1 64.5 L 65.5 64 L 55.9 63.3 L 46.3 62.4 L 36.8 61.2 L 27.2 59.4 L 17.6 56.9 L 8 50 Z" />
         </g>
         <!-- Lightening holes in the rib (decoration): holes cut to save weight. -->
         <g class="deco holes">
-          <circle cx="44" cy="56" r="8" />
-          <circle cx="132" cy="47" r="13" />
+          <circle cx="56" cy="47.8" r="6" />
+          <circle cx="128" cy="47.6" r="6" />
+          <circle cx="196" cy="48.2" r="6" />
         </g>
 
-        <!-- FRONT SPAR and REAR SPAR, where they pass through the rib. -->
-        <g class="part" data-part="front-spar" tabindex="0" role="button">
-          <rect class="hit" x="62" y="20" width="24" height="64" />
-          <rect class="shape" x="69" y="24" width="10" height="55" />
-        </g>
-        <g class="part" data-part="rear-spar" tabindex="0" role="button">
-          <rect class="hit" x="183" y="18" width="24" height="60" />
-          <rect class="shape" x="190" y="24" width="10" height="47" />
+        <!-- SPARS: where the spars pass through the rib, close together. -->
+        <g class="part" data-part="spars" tabindex="0" role="button">
+          <rect class="hit" x="33" y="31.5" width="15" height="33.1" />
+          <rect class="hit" x="85" y="27.1" width="15" height="40.9" />
+          <rect class="hit" x="155" y="29.5" width="15" height="36.7" />
+          <rect class="hit" x="219" y="36.4" width="15" height="24.5" />
+          <rect class="shape" x="37" y="35.5" width="7" height="25.1" />
+          <rect class="shape" x="89" y="31.1" width="7" height="32.9" />
+          <rect class="shape" x="159" y="33.5" width="7" height="28.7" />
+          <rect class="shape" x="223" y="40.4" width="7" height="16.5" />
         </g>
 
         <!-- WING SKIN: the outline all round. "outline" shapes have no fill, so only
              the thick line itself can be clicked; the see-through "hit-line" is a
              wider line around it that makes it easier to tap. -->
         <g class="part" data-part="wing-skin" tabindex="0" role="button">
-          <path class="hit-line" d="M 15 58 C 15 30 90 16 150 20 C 175.7 21.7 201.3 26.3 224 32 L 224 66.3 C 199.7 69.3 173.5 72.1 150 74 C 90 78 15 82 15 58 Z" />
-          <path class="shape outline" d="M 15 58 C 15 30 90 16 150 20 C 175.7 21.7 201.3 26.3 224 32 L 224 66.3 C 199.7 69.3 173.5 72.1 150 74 C 90 78 15 82 15 58 Z" />
+          <path class="hit-line" d="M 8 50 L 17.6 40.8 L 27.2 37.4 L 36.8 35.1 L 46.3 33.5 L 55.9 32.2 L 65.5 31.3 L 75.1 30.7 L 84.7 30.3 L 94.2 30 L 103.8 30 L 113.4 30.1 L 123 30.3 L 132.6 30.7 L 142.2 31.1 L 151.8 31.7 L 161.3 32.4 L 170.9 33.2 L 180.5 34.1 L 190.1 35.1 L 199.7 36.1 L 209.2 37.2 L 218.8 38.5 L 228.4 39.7 L 238 41.1 L 238 56.7 L 228.4 57.7 L 218.8 58.7 L 209.2 59.6 L 199.7 60.4 L 190.1 61.2 L 180.5 61.9 L 170.9 62.6 L 161.3 63.2 L 151.8 63.7 L 142.2 64.1 L 132.6 64.5 L 123 64.8 L 113.4 64.9 L 103.8 65 L 94.2 65 L 84.7 64.8 L 75.1 64.5 L 65.5 64 L 55.9 63.3 L 46.3 62.4 L 36.8 61.2 L 27.2 59.4 L 17.6 56.9 L 8 50 Z" />
+          <path class="shape outline" d="M 8 50 L 17.6 40.8 L 27.2 37.4 L 36.8 35.1 L 46.3 33.5 L 55.9 32.2 L 65.5 31.3 L 75.1 30.7 L 84.7 30.3 L 94.2 30 L 103.8 30 L 113.4 30.1 L 123 30.3 L 132.6 30.7 L 142.2 31.1 L 151.8 31.7 L 161.3 32.4 L 170.9 33.2 L 180.5 34.1 L 190.1 35.1 L 199.7 36.1 L 209.2 37.2 L 218.8 38.5 L 228.4 39.7 L 238 41.1 L 238 56.7 L 228.4 57.7 L 218.8 58.7 L 209.2 59.6 L 199.7 60.4 L 190.1 61.2 L 180.5 61.9 L 170.9 62.6 L 161.3 63.2 L 151.8 63.7 L 142.2 64.1 L 132.6 64.5 L 123 64.8 L 113.4 64.9 L 103.8 65 L 94.2 65 L 84.7 64.8 L 75.1 64.5 L 65.5 64 L 55.9 63.3 L 46.3 62.4 L 36.8 61.2 L 27.2 59.4 L 17.6 56.9 L 8 50 Z" />
         </g>
 
-        <!-- FLAPS: the flap section, hinged behind the main wing. It has its own skin
-             and rib inside; the small circle is the hinge point (decoration). -->
+        <!-- FLAPS: the flap section, hinged behind the main wing. -->
         <g class="part control" data-part="flaps" tabindex="0" role="button">
-          <path class="shape" d="M 230 33.6 C 257.6 40.9 280.2 49.6 292 56 C 277.3 58.9 254.9 62.4 230 65.6 Q 221 49.6 230 33.6 Z" />
+          <path class="shape" d="M 244 42 L 246 42.3 L 248 42.6 L 250 42.9 L 252 43.2 L 254 43.5 L 256 43.8 L 258 44.2 L 260 44.5 L 262 44.8 L 264 45.1 L 266 45.5 L 268 45.8 L 270 46.1 L 272 46.5 L 274 46.8 L 276 47.2 L 278 47.5 L 280 47.8 L 282 48.2 L 284 48.6 L 286 48.9 L 288 49.3 L 290 49.6 L 292 50 L 292 50 L 290 50.3 L 288 50.5 L 286 50.8 L 284 51.1 L 282 51.3 L 280 51.6 L 278 51.9 L 276 52.1 L 274 52.4 L 272 52.6 L 270 52.9 L 268 53.2 L 266 53.4 L 264 53.7 L 262 53.9 L 260 54.1 L 258 54.4 L 256 54.6 L 254 54.9 L 252 55.1 L 250 55.3 L 248 55.6 L 246 55.8 L 244 56 Q 238 49 244 42 Z" />
         </g>
-        <circle class="deco hinge" cx="227" cy="49.6" r="2.5" />
+        <circle class="deco hinge" cx="242" cy="49" r="2" />
         </svg>
       </figure>
     </div>
@@ -677,11 +643,10 @@
 
 
   <!-- =====================================================================
-       MODULE 3 DIAGRAMS: ENGINE AND EMPENNAGE
-       Three pictures: a cutaway of a turbofan engine hanging from the wing,
-       then the empennage (the whole tail) from the side and from above.
-       The two tail views use the same scale and sit side by side, so the
-       same parts can be compared between them.
+       MODULE 3 DIAGRAMS: FIGHTER ENGINE AND EMPENNAGE
+       Three pictures: a cutaway of a fighter's jet engine (with its air
+       intake duct and afterburner), then the empennage (the whole tail)
+       from the side and from above.
 
        Same rules as the other diagrams: each clickable part is a <g> with
        class="part" and a data-part name matching an id in ENGINE_PARTS in
@@ -691,76 +656,83 @@
   <template id="engine-diagrams">
 
     <!-- ===== ENGINE: CUTAWAY SIDE VIEW =====
-         A turbofan engine with the casing cut open to show the inside.
+         One engine inside the rear fuselage, cut open to show the inside.
          Air flows from left to right. The engine's centre line runs along
-         y = 135; the bottom half of each part mirrors the top half. -->
+         y = 130. -->
     <figure class="diagram">
       <figcaption class="diagram-caption">Engine <span class="diagram-note">(cutaway side view; air flows from left to right)</span></figcaption>
-      <svg class="aircraft-svg" viewBox="16 -8 564 248" role="group" aria-label="Cutaway side view of a turbofan engine">
+      <svg class="aircraft-svg" viewBox="14 52 572 150" role="group" aria-label="Cutaway side view of a fighter jet engine">
 
-        <!-- The underside of the wing above the engine (decoration). -->
-        <rect class="deco wing-stub" x="150" y="0" width="340" height="16" rx="4" />
-        <text class="deco section-label" x="320" y="12" text-anchor="middle">Wing</text>
+        <!-- The fuselage around the engine (decoration). -->
+        <rect class="deco engine-bay-outline" x="20" y="72" width="476" height="116" rx="10" />
+        <text class="deco section-label" x="490" y="66" text-anchor="end">Fuselage</text>
 
-        <!-- PYLON: the mount joining the engine to the wing. -->
-        <g class="part" data-part="pylon" tabindex="0" role="button">
-          <polygon class="shape" points="210,16 470,16 432,56 250,56" />
+        <!-- AIR INTAKE: the duct leading air from the opening on the side of the
+             fuselage to the front of the engine. -->
+        <g class="part" data-part="air-intake" tabindex="0" role="button">
+          <polygon class="shape" points="22,84 118,94 118,166 22,176" />
         </g>
 
-        <!-- NACELLE: the casing (cowlings) around the engine, cut open so we can
-             see inside: only the top and bottom of the shell are drawn. -->
-        <g class="part" data-part="nacelle" tabindex="0" role="button">
-          <path class="shape" d="M 70 64 Q 78 54 110 54 L 420 54 Q 452 56 474 72 L 470 82 Q 448 68 420 66 L 110 66 Q 88 66 80 76 Z" />
-          <path class="shape" d="M 70 206 Q 78 216 110 216 L 420 216 Q 452 214 474 198 L 470 188 Q 448 202 420 204 L 110 204 Q 88 204 80 194 Z" />
-        </g>
-
-        <!-- FAN: the big blades at the front, with the pointed spinner in the middle. -->
+        <!-- FAN: a few rows of blades at the front of the engine. -->
         <g class="part" data-part="fan" tabindex="0" role="button">
-          <rect class="shape" x="104" y="70" width="16" height="130" rx="5" />
-          <path class="shape" d="M 78 135 Q 82 114 104 110 L 104 160 Q 82 156 78 135 Z" />
+          <rect class="shape" x="121" y="92" width="13" height="76" rx="4" />
+          <path class="shape" d="M 112 130 Q 114 120 121 118 L 121 142 Q 114 140 112 130 Z" />
         </g>
 
         <!-- COMPRESSOR: rows of blades that get smaller toward the back. -->
         <g class="part" data-part="compressor" tabindex="0" role="button">
-          <polygon class="shape" points="136,98 286,112 286,158 136,172" />
+          <polygon class="shape" points="139,98 240,110 240,150 139,162" />
         </g>
         <g class="deco blades">
-          <line x1="154" y1="103.7" x2="154" y2="166.3" />
-          <line x1="174" y1="105.5" x2="174" y2="164.5" />
-          <line x1="194" y1="107.4" x2="194" y2="162.6" />
-          <line x1="214" y1="109.3" x2="214" y2="160.7" />
-          <line x1="234" y1="111.1" x2="234" y2="158.9" />
-          <line x1="254" y1="113" x2="254" y2="157" />
-          <line x1="274" y1="114.9" x2="274" y2="155.1" />
+          <line x1="152" y1="103.5" x2="152" y2="156.5" />
+          <line x1="168" y1="105.4" x2="168" y2="154.6" />
+          <line x1="184" y1="107.3" x2="184" y2="152.7" />
+          <line x1="200" y1="109.2" x2="200" y2="150.8" />
+          <line x1="216" y1="111.1" x2="216" y2="148.9" />
+          <line x1="232" y1="113" x2="232" y2="147" />
         </g>
 
         <!-- COMBUSTION CHAMBER: where fuel is burned. The flame is decoration. -->
         <g class="part" data-part="combustion-chamber" tabindex="0" role="button">
-          <rect class="shape" x="291" y="112" width="62" height="46" rx="10" />
+          <rect class="shape" x="245" y="111" width="48" height="38" rx="8" />
         </g>
-        <path class="deco flame" d="M 302 135 Q 318 120 340 128 Q 330 135 340 142 Q 318 150 302 135 Z" />
+        <path class="deco flame" d="M 252 130 Q 265 119 284 125 Q 276 130 284 135 Q 265 141 252 130 Z" />
 
-        <!-- TURBINE: rows of blades, spun by the hot gas, getting bigger toward the back. -->
+        <!-- TURBINE: blades spun by the hot gas, getting bigger toward the back. -->
         <g class="part" data-part="turbine" tabindex="0" role="button">
-          <polygon class="shape" points="358,112 426,100 426,170 358,158" />
+          <polygon class="shape" points="298,111 346,103 346,157 298,149" />
         </g>
         <g class="deco blades">
-          <line x1="372" y1="113.5" x2="372" y2="156.5" />
-          <line x1="388" y1="110.7" x2="388" y2="159.3" />
-          <line x1="404" y1="107.9" x2="404" y2="162.1" />
-          <line x1="420" y1="105.1" x2="420" y2="164.9" />
+          <line x1="310" y1="113" x2="310" y2="147" />
+          <line x1="322" y1="111" x2="322" y2="149" />
+          <line x1="334" y1="109" x2="334" y2="151" />
         </g>
 
-        <!-- EXHAUST NOZZLE: where the hot gas leaves the engine, with a cone in the middle. -->
-        <g class="part" data-part="exhaust-nozzle" tabindex="0" role="button">
-          <polygon class="shape" points="431,100 520,114 520,156 431,170" />
+        <!-- AFTERBURNER: the long pipe behind the turbine where extra fuel is burned.
+             The rings (flame holders) and the long flame are decoration. -->
+        <g class="part" data-part="afterburner" tabindex="0" role="button">
+          <rect class="shape" x="351" y="102" width="140" height="56" rx="4" />
         </g>
-        <path class="deco plug" d="M 431 122 L 548 135 L 431 148 Z" />
+        <g class="deco blades">
+          <line x1="366" y1="110" x2="366" y2="150" />
+          <line x1="374" y1="114" x2="374" y2="146" />
+        </g>
+        <path class="deco flame" d="M 382 130 Q 430 112 486 122 Q 470 130 486 138 Q 430 148 382 130 Z" />
+
+        <!-- EXHAUST NOZZLE: overlapping metal flaps (petals) that open and close. -->
+        <g class="part" data-part="exhaust-nozzle" tabindex="0" role="button">
+          <polygon class="shape" points="494,100 536,108 566,104 566,156 536,152 494,160" />
+        </g>
+        <g class="deco petals">
+          <line x1="508" y1="107" x2="508" y2="153" />
+          <line x1="522" y1="107" x2="522" y2="153" />
+          <line x1="536" y1="107" x2="536" y2="153" />
+          <line x1="550" y1="107" x2="550" y2="153" />
+        </g>
 
         <!-- Labels (decoration). -->
-        <text class="deco section-label" x="26" y="128">Air</text>
-        <text class="deco section-label" x="26" y="144">in</text>
-        <text class="deco section-label" x="574" y="190" text-anchor="end">Exhaust</text>
+        <text class="deco section-label" x="22" y="66">Air in</text>
+        <text class="deco section-label" x="580" y="198" text-anchor="end">Exhaust</text>
       </svg>
     </figure>
 
@@ -768,74 +740,75 @@
     <div class="diagram-row is-even">
 
     <!-- ===== EMPENNAGE: SIDE VIEW =====
-         The back end of the aircraft, nose to the left. The dashed lines
-         inside the fin show its structure under the skin: two spars
-         running up the fin and ribs running across it. -->
+         The back end of the fighter, nose to the left. The two fins
+         overlap in this view. The dashed lines inside the fin show its
+         structure under the skin: spars running up it and ribs across it. -->
     <figure class="diagram">
       <figcaption class="diagram-caption">Empennage <span class="diagram-note">(side view; dashed lines show the spars and ribs inside the fin)</span></figcaption>
-      <svg class="aircraft-svg" viewBox="190 20 380 210" role="group" aria-label="Side view of the empennage">
+      <svg class="aircraft-svg" viewBox="190 20 410 180" role="group" aria-label="Side view of a fighter's empennage">
 
-        <!-- VERTICAL STABILISER (FIN): drawn first, so the tail cone covers its root. -->
+        <!-- VERTICAL STABILISERS (FINS): drawn first, so the body covers their roots. -->
         <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
-          <path class="shape" d="M 330 150 L 440 30 L 518 30 L 548 120 Z" />
+          <path class="shape" d="M 380 118 L 450 34 L 500 34 L 520 117 Z" />
         </g>
         <!-- Spars and ribs inside the fin (decoration). -->
         <g class="deco inner-structure">
-          <line x1="357.2" y1="140" x2="448.8" y2="40" />
-          <line x1="487.8" y1="40" x2="522.2" y2="140" />
-          <line x1="416.5" y1="60" x2="499.6" y2="60" />
-          <line x1="389" y1="90" x2="510" y2="90" />
-          <line x1="361.5" y1="120" x2="520.3" y2="120" />
+          <line x1="400.7" y1="110" x2="457.3" y2="42" />
+          <line x1="479.7" y1="42" x2="468.3" y2="110" />
+          <line x1="432.3" y1="60" x2="482.9" y2="60" />
+          <line x1="410.7" y1="86" x2="480.8" y2="86" />
         </g>
 
-        <!-- RUDDER (control surface): hinged along the back edge of the fin. -->
+        <!-- RUDDERS (control surface): hinged along the back edge of each fin. -->
         <g class="part control" data-part="rudder" tabindex="0" role="button">
-          <polygon class="shape" points="494,32 518.7,32 547,118 525,122" />
+          <polygon class="shape" points="486.3,52 504.3,52 518.8,112 484,112" />
         </g>
 
-        <!-- TAIL CONE: the narrowing back end of the fuselage. -->
-        <g class="part" data-part="tail-cone" tabindex="0" role="button">
-          <path class="shape" d="M 200 150 L 340 150 Q 440 146 548 118 L 556 136 Q 470 206 340 216 L 200 216 Z" />
+        <!-- REAR FUSELAGE: the back end of the body, around the engines. -->
+        <g class="part" data-part="rear-fuselage" tabindex="0" role="button">
+          <path class="shape" d="M 200 120 L 520 116 L 560 122 L 560 162 L 520 168 L 200 176 Z" />
         </g>
-        <ellipse class="deco cut-edge" cx="200" cy="183" rx="10" ry="33" />
+        <ellipse class="deco cut-edge" cx="200" cy="148" rx="9" ry="28" />
+        <!-- Engine nozzle at the very back (decoration). -->
+        <polygon class="deco nozzle" points="560,126 590,130 590,156 560,160" />
 
-        <!-- HORIZONTAL STABILISER: seen from the side, only a thin edge shows. -->
-        <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
-          <rect class="hit" x="428" y="146" width="132" height="30" />
-          <polygon class="shape" points="430,164 540,150 556,154 470,174" />
+        <!-- STABILATORS (control surface): the all-moving tail, seen edge-on. -->
+        <g class="part control" data-part="stabilators" tabindex="0" role="button">
+          <rect class="hit" x="416" y="138" width="136" height="28" />
+          <polygon class="shape" points="420,150 530,142 548,147 460,162" />
         </g>
       </svg>
     </figure>
 
     <!-- ===== EMPENNAGE: TOP VIEW =====
          Looking down on the tail. The centre line runs along y = 130; the
-         two horizontal stabilisers mirror each other (y becomes 260 - y). -->
+         two sides mirror each other (y becomes 260 - y). -->
     <figure class="diagram">
-      <figcaption class="diagram-caption">Empennage <span class="diagram-note">(top view)</span></figcaption>
-      <svg class="aircraft-svg" viewBox="190 10 380 240" role="group" aria-label="Top view of the empennage">
+      <figcaption class="diagram-caption">Empennage <span class="diagram-note">(top view; the rudders only show in the side view)</span></figcaption>
+      <svg class="aircraft-svg" viewBox="190 14 410 232" role="group" aria-label="Top view of a fighter's empennage">
 
-        <!-- HORIZONTAL STABILISERS: drawn before the tail cone, which covers their roots. -->
-        <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
-          <polygon class="shape" points="420,110 522,22 556,22 528,120" />
-          <polygon class="shape" points="420,150 522,238 556,238 528,140" />
+        <!-- STABILATORS (control surface): the two all-moving tail surfaces, drawn
+             before the body so it covers their roots. -->
+        <g class="part control" data-part="stabilators" tabindex="0" role="button">
+          <polygon class="shape" points="436,100 520,30 554,30 552,102" />
+          <polygon class="shape" points="436,160 520,230 554,230 552,158" />
         </g>
 
-        <!-- ELEVATORS (control surface): hinged along the back edge of each horizontal stabiliser. -->
-        <g class="part control" data-part="elevators" tabindex="0" role="button">
-          <polygon class="shape" points="543.3,28 554.3,28 531.4,108 500.9,108" />
-          <polygon class="shape" points="543.3,232 554.3,232 531.4,152 500.9,152" />
+        <!-- REAR FUSELAGE seen from above, wide enough for two engines side by side. -->
+        <g class="part" data-part="rear-fuselage" tabindex="0" role="button">
+          <path class="shape" d="M 200 95 L 520 98 L 560 104 L 560 156 L 520 162 L 200 165 Z" />
         </g>
+        <ellipse class="deco cut-edge" cx="200" cy="130" rx="9" ry="35" />
+        <!-- The two engine nozzles (decoration). -->
+        <rect class="deco nozzle" x="560" y="108" width="28" height="18" rx="4" />
+        <rect class="deco nozzle" x="560" y="134" width="28" height="18" rx="4" />
 
-        <!-- TAIL CONE seen from above. -->
-        <g class="part" data-part="tail-cone" tabindex="0" role="button">
-          <path class="shape" d="M 200 100 L 340 100 Q 440 108 552 124 L 552 136 Q 440 152 340 160 L 200 160 Z" />
-        </g>
-        <ellipse class="deco cut-edge" cx="200" cy="130" rx="10" ry="30" />
-
-        <!-- VERTICAL STABILISER (FIN): from above, only a thin strip along the centre. -->
+        <!-- VERTICAL STABILISERS (FINS): from above, each fin is a thin strip. -->
         <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
-          <rect class="hit" x="328" y="120" width="224" height="20" />
-          <path class="shape" d="M 330 130 L 440 125 L 548 127 L 548 133 L 440 135 Z" />
+          <rect class="hit" x="376" y="93" width="148" height="18" />
+          <rect class="hit" x="376" y="149" width="148" height="18" />
+          <polygon class="shape" points="380,103 518,99 520,104 382,107" />
+          <polygon class="shape" points="380,157 518,161 520,156 382,153" />
         </g>
       </svg>
     </figure>

@@ -1,0 +1,178 @@
+<!doctype html>
+<!--
+  ===========================================================================
+  AIRCRAFT FAMILIARISATION TRAINING: index.html
+
+  This file holds the STRUCTURE of the page (what is on it).
+    - style.css decides how it LOOKS.
+    - app.js decides how it BEHAVES (what happens when you click things).
+
+  The page has two "screens" that live in this one file:
+    1. The welcome screen (shown first).
+    2. The main learning area (hidden until "Start Learning" is clicked).
+  app.js switches between them by adding or removing the "hidden" attribute.
+  ===========================================================================
+-->
+<html lang="en">
+<head>
+  <!-- Tells the browser which character set to use (so symbols display correctly). -->
+  <meta charset="utf-8">
+
+  <!-- Makes the page fit the width of phones and tablets instead of zooming out. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- The text shown on the browser tab. -->
+  <title>Aircraft Familiarisation Training</title>
+
+  <!-- Load our stylesheet. The path is relative: style.css sits in the same folder. -->
+  <link rel="stylesheet" href="style.css">
+
+  <!--
+    Load our JavaScript. "defer" means: download it now, but only run it once
+    the whole page has been read. That way app.js can find every element below.
+  -->
+  <script src="app.js" defer></script>
+</head>
+<body>
+
+  <!-- =====================================================================
+       TOP BAR
+       A thin navy bar shown on both screens. It holds the link back to the
+       portal's module page (every item in this portal has one).
+       ===================================================================== -->
+  <header class="top-bar">
+    <a class="back-link" href="../../../module.html?m=flight">&larr; Principles of Flight</a>
+    <span class="top-bar-title">Aircraft Familiarisation Training</span>
+  </header>
+
+
+  <!-- =====================================================================
+       SCREEN 1: WELCOME SCREEN
+       Shown when the page first opens.
+       ===================================================================== -->
+  <main id="welcome-screen" class="welcome">
+    <div class="welcome-card">
+      <!-- Small label above the title. -->
+      <p class="welcome-eyebrow">Interactive Learning Module</p>
+
+      <!-- Main title of the application. -->
+      <h1 class="welcome-title">Aircraft Familiarisation Training</h1>
+
+      <!-- Short explanation of what the trainee will learn. -->
+      <p class="welcome-text">
+        Welcome, trainee. This module introduces the main parts of an aircraft
+        in plain English. No aviation background is needed. You will work
+        through three short modules in order: the main aircraft parts, how a
+        wing is built, and the engine and tail. Each module unlocks when you
+        complete the one before it.
+      </p>
+
+      <!-- A short list of what is coming, so the trainee knows what to expect. -->
+      <ul class="welcome-list">
+        <li>Module 1: Aircraft Parts</li>
+        <li>Module 2: Wing Structure</li>
+        <li>Module 3: Engine and Tail</li>
+      </ul>
+
+      <!-- The button that takes the trainee into the main learning area.
+           app.js listens for clicks on this button using its id. -->
+      <button type="button" id="start-button" class="button button-primary button-large">
+        Start Learning
+      </button>
+
+      <!-- A reminder that nothing is saved (this portal never stores trainee data). -->
+      <p class="welcome-note">Your progress is not saved. Reloading the page starts again from the beginning.</p>
+    </div>
+  </main>
+
+
+  <!-- =====================================================================
+       SCREEN 2: MAIN LEARNING AREA
+       The "hidden" attribute keeps this out of sight until app.js removes it.
+       ===================================================================== -->
+  <div id="learning-screen" class="learning" hidden>
+
+    <!-- ---------------------------------------------------------------
+         PROGRESS BAR
+         The outer box is the grey track; the inner box is the navy fill.
+         app.js changes the fill's width (0% to 100%).
+         role="progressbar" and the aria-* values let screen readers
+         announce the progress too.
+         --------------------------------------------------------------- -->
+    <section class="progress-section" aria-label="Overall progress">
+      <div class="progress-label">
+        <span>Your progress</span>
+        <!-- app.js writes the percentage into this span. -->
+        <span id="progress-percent">0%</span>
+      </div>
+      <div id="progress-track" class="progress-track"
+           role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"
+           aria-label="Training progress">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+    </section>
+
+
+    <!-- ---------------------------------------------------------------
+         MODULE NAVIGATION PANEL
+         Three buttons, one per module. app.js builds them from a list,
+         so the <ol> starts empty here. (Keeping the module names in one
+         place in app.js means you only edit them once.)
+         --------------------------------------------------------------- -->
+    <nav class="module-nav" aria-label="Training modules">
+      <ol id="module-list" class="module-list"></ol>
+    </nav>
+
+
+    <!-- ---------------------------------------------------------------
+         TWO-COLUMN AREA
+         Left/centre: the main content area (where activities will load).
+         Right: the learning panel (topic name, explanation, feedback).
+         On narrow screens the panel moves underneath (see style.css).
+         --------------------------------------------------------------- -->
+    <div class="workspace">
+
+      <!-- MAIN CONTENT AREA -->
+      <main class="content-area" aria-labelledby="content-heading">
+        <!-- app.js updates the heading and text when a module is chosen. -->
+        <h2 id="content-heading" class="content-heading">Choose a module to begin</h2>
+        <div id="content-body" class="content-body">
+          <p class="placeholder">Select <strong>Module 1: Aircraft Parts</strong> from the list above to start.</p>
+        </div>
+
+        <!-- Button to mark the current module complete. Hidden until a
+             module is open. This is what unlocks the next module. -->
+        <button type="button" id="complete-button" class="button button-primary" hidden>
+          Mark Module as Complete
+        </button>
+      </main>
+
+      <!-- LEARNING PANEL (right side)
+           aria-live="polite" asks screen readers to read out changes here. -->
+      <aside class="learning-panel" aria-labelledby="panel-topic" aria-live="polite">
+        <p class="panel-label">Current topic</p>
+        <h2 id="panel-topic" class="panel-topic">No topic selected</h2>
+
+        <p class="panel-label">What this is about</p>
+        <p id="panel-explanation" class="panel-explanation">
+          Pick a module to see a short, plain-English explanation here.
+        </p>
+
+        <!-- Encouraging message box. Hidden until there is something to say. -->
+        <p id="panel-message" class="panel-message" hidden></p>
+      </aside>
+    </div>
+  </div>
+
+
+  <!-- =====================================================================
+       FOOTER
+       Always visible at the bottom. app.js keeps both lines up to date.
+       ===================================================================== -->
+  <footer class="footer">
+    <span id="footer-module">Module 1 of 3</span>
+    <span id="footer-progress">Progress: 0% Complete</span>
+  </footer>
+
+</body>
+</html>

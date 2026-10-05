@@ -1,0 +1,463 @@
+/* ===========================================================================
+   AIRCRAFT FAMILIARISATION TRAINING: style.css
+
+   This file controls how the page LOOKS: colours, fonts, spacing, layout.
+
+   How CSS works, in one sentence: a "selector" (like .footer) picks some
+   elements on the page, and the lines inside { } set their appearance.
+   =========================================================================== */
+
+
+/* ---------------------------------------------------------------------------
+   1. COLOUR PALETTE (CSS VARIABLES)
+   We store every colour once here as a "variable" (names start with --).
+   Everywhere else uses var(--name). To change a colour, change it here only.
+   Palette: navy blue, white and light grey.
+   --------------------------------------------------------------------------- */
+:root {
+  /* Tells the browser this page supports both light and dark themes. */
+  color-scheme: light dark;
+
+  --navy: #14284b;          /* main brand colour: top bar, buttons, progress fill */
+  --navy-dark: #0c1a33;     /* darker navy for button hover */
+  --navy-soft: #e6ebf3;     /* very pale navy tint for highlights */
+  --page-bg: #eef0f3;       /* light grey page background */
+  --surface: #ffffff;       /* white cards and panels */
+  --border: #d3d8e0;        /* light grey borders */
+  --text: #1a1f29;          /* main text (almost black) */
+  --text-muted: #525a68;    /* secondary text (grey) */
+  --on-navy: #ffffff;       /* text that sits on navy backgrounds */
+  --track: #d9dde4;         /* empty part of the progress bar */
+  --success-bg: #e3f2e8;    /* encouraging message background (soft green) */
+  --success-text: #1d5b34;  /* encouraging message text */
+  --focus: #3b6fd4;         /* outline shown when using the keyboard */
+
+  --radius: 10px;           /* how rounded the corners are */
+}
+
+/* DARK THEME
+   If the trainee's device is set to dark mode, these values replace the ones
+   above. Navy stays as the accent but becomes a little lighter so it can be
+   seen on a dark background. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navy: #7f9fd9;
+    --navy-dark: #a3bbe6;
+    --navy-soft: #1d2a42;
+    --page-bg: #10141b;
+    --surface: #1a2029;
+    --border: #2f3846;
+    --text: #e9edf3;
+    --text-muted: #a8b1bf;
+    --on-navy: #0c1424;
+    --track: #2b3340;
+    --success-bg: #173523;
+    --success-text: #9fe0b6;
+    --focus: #9ab8ff;
+  }
+
+  /* The top bar keeps a deep navy in dark mode so it still feels "navy". */
+  .top-bar { background: #0b1730; }
+}
+
+
+/* ---------------------------------------------------------------------------
+   2. BASE STYLES
+   Sensible defaults for the whole page.
+   --------------------------------------------------------------------------- */
+
+/* Make width/height include padding and borders. This makes layout much
+   easier to predict, so almost every project starts with this line. */
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  /* min-height plus flex column lets the footer sit at the bottom. */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--page-bg);
+  color: var(--text);
+  /* System fonts: look native on every device and need no download. */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  /* Large readable base size: 18px. Everything in "rem" scales from this. */
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+h1, h2 { line-height: 1.25; margin: 0; }
+
+/* The "hidden" attribute must always win, even over display rules below. */
+[hidden] { display: none !important; }
+
+/* A clear outline when moving around with the Tab key (accessibility). */
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+
+/* ---------------------------------------------------------------------------
+   3. BUTTONS
+   One shared look for every button, plus variations.
+   --------------------------------------------------------------------------- */
+.button {
+  font: inherit;               /* use the page font, not the browser default */
+  font-weight: 600;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;             /* shows the hand pointer on hover */
+  min-height: 48px;            /* comfortable size to tap on a tablet */
+}
+
+.button-primary {
+  background: var(--navy);
+  color: var(--on-navy);
+}
+.button-primary:hover { background: var(--navy-dark); }
+
+.button-large {
+  font-size: 1.25rem;
+  padding: 0.9rem 2.2rem;
+}
+
+
+/* ---------------------------------------------------------------------------
+   4. TOP BAR
+   --------------------------------------------------------------------------- */
+.top-bar {
+  display: flex;
+  flex-wrap: wrap;             /* lets items drop to a new line on small screens */
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #14284b;         /* always navy, in light and dark mode */
+  color: #ffffff;
+}
+
+.back-link {
+  color: #ffffff;
+  font-size: 1rem;
+  text-decoration: none;
+}
+.back-link:hover { text-decoration: underline; }
+
+.top-bar-title {
+  font-weight: 600;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+
+/* ---------------------------------------------------------------------------
+   5. WELCOME SCREEN
+   A centred white card on the grey background.
+   --------------------------------------------------------------------------- */
+.welcome {
+  flex: 1;                     /* fill the space between top bar and footer */
+  display: flex;
+  align-items: center;         /* centre the card vertically */
+  justify-content: center;     /* centre the card horizontally */
+  padding: 2rem 1rem;
+}
+
+.welcome-card {
+  width: 100%;
+  max-width: 760px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-top: 6px solid var(--navy);   /* navy stripe across the top */
+  border-radius: var(--radius);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 18px rgba(12, 26, 51, 0.08);
+}
+
+.welcome-eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--navy);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.95rem;
+}
+
+.welcome-title {
+  /* clamp(min, preferred, max): the title grows with the screen but stays
+     between 2rem and 2.75rem. */
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  color: var(--text);
+  margin-bottom: 1.25rem;
+}
+
+.welcome-text {
+  margin: 0 auto 1.25rem;
+  max-width: 60ch;             /* keep lines short enough to read easily */
+  color: var(--text-muted);
+  text-align: left;
+}
+
+.welcome-list {
+  display: inline-block;
+  text-align: left;
+  margin: 0 0 1.75rem;
+  padding-left: 1.25rem;
+  font-weight: 600;
+}
+
+/* Put the Start button on its own line, centred under the list. */
+#start-button {
+  display: block;
+  margin: 0 auto;
+}
+
+.welcome-note {
+  margin: 1.25rem 0 0;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+
+/* ---------------------------------------------------------------------------
+   6. MAIN LEARNING AREA (overall container)
+   --------------------------------------------------------------------------- */
+.learning {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;              /* centre the area on wide screens */
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;                /* space between progress, nav and workspace */
+}
+
+
+/* ---------------------------------------------------------------------------
+   7. PROGRESS BAR
+   --------------------------------------------------------------------------- */
+.progress-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* The grey track. */
+.progress-track {
+  height: 16px;
+  background: var(--track);
+  border-radius: 999px;        /* very large radius = fully rounded ends */
+  overflow: hidden;            /* keeps the fill inside the rounded track */
+}
+
+/* The navy fill. app.js sets its width. "transition" animates the change. */
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--navy);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+
+/* ---------------------------------------------------------------------------
+   8. MODULE NAVIGATION PANEL
+   Three module buttons side by side (they wrap on small screens).
+   --------------------------------------------------------------------------- */
+.module-list {
+  list-style: none;            /* remove the default 1. 2. 3. numbers */
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* "auto-fit" + "minmax" = as many columns as fit, each at least 220px.
+     On a laptop that is 3 across; on a narrow tablet it may wrap. */
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+/* Each module button. */
+.module-button {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  text-align: left;
+  font: inherit;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.module-button:hover { border-color: var(--navy); }
+
+/* The small "Module 1" line and the status line under the title. */
+.module-number {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.module-title { font-weight: 600; font-size: 1.1rem; }
+.module-status { font-size: 0.9rem; color: var(--text-muted); }
+
+/* The module that is currently open: navy border and pale tint. */
+.module-button.is-active {
+  border-color: var(--navy);
+  background: var(--navy-soft);
+}
+
+/* A completed module: a green status line. */
+.module-button.is-complete .module-status {
+  color: var(--success-text);
+  font-weight: 600;
+}
+
+/* A locked module: greyed out, and the cursor shows it can't be clicked.
+   (The button is also "disabled" in app.js, so clicks do nothing.) */
+.module-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  border-style: dashed;
+}
+.module-button:disabled:hover { border-color: var(--border); }
+
+
+/* ---------------------------------------------------------------------------
+   9. WORKSPACE: CONTENT AREA + LEARNING PANEL
+   A two-column grid: the content area gets about two thirds of the width,
+   the learning panel the remaining third.
+   --------------------------------------------------------------------------- */
+.workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* Shared card look for both columns. */
+.content-area,
+.learning-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+}
+
+/* MAIN CONTENT AREA */
+.content-area {
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.content-heading { font-size: 1.6rem; }
+
+/* The box where activities will load later. For now it shows placeholder text. */
+.content-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  padding: 1.5rem;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--page-bg);
+  text-align: center;
+}
+
+.placeholder {
+  margin: 0;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+/* Keep the "Mark complete" button at its natural width, aligned left. */
+#complete-button { align-self: flex-start; }
+
+/* LEARNING PANEL */
+.learning-panel {
+  border-top: 6px solid var(--navy);
+}
+
+.panel-label {
+  margin: 0 0 0.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.panel-topic {
+  font-size: 1.4rem;
+  color: var(--navy);
+  margin-bottom: 1.25rem;
+}
+
+.panel-explanation { margin: 0 0 1.25rem; }
+
+/* Encouraging message: a soft green box with a left stripe. */
+.panel-message {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  background: var(--success-bg);
+  color: var(--success-text);
+  border-left: 5px solid currentColor;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+
+/* ---------------------------------------------------------------------------
+   10. FOOTER
+   --------------------------------------------------------------------------- */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 1.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+
+/* ---------------------------------------------------------------------------
+   11. RESPONSIVE LAYOUT (TABLETS AND PHONES)
+   "@media (max-width: 860px)" means: only use these rules when the screen is
+   860 pixels wide or less (portrait tablets and phones).
+   --------------------------------------------------------------------------- */
+@media (max-width: 860px) {
+  /* Stack the learning panel underneath the content area. */
+  .workspace { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  /* Small screens: less padding so content has room to breathe. */
+  .learning { padding: 1rem; }
+  .welcome-card { padding: 1.75rem 1.25rem; }
+  .content-area, .learning-panel { padding: 1.1rem; }
+  .top-bar, .footer { padding-left: 1rem; padding-right: 1rem; }
+  /* Let module buttons shrink below 220px so nothing scrolls sideways. */
+  .module-list { grid-template-columns: 1fr; }
+}

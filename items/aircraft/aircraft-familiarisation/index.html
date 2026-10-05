@@ -211,7 +211,7 @@
 
       <!-- ===== SIDE VIEW ===== -->
       <figure class="diagram">
-        <figcaption class="diagram-caption">Side view</figcaption>
+        <figcaption class="diagram-caption">Side view <span class="diagram-note">(the elevators only show in the top view)</span></figcaption>
         <svg class="aircraft-svg" viewBox="70 34 720 262" role="group" aria-label="Side view of an aircraft">
 
           <!-- The ground (decoration). -->
@@ -220,6 +220,13 @@
           <!-- VERTICAL STABILISER (FIN): the tall upright surface at the back. -->
           <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
             <path class="shape" d="M 628 144 L 690 42 L 734 42 L 748 126 Z" />
+          </g>
+
+          <!-- RUDDER (control surface): the hinged strip along the back edge
+               of the fin. Control surfaces have class="part control" so
+               style.css can give them their own colour. -->
+          <g class="part control" data-part="rudder" tabindex="0" role="button">
+            <path class="shape" d="M 719 50 L 735 50 L 747 118 L 731 120 Z" />
           </g>
 
           <!-- FUSELAGE: the long main body. The back end (tail cone) curves upward. -->
@@ -257,6 +264,18 @@
             <path class="shape" d="M 320 182 L 460 182 L 580 262 L 545 268 Z" />
           </g>
 
+          <!-- FLAPS (control surface): the inner part of the wing's back
+               (trailing) edge, closest to the body. -->
+          <g class="part control" data-part="flaps" tabindex="0" role="button">
+            <path class="shape" d="M 466 186 L 520 222 L 513 232 L 459 196 Z" />
+          </g>
+
+          <!-- AILERONS (control surface): the outer part of the wing's back
+               edge, closest to the wing tip. -->
+          <g class="part control" data-part="ailerons" tabindex="0" role="button">
+            <path class="shape" d="M 526 226 L 568 254 L 561 264 L 519 236 Z" />
+          </g>
+
           <!-- ENGINE: the pod hanging under the wing, plus the pylon that holds it. -->
           <g class="part" data-part="engine" tabindex="0" role="button">
             <rect class="shape" x="342" y="194" width="46" height="16" />
@@ -267,10 +286,12 @@
 
           <!-- LANDING GEAR: the nose wheel and the main wheels.
                The see-through "hit" rectangles make these thin parts
-               easier to tap on a tablet. -->
+               easier to tap on a tablet. The one around the main wheels
+               stays below the wing, so it doesn't cover the flaps and
+               ailerons. -->
           <g class="part" data-part="landing-gear" tabindex="0" role="button">
             <rect class="hit" x="138" y="196" width="44" height="80" />
-            <rect class="hit" x="470" y="196" width="60" height="92" />
+            <rect class="hit" x="472" y="254" width="56" height="34" />
             <rect class="shape" x="156" y="198" width="8" height="50" />
             <circle class="shape" cx="160" cy="262" r="12" />
             <rect class="shape" x="496" y="198" width="8" height="60" />
@@ -285,7 +306,7 @@
            fuselage runs along y = 165, and each shape on one side has a
            mirror-image partner on the other (y becomes 330 - y). -->
       <figure class="diagram">
-        <figcaption class="diagram-caption">Top view <span class="diagram-note">(the landing gear is underneath, so it only shows in the side view)</span></figcaption>
+        <figcaption class="diagram-caption">Top view <span class="diagram-note">(the landing gear and the rudder only show in the side view)</span></figcaption>
         <svg class="aircraft-svg" viewBox="70 8 720 314" role="group" aria-label="Top view of an aircraft">
 
           <!-- ENGINES: drawn first, because from above each engine hangs
@@ -301,10 +322,28 @@
             <path class="shape" d="M 320 193 L 500 312 L 530 312 L 460 193 Z" />
           </g>
 
+          <!-- FLAPS (control surface): inner back edge of each wing. -->
+          <g class="part control" data-part="flaps" tabindex="0" role="button">
+            <path class="shape" d="M 437 135 L 461 135 L 491 85 L 467 85 Z" />
+            <path class="shape" d="M 437 195 L 461 195 L 491 245 L 467 245 Z" />
+          </g>
+
+          <!-- AILERONS (control surface): outer back edge of each wing. -->
+          <g class="part control" data-part="ailerons" tabindex="0" role="button">
+            <path class="shape" d="M 477 78 L 495 78 L 522 32 L 506 32 Z" />
+            <path class="shape" d="M 477 252 L 495 252 L 522 298 L 506 298 Z" />
+          </g>
+
           <!-- HORIZONTAL STABILISERS: the two small wings at the tail. -->
           <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
             <path class="shape" d="M 670 146 L 735 80 L 758 80 L 744 152 Z" />
             <path class="shape" d="M 670 184 L 735 250 L 758 250 L 744 178 Z" />
+          </g>
+
+          <!-- ELEVATORS (control surface): back edge of each horizontal stabiliser. -->
+          <g class="part control" data-part="elevators" tabindex="0" role="button">
+            <path class="shape" d="M 732 150 L 744 150 L 757 84 L 745 84 Z" />
+            <path class="shape" d="M 732 180 L 744 180 L 757 246 L 745 246 Z" />
           </g>
 
           <!-- FUSELAGE: the long body, narrowing toward the tail. -->
@@ -333,11 +372,13 @@
       <!-- Feedback after an answer in the parts check (hints and "Correct!"). -->
       <p class="activity-feedback" data-role="feedback" hidden></p>
 
-      <!-- Name buttons for every part (explore step only). They do the same
-           as clicking the diagram, and show which parts have been explored. -->
-      <ul class="part-chips" data-role="chips"></ul>
+      <!-- Name buttons for every part (explore step only), in two groups:
+           "Main parts" and "Control surfaces". app.js builds them. They do
+           the same as clicking the diagram, and show which parts have been
+           explored. -->
+      <div class="chip-groups" data-role="chips"></div>
 
-      <!-- "3 of 7 parts explored" or "Question 2 of 7". -->
+      <!-- "3 of 11 parts explored" or "Question 2 of 11". -->
       <p class="activity-count" data-role="count"></p>
 
       <!-- Buttons that appear at the right moments. -->

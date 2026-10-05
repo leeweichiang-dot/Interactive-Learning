@@ -1,6 +1,7 @@
 /*
- * Renders the portal pages from window.CATALOGUE (see catalogue.js).
- * The page to render is chosen by <body data-page="home|module">.
+ * Renders the portal pages from window.CATALOGUE (see catalogue.js), with the
+ * trainee's own progress from tracker.js and portal/summary.js.
+ * The page to render is chosen by <body data-page="home|module|progress">.
  */
 (function () {
   "use strict";
@@ -16,11 +17,16 @@
   const modules = catalogue.modules || [];
   const items = catalogue.items || [];
 
+  // This trainee's progress; empty if tracker.js didn't load.
+  const progress = window.Tracker ? window.Tracker.load() : { trainee: {}, items: {} };
+  const summary = window.ProgressSummary ? window.ProgressSummary.summarise(progress.items) : null;
+
   checkCatalogue();
 
   const page = document.body.dataset.page;
   if (page === "home") renderHome();
   if (page === "module") renderModule();
+  if (page === "progress") renderProgress();
 
   // Pages
 
@@ -35,11 +41,14 @@
 
     shown.forEach(function (mod) {
       const count = visibleItems(mod.id).length;
+      const modSummary = moduleSummary(mod.id);
+      const done = modSummary ? modSummary.done : 0;
       const card = el("a", { className: "card", href: moduleHref(mod) }, [
         mod.code ? el("span", { className: "eyebrow", text: mod.code }) : null,
         el("h2", { className: "card-title", text: mod.title }),
         mod.description ? el("p", { className: "card-text", text: mod.description }) : null,
-        el("span", { className: "card-meta", text: count === 1 ? "1 item" : count + " items" })
+        el("span", { className: "card-meta", text: (count === 1 ? "1 item" : count + " items") + (done ? " · " + done + " done" : "") }),
+        done ? meter(modSummary.completion, done + " of " + modSummary.total + " done") : null
       ]);
       list.append(el("li", {}, [card]));
     });
@@ -60,11 +69,12 @@
     }
 
     document.title = mod.title;
-    content.append(
+    // Built with el() so a missing code or description is skipped, not shown as "null".
+    content.append(el("div", {}, [
       mod.code ? el("p", { className: "eyebrow", text: mod.code }) : null,
       el("h1", { text: mod.title }),
       mod.description ? el("p", { className: "lead", text: mod.description }) : null
-    );
+    ]));
 
     const modItems = visibleItems(mod.id);
     if (modItems.length === 0) {
@@ -82,13 +92,180 @@
           el("a", { className: "card", href: itemHref(item) }, [
             el("span", { className: "badge", text: type.label }),
             el("h3", { className: "card-title", text: item.title }),
-            item.summary ? el("p", { className: "card-text", text: item.summary }) : null
+            item.summary ? el("p", { className: "card-text", text: item.summary }) : null,
+            statusLine(itemSummary(item))
           ])
         ]));
       });
 
       content.append(el("section", {}, [el("h2", { text: type.heading }), list]));
     });
+  }
+
+  function renderProgress() {
+    const content = document.getElementById("content");
+    const Tracker = window.Tracker;
+
+    if (!Tracker || !summary) {
+      content.append(notice("Progress tracking couldn't load on this page."));
+      return;
+    }
+    if (!Tracker.available()) {
+      content.append(notice("This browser isn't saving progress, so there's nothing to show. " +
+        "This can happen when the pages are opened straight from disk in some browsers; ask your instructor for the web link."));
+    }
+
+    // Name and class, so the instructor can match the file to the trainee.
+    const nameInput = el("input", { id: "trainee-name" });
+    const groupInput = el("input", { id: "trainee-group" });
+    nameInput.value = progress.trainee.name || "";
+    groupInput.value = progress.trainee.group || "";
+    nameInput.autocomplete = "name";
+    [nameInput, groupInput].forEach(function (input) {
+      input.addEventListener("input", function () { Tracker.setTrainee(nameInput.value, groupInput.value); });
+    });
+
+    content.append(el("section", {}, [
+      el("h2", { text: "About you" }),
+      el("div", { className: "form-row" }, [
+        el("label", { className: "field" }, [el("span", { text: "Name" }), nameInput]),
+        el("label", { className: "field" }, [el("span", { text: "Class or group" }), groupInput])
+      ]),
+      el("p", { className: "hint", text: "Used only to label your progress file. It stays on this device." })
+    ]));
+
+    // Overview
+    content.append(el("section", {}, [
+      el("h2", { text: "Overview" }),
+      el("div", { className: "stats" }, [
+        stat(summary.done + " / " + summary.total, "items done"),
+        stat(summary.quizScore == null ? "–" : summary.quizScore + "%", "average score"),
+        stat(String(summary.topics.filter(function (t) { return t.score < window.ProgressSummary.STRONG; }).length), "topics to work on")
+      ])
+    ]));
+
+    // Weak topics first: they're the point of the page.
+    const weak = summary.topics.filter(function (t) { return t.score < window.ProgressSummary.STRONG; });
+    const topicSection = el("section", {}, [el("h2", { text: "Topics to work on" })]);
+    if (summary.topics.length === 0) {
+      topicSection.append(el("p", { className: "hint", text: "Answer some questions in a quiz or activity to see how you're doing on each topic." }));
+    } else if (weak.length === 0) {
+      topicSection.append(el("p", { className: "hint", text: "Nothing stands out: every topic is at " + window.ProgressSummary.STRONG + "% or better on your latest answers." }));
+    } else {
+      const list = el("ul", { className: "topic-list" });
+      weak.forEach(function (t) {
+        list.append(el("li", { className: "topic" }, [
+          el("div", { className: "topic-head" }, [
+            el("span", { className: "topic-name", text: t.name }),
+            scoreChip(t.score)
+          ]),
+          el("span", { className: "hint", text: t.module.title + " · " + t.right + " of " + t.total + " right · practise with " }),
+          inlineLinks(t.items)
+        ]));
+      });
+      topicSection.append(list);
+    }
+    content.append(topicSection);
+
+    // Each module
+    const modSection = el("section", {}, [el("h2", { text: "By module" })]);
+    summary.modules.forEach(function (m) {
+      if (m.total === 0) return;
+      const rows = el("ul", { className: "status-list" });
+      m.items.forEach(function (i) {
+        rows.append(el("li", {}, [
+          el("a", { href: itemHref(i.item), text: i.item.title }),
+          statusLine(i)
+        ]));
+      });
+      modSection.append(el("div", { className: "panel" }, [
+        el("h3", { className: "card-title", text: m.module.title }),
+        meter(m.completion, m.done + " of " + m.total + " done" + (m.quizScore == null ? "" : " · average score " + m.quizScore + "%")),
+        rows
+      ]));
+    });
+    content.append(modSection);
+
+    // Hand in
+    const message = el("p", { className: "hint", text: "" });
+    message.setAttribute("role", "status");
+    const downloadButton = el("button", { className: "button primary", text: "Download my progress file" });
+    downloadButton.type = "button";
+    downloadButton.addEventListener("click", function () {
+      if (!nameInput.value.trim()) {
+        message.textContent = "Add your name first, so your instructor knows whose file it is.";
+        nameInput.focus();
+        return;
+      }
+      Tracker.setTrainee(nameInput.value, groupInput.value);
+      Tracker.download();
+      message.textContent = "Downloaded. Hand the file to your instructor the way they asked (for example, upload it to the LMS).";
+    });
+    const clearButton = el("button", { className: "button", text: "Clear my progress" });
+    clearButton.type = "button";
+    clearButton.addEventListener("click", function () {
+      if (!confirm("Clear all progress saved on this device? This can't be undone.")) return;
+      Tracker.clear();
+      location.reload();
+    });
+    content.append(el("section", {}, [
+      el("h2", { text: "Hand in your progress" }),
+      el("p", { className: "hint", text: "Your progress is saved only in this browser. To share it, download the file and give it to your instructor." }),
+      el("div", { className: "actions" }, [downloadButton, clearButton]),
+      message
+    ]));
+  }
+
+  // Progress helpers
+
+  function moduleSummary(moduleId) {
+    if (!summary) return null;
+    return summary.modules.find(function (m) { return m.module.id === moduleId; }) || null;
+  }
+
+  function itemSummary(item) {
+    if (!summary) return null;
+    return summary.items.find(function (i) { return i.item === item; }) || null;
+  }
+
+  function statusLine(info) {
+    if (!info || info.status === "none") return null;
+    if (info.latest != null) {
+      return el("span", { className: "status" }, [
+        scoreChip(info.latest),
+        el("span", { text: " " + info.right + " of " + info.answered + " right" })
+      ]);
+    }
+    return el("span", { className: "status status-" + info.status, text: info.status === "done" ? "✓ Done" : "Started" });
+  }
+
+  function scoreChip(pct) {
+    return el("span", { className: "score score-" + window.ProgressSummary.band(pct), text: pct + "%" });
+  }
+
+  function meter(pct, label) {
+    const bar = el("span", { className: "meter-fill" });
+    bar.style.width = (pct || 0) + "%";
+    return el("span", { className: "meter-wrap" }, [
+      el("span", { className: "meter", attrs: { "aria-hidden": "true" } }, [bar]),
+      el("span", { className: "meter-label", text: label })
+    ]);
+  }
+
+  function stat(value, label) {
+    return el("div", { className: "stat" }, [
+      el("span", { className: "stat-value", text: value }),
+      el("span", { className: "stat-label", text: label })
+    ]);
+  }
+
+  function inlineLinks(list) {
+    const span = el("span", { className: "hint" });
+    list.forEach(function (item, i) {
+      if (i > 0) span.append(", ");
+      span.append(el("a", { href: itemHref(item), text: item.title }));
+    });
+    return span;
   }
 
   // Catalogue helpers
@@ -137,7 +314,9 @@
     const node = document.createElement(tag);
     if (props.className) node.className = props.className;
     if (props.href) node.href = props.href;
+    if (props.id) node.id = props.id;
     if (props.text) node.textContent = props.text;
+    Object.keys(props.attrs || {}).forEach(function (name) { node.setAttribute(name, props.attrs[name]); });
     (children || []).forEach(function (child) {
       if (child) node.append(child);
     });

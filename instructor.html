@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Class overview</title>
+  <link rel="stylesheet" href="portal/portal.css">
+  <script src="catalogue.js" defer></script>
+  <script src="portal/summary.js" defer></script>
+  <script src="portal/sample-class.js" defer></script>
+  <script src="portal/instructor.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <a class="site-name" href="index.html">Interactive Learning</a>
+      <nav class="site-nav" aria-label="Main">
+        <a href="progress.html">My progress</a>
+        <a href="instructor.html" aria-current="page">Instructor</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <a class="breadcrumb" href="index.html">&larr; All modules</a>
+    <noscript><p class="notice">This page needs JavaScript turned on.</p></noscript>
+    <h1>Class overview</h1>
+    <p class="lead">Add the progress files your trainees download from <em>My progress</em> to see how the class is doing and where to focus.
+      Files are read in this browser only: nothing is uploaded or kept after you close the page.</p>
+
+    <section class="panel import" id="import">
+      <div class="dropzone" id="dropzone">
+        <p><strong>Drop progress files here</strong> or</p>
+        <div class="actions">
+          <label class="button primary">
+            Choose files…
+            <input type="file" id="files" accept=".json,application/json" multiple class="visually-hidden">
+          </label>
+          <button type="button" class="button" id="sample">Try with sample class</button>
+          <button type="button" class="button" id="clear" hidden>Clear</button>
+        </div>
+      </div>
+      <p class="hint" id="import-status" role="status"></p>
+      <ul class="errors" id="import-errors"></ul>
+    </section>
+
+    <div id="dashboard"></div>
+  </main>
+</body>
+</html>

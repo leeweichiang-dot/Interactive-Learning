@@ -64,7 +64,7 @@ window.CATALOGUE = {
       module: "sample",
       type: "quiz",
       title: "Binary Check-up",
-      summary: "Five quick questions with instant feedback. Nothing is saved."
+      summary: "Five quick questions with instant feedback."
     },
     {
       id: "cut-the-thrust",

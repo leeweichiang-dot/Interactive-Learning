@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cut the Thrust: Clean vs Defective Aircraft</title>
+  <script src="../../../tracker.js" data-module="flight" data-item="cut-the-thrust" data-type="tool"></script>
   <style>
     /* =====================================================================
        COLOURS AND THEME
@@ -771,7 +772,7 @@
         </div>
       </nav>
       <p class="session-score" aria-live="polite">Session score <strong id="t-score">0</strong> points
-        <span class="breakdown" id="t-score-breakdown">Not saved: it resets when you leave the page.</span></p>
+        <span class="breakdown" id="t-score-breakdown">Resets when you leave the page. Your answers are saved under My progress.</span></p>
     </div>
 
     <!-- ===================== QR CODE (start screen only) ===================== -->
@@ -1250,7 +1251,7 @@
     </div>
 
     <p class="disclaimer">Illustrative values – not aircraft data. Simple teaching formulas are used, and time runs faster than real life.
-      Training scores stay on this page only: nothing is saved or sent anywhere, and they reset when you reload or close it.</p>
+      Points reset when you reload or close the page. Your answers are saved on this device only, under My progress on the portal; nothing is sent anywhere.</p>
   </main>
 
   <script>
@@ -3674,7 +3675,9 @@
        Predict First, Mystery Aircraft and Fix & Verify. They drive the two
        simulators above through window.FW_SIM and window.HELI_SIM, and work
        for whichever aircraft (Fixed-wing or Helicopter) is selected.
-       The score lives only in this page: nothing is saved or sent anywhere.
+       The points live only in this page. Each answer is also sent to the
+       portal's tracker (../../../tracker.js), which saves it on this device
+       for My progress (see T3b). Nothing is sent anywhere.
        ======================================================================= */
     (function () {
       "use strict";
@@ -4013,8 +4016,30 @@
       function addPoints(act, n) {
         score[act] = Math.max(0, score[act] + n);
         $("t-score").textContent = score.predict + score.mystery + score.fix;
-        $("t-score-breakdown").textContent = "Predict " + score.predict + " · Mystery " + score.mystery + " · Fix " + score.fix +
-          " · not saved";
+        $("t-score-breakdown").textContent = "Predict " + score.predict + " · Mystery " + score.mystery + " · Fix " + score.fix;
+      }
+
+      /* ---------------------------------------------------------------------
+         T3b. SAVE ANSWERS FOR MY PROGRESS (on this device only)
+         Each answer is { q, topic, correct }. Its latest answer is what counts,
+         so each question name includes the aircraft and the defect.
+         --------------------------------------------------------------------- */
+
+      const TOPICS = {
+        force: "Which force changes most",
+        report: "Matching defects to pilot reports",
+        diagnose: "Diagnosing defects",
+        order: "Ranking fixes by performance gain"
+      };
+
+      function track(answers) {
+        if (!window.Tracker || answers.length === 0) return;
+        const right = answers.filter(function (a) { return a.correct; }).length;
+        window.Tracker.quizResult(right, answers.length, answers);
+      }
+
+      function question(text) {
+        return T().label + " · " + text;
       }
 
       /* ---------------------------------------------------------------------
@@ -4213,6 +4238,13 @@
         const points = (forceRight ? POINTS.predictRight : 0) + (reportRight ? POINTS.predictRight : 0);
         A.points += points;
         addPoints("predict", points);
+        const situation = sc.id === "cut"
+          ? (kind() === "fixed" ? "thrust cut" : "collective lowered")
+          : sim().defects.find(function (d) { return d.id === sc.id; }).name;
+        track([
+          { q: question(situation + ": which force changes most"), topic: TOPICS.force, correct: forceRight },
+          { q: question(situation + ": what the pilot reports"), topic: TOPICS.report, correct: reportRight }
+        ]);
 
         // Force explanation: what changed most, why, and what happens next.
         const f = {};
@@ -4331,6 +4363,13 @@
         const total = Math.max(0, right * POINTS.mysteryRight + wrong * POINTS.mysteryWrong + bonus);
         A.result = { rows: rows, right: right, wrong: wrong, missed: missed, perfect: perfect, unused: unused, bonus: bonus, total: total };
         addPoints("mystery", total);
+        // One answer per defect that was there, and one for not ticking any that weren't.
+        const answers = A.defects.map(function (x) {
+          const d = sim().defects.find(function (d) { return d.id === x.id; });
+          return { q: question("diagnose " + d.name), topic: TOPICS.diagnose, correct: Boolean(A.picked[x.id]) };
+        });
+        answers.push({ q: question("diagnosis with no false alarms"), topic: TOPICS.diagnose, correct: wrong === 0 });
+        track(answers);
         // Show the real Hangar Condition and the defect markers again.
         document.body.classList.remove("t-secret");
       }
@@ -4513,6 +4552,9 @@
         A.points += points;
         addPoints("fix", points);
         A.result = { right: right, marks: marks, points: points };
+        track(A.order.map(function (id, k) {
+          return { q: question("place the fix: " + shortName(id)), topic: TOPICS.order, correct: marks[k] };
+        }));
       }
 
       function moveItem(id, dir) {

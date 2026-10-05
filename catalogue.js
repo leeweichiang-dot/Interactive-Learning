@@ -37,7 +37,7 @@ window.CATALOGUE = {
     {
       id: "aircraft",
       title: "Aircraft Familiarisation",
-      description: "Learn the main parts of an aircraft, how the fuselage and wings are built, and the engine and tail, in plain English."
+      description: "Learn the main parts of an aircraft, how the fuselage and wings are built, and the engine and empennage (tail), in plain English."
     }
   ],
 
@@ -75,7 +75,7 @@ window.CATALOGUE = {
       module: "aircraft",
       type: "lesson",
       title: "Aircraft Familiarisation Training",
-      summary: "Three short modules in order: aircraft parts, fuselage and wing structure, and engine and tail."
+      summary: "Three short modules in order: aircraft parts, fuselage and wing structure, and engine and empennage."
     }
   ]
 };

@@ -5,7 +5,7 @@
      - switching from the welcome screen to the learning area
      - building the module buttons and locking/unlocking them
      - showing each module's content and updating the learning panel
-     - running the diagram activities for Modules 1 and 2 (sections 11-13)
+     - running the diagram activities for Modules 1, 2 and 3 (sections 11-14)
      - updating the progress bar and footer
 
    Nothing is saved. All progress lives in memory, so reloading the page
@@ -27,9 +27,9 @@
      explanation  a plain-English summary shown in the learning panel
    and then ONE of these:
      activity     a function that builds the module's interactive activity
-                  inside the main content area (Modules 1 and 2 have one)
+                  inside the main content area (all three modules have one)
      placeholder  text shown in the main content area until an activity
-                  is built (Module 3, for now)
+                  is built (handy when adding a new module)
    --------------------------------------------------------------------------- */
 const MODULES = [
   {
@@ -54,12 +54,15 @@ const MODULES = [
     activity: buildStructureActivity
   },
   {
-    title: "Engine and Tail",
-    placeholder: "Engine and Tail learning activity will load here.",
+    title: "Engine and Empennage",
     explanation:
-      "The engine creates the push (thrust) that moves the aircraft forward. " +
-      "The tail has an upright fin and two small horizontal wings. Together " +
-      "they stop the aircraft swinging side to side or pitching up and down."
+      "The engine makes the push (thrust) that moves the aircraft forward. A " +
+      "jet engine works in four steps: suck, squeeze, bang, blow. The " +
+      "empennage (say \"em-PEN-ij\") is the whole tail: the fixed fin and " +
+      "horizontal stabilisers keep the aircraft steady, and the hinged " +
+      "rudder and elevators steer it.",
+    // buildEngineActivity is in section 14.
+    activity: buildEngineActivity
   }
 ];
 
@@ -323,9 +326,9 @@ function startLearning() {
 
 
 /* ===========================================================================
-   11. SHARED DIAGRAM ACTIVITY (used by Modules 1 and 2)
+   11. SHARED DIAGRAM ACTIVITY (used by Modules 1, 2 and 3)
 
-   Modules 1 and 2 work the same way, so they share this code. Only their
+   All three modules work the same way, so they share this code. Only their
    pictures and their list of parts are different. The trainee works
    through two steps:
      Step 1, Explore:     click each part on the pictures to read what it is.
@@ -357,7 +360,8 @@ function shuffled(list) {
    buildDiagramActivity(container, config)
    Builds the activity inside "container" (the main content area).
    "config" is an object describing one module's activity:
-     moduleIndex          which module this is (0 = Module 1, 1 = Module 2)
+     moduleIndex          which module this is (0 = Module 1, 1 = Module 2,
+                          2 = Module 3)
      diagramsTemplateId   id of the <template> holding the pictures
      parts                the list of parts (see the module sections below)
      groups               the groups of name buttons, in order. Each has an
@@ -1052,8 +1056,192 @@ function buildStructureActivity(container) {
 }
 
 
+/* ===========================================================================
+   14. MODULE 3 ACTIVITY: ENGINE AND EMPENNAGE
+   Pictures: <template id="engine-diagrams"> in index.html.
+   Same fields as AIRCRAFT_PARTS in section 12.
+   =========================================================================== */
+const ENGINE_PARTS = [
+  // ----- Engine (a turbofan, the type used on most airliners) -----
+  {
+    id: "pylon",
+    group: "engine",
+    name: "Pylon",
+    explanation:
+      "The pylon is the strong mount that hangs the engine under the wing. " +
+      "It carries the engine's weight and its push (thrust) into the wing " +
+      "structure. Fuel pipes, wiring and controls pass through it between " +
+      "the wing and the engine.",
+    short: "the strong mount that hangs the engine from the wing.",
+    hint: "Look above the engine for the mount that joins it to the wing."
+  },
+  {
+    id: "nacelle",
+    group: "engine",
+    name: "Nacelle",
+    explanation:
+      "The nacelle is the smooth, streamlined casing around the engine. Its " +
+      "panels, called cowlings, open on hinges so engineers can reach the " +
+      "engine for inspection and maintenance. Here it is cut open so you can " +
+      "see inside.",
+    short: "the streamlined casing (cowlings) around the engine.",
+    hint: "Look for the outer casing wrapped around the whole engine, above and below."
+  },
+  {
+    id: "fan",
+    group: "engine",
+    name: "Fan",
+    explanation:
+      "The fan is the large set of blades at the front. It sucks in a huge " +
+      "amount of air: this is \"suck\". Most of that air flows around the " +
+      "outside of the engine's core and makes most of the thrust; the rest " +
+      "goes into the core.",
+    short: "the big front blades that suck air in (suck).",
+    hint: "Look at the very front of the engine for the large blades and the pointed spinner."
+  },
+  {
+    id: "compressor",
+    group: "engine",
+    name: "Compressor",
+    explanation:
+      "The compressor is many rows of smaller blades behind the fan. They " +
+      "squeeze the air into a smaller and smaller space, so it becomes high " +
+      "pressure: this is \"squeeze\".",
+    short: "rows of blades that squeeze the air (squeeze).",
+    hint: "Look just behind the fan for rows of blades that get smaller toward the back."
+  },
+  {
+    id: "combustion-chamber",
+    group: "engine",
+    name: "Combustion chamber",
+    explanation:
+      "In the combustion chamber, fuel is sprayed into the squeezed air and " +
+      "burned. This makes very hot gas that expands fast: this is \"bang\". " +
+      "It is the hottest part of the engine.",
+    short: "where fuel is burned in the squeezed air (bang).",
+    hint: "Look in the middle of the engine core, where the flame is."
+  },
+  {
+    id: "turbine",
+    group: "engine",
+    name: "Turbine",
+    explanation:
+      "The hot gas rushes through the turbine blades and spins them, like " +
+      "wind spinning a windmill. The turbine is joined by a shaft to the fan " +
+      "and compressor at the front, so it keeps them turning.",
+    short: "blades spun by the hot gas, which drive the fan and compressor.",
+    hint: "Look behind the combustion chamber for rows of blades that get bigger again."
+  },
+  {
+    id: "exhaust-nozzle",
+    group: "engine",
+    name: "Exhaust nozzle",
+    explanation:
+      "The exhaust nozzle at the back shapes the hot gas into a fast jet as " +
+      "it leaves the engine: this is \"blow\". Pushing the gas backwards " +
+      "pushes the aircraft forwards.",
+    short: "where the hot gas leaves the engine as a fast jet (blow).",
+    hint: "Look at the very back of the engine, where the hot gas leaves."
+  },
+
+  // ----- Empennage (the whole tail): fixed parts -----
+  {
+    id: "tail-cone",
+    group: "empennage",
+    name: "Tail cone",
+    explanation:
+      "The tail cone is the narrowing back end of the fuselage. The fin and " +
+      "the horizontal stabilisers are attached to it. On many airliners it " +
+      "also holds a small extra engine, the APU (auxiliary power unit), " +
+      "which supplies power on the ground.",
+    short: "the narrowing back end of the fuselage that carries the tail.",
+    hint: "Look for the narrowing back end of the body."
+  },
+  {
+    id: "vertical-stabiliser",
+    group: "empennage",
+    name: "Vertical stabiliser (fin)",
+    explanation:
+      "The vertical stabiliser, or fin, is the tall upright surface. It keeps " +
+      "the aircraft pointing straight and stops it swinging from side to " +
+      "side. Inside, it is built like a wing: spars run up it, ribs run " +
+      "across it, and skin covers them (the dashed lines in the side view).",
+    short: "the tall upright surface that keeps the aircraft pointing straight.",
+    hint: "Look for the tall upright surface: big in the side view, a thin strip in the top view."
+  },
+  {
+    id: "horizontal-stabiliser",
+    group: "empennage",
+    name: "Horizontal stabiliser",
+    explanation:
+      "The horizontal stabilisers are the two small wings at the tail. They " +
+      "stop the nose bobbing up and down. Like the fin, each one is built " +
+      "like a small wing, with spars, ribs and skin, and is attached to the " +
+      "tail cone.",
+    short: "the small flat wings that stop the nose bobbing up and down.",
+    hint: "Look for the small flat wings at the tail: clearest in the top view."
+  },
+
+  // ----- Empennage control surfaces: hinged panels -----
+  {
+    id: "rudder",
+    group: "empennage-control",
+    name: "Rudder",
+    explanation:
+      "The rudder is the hinged panel on the back edge of the fin, attached " +
+      "to the fin's rear spar. Moving it left or right swings the nose left " +
+      "or right (yaw). On airliners it is moved by hydraulic actuators: " +
+      "rams pushed by high-pressure fluid.",
+    short: "it swings the nose left or right (yaw).",
+    hint: "In the side view, look along the back edge of the fin."
+  },
+  {
+    id: "elevators",
+    group: "empennage-control",
+    name: "Elevators",
+    explanation:
+      "The elevators are the hinged panels on the back edge of the horizontal " +
+      "stabilisers, attached to their rear spars. Moving them up points the " +
+      "nose up; moving them down points the nose down (pitch).",
+    short: "they point the nose up or down (pitch).",
+    hint: "In the top view, look along the back edge of the small flat wings."
+  }
+];
+
+const ENGINE_PART_GROUPS = [
+  { id: "engine", title: "Engine (turbofan)" },
+  { id: "empennage", title: "Empennage (tail)" },
+  { id: "empennage-control", title: "Empennage control surfaces (hinged panels)", swatch: true }
+];
+
+function buildEngineActivity(container) {
+  buildDiagramActivity(container, {
+    moduleIndex: 2,
+    diagramsTemplateId: "engine-diagrams",
+    parts: ENGINE_PARTS,
+    groups: ENGINE_PART_GROUPS,
+    exploreInstructions:
+      "Click or tap each part of the engine and the empennage (tail) on the " +
+      "pictures, or use the name buttons, to find out what it does. Parts " +
+      "you have explored turn green.",
+    checkInstructions:
+      "Find each part on any of the pictures. If you pick the wrong one, you " +
+      "will get a hint. Nothing is saved.",
+    checkExplanation:
+      "Use what you learned in Step 1. Find each part of the engine and the " +
+      "empennage on the pictures.",
+    summary:
+      "You can now name the parts of a turbofan engine in the order the air " +
+      "meets them (fan, compressor, combustion chamber, turbine and exhaust " +
+      "nozzle: suck, squeeze, bang, blow), the pylon and nacelle around it, " +
+      "and the parts of the empennage: tail cone, fin, horizontal " +
+      "stabilisers, rudder and elevators."
+  });
+}
+
+
 /* ---------------------------------------------------------------------------
-   14. CONNECT EVERYTHING (runs once when the page loads)
+   15. CONNECT EVERYTHING (runs once when the page loads)
    "addEventListener" means: when this event happens, run this function.
    --------------------------------------------------------------------------- */
 startButton.addEventListener("click", startLearning);

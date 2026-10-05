@@ -33,6 +33,11 @@ window.CATALOGUE = {
       id: "flight",
       title: "Principles of Flight",
       description: "How lift, weight, thrust and drag work together, explained in plain English for maintenance trainees."
+    },
+    {
+      id: "aircraft",
+      title: "Aircraft Familiarisation",
+      description: "Learn the main parts of an aircraft, how a wing is built, and the engine and tail, in plain English."
     }
   ],
 
@@ -67,10 +72,10 @@ window.CATALOGUE = {
     },
     {
       id: "aircraft-familiarisation",
-      module: "flight",
+      module: "aircraft",
       type: "lesson",
       title: "Aircraft Familiarisation Training",
-      summary: "Three modules in order: aircraft parts, wing structure, and engine and tail. Each unlocks when the one before is complete."
+      summary: "Three short modules in order: aircraft parts, wing structure, and engine and tail."
     }
   ]
 };

@@ -70,7 +70,18 @@
 
   function setTrainee(name, group) {
     const data = load();
+    const id = data.trainee && data.trainee.id;
     data.trainee = { name: String(name || "").trim(), group: String(group || "").trim() };
+    if (id) data.trainee.id = id;
+    save(data);
+  }
+
+  // Optional trainee ID, set by items with their own sign-in (the aircraft
+  // training). It goes into the progress file so instructors can match it.
+  function setTraineeId(id) {
+    const data = load();
+    if (!data.trainee) data.trainee = { name: "", group: "" };
+    data.trainee.id = String(id || "").trim();
     save(data);
   }
 
@@ -101,6 +112,7 @@
     load: load,
     available: available,
     setTrainee: setTrainee,
+    setTraineeId: setTraineeId,
     clear: clear,
     download: download,
     complete: function () {},

@@ -2,16 +2,21 @@
    AIRCRAFT FAMILIARISATION TRAINING: app.js
 
    This file controls how the page BEHAVES:
+     - signing the trainee in and restoring their saved progress (section 15)
      - switching from the welcome screen to the learning area
      - building the module buttons and showing which modules are done
      - showing each module's content and updating the learning panel
      - running the diagram activities for Modules 1, 2 and 3 (sections 11-14)
      - updating the progress bar and footer
+     - saving each Parts Check score and showing a pass or review message
+       (section 16)
 
-   The page itself keeps its progress in memory, so reloading it starts
-   again from the beginning. Each Parts Check result, and finishing all the
-   modules, is also sent to the portal's tracker (../../../tracker.js), which
-   saves it on this device for the trainee's My progress page.
+   Each trainee's completed modules and highest Parts Check scores are saved
+   in this browser (localStorage) under their trainee ID, so they can carry
+   on where they left off; the instructor dashboard (dashboard.html) reads
+   them too. Each Parts Check result, and finishing all the modules, is also
+   sent to the portal's tracker (../../../tracker.js), which saves it on this
+   device for the trainee's My progress page.
    =========================================================================== */
 
 // "use strict" asks the browser to point out common mistakes as errors.
@@ -245,6 +250,8 @@ function completeCurrentModule() {
 
   completedModules.add(currentIndex);
   completeButton.hidden = true;
+  // Save the finished module under the trainee's ID (section 15).
+  recordModuleComplete(currentIndex);
 
   // Pick an encouraging message depending on whether there is more to do.
   if (completedModules.size < MODULES.length) {
@@ -304,9 +311,11 @@ function updateProgress() {
   // Math.round removes the decimals (e.g. 33.333... becomes 33).
   const percent = Math.round((completedModules.size / MODULES.length) * 100);
 
-  // Progress bar: set the fill width and the number beside it.
+  // Progress bar: set the fill width and the text beside it.
   progressFill.style.width = percent + "%";
-  progressPercent.textContent = percent + "%";
+  // e.g. "1 of 3 modules completed, 33%".
+  progressPercent.textContent =
+    completedModules.size + " of " + MODULES.length + " modules completed, " + percent + "%";
   progressTrack.setAttribute("aria-valuenow", percent);
 
   // Footer, "Module X of 3": the open module, or Module 1 if none is open yet.
@@ -417,6 +426,7 @@ function buildDiagramActivity(container, config) {
   const exploreBtn    = getRole("explore-again");
   const retryBtn      = getRole("retry");
   const nextModuleBtn = getRole("next-module");
+  const scoreMessage  = getRole("score-message");   // pass/review box (section 16)
   // Every clickable part in every picture. Most parts appear in more than
   // one picture, with the same data-part name each time.
   const partShapes    = container.querySelectorAll(".part");
@@ -532,6 +542,7 @@ function buildDiagramActivity(container, config) {
     exploreBtn.hidden = true;
     retryBtn.hidden = true;
     nextModuleBtn.hidden = true;
+    scoreMessage.hidden = true;   // hide the last score while exploring again
 
     refresh();
   }
@@ -579,6 +590,7 @@ function buildDiagramActivity(container, config) {
     exploreBtn.hidden = true;
     retryBtn.hidden = true;
     nextModuleBtn.hidden = true;
+    scoreMessage.hidden = true;   // hide the last score while retaking the check
 
     showPanelTopic("Parts Check", config.checkExplanation);
     hidePanelMessage();
@@ -655,6 +667,11 @@ function buildDiagramActivity(container, config) {
     if (window.Tracker) {
       window.Tracker.quizResult(firstTryCorrect, parts.length, checkAnswers);
     }
+
+    // Save the score as a percentage under the trainee's ID (keeping only
+    // their highest), then show the green or amber message (section 16).
+    const result = saveQuizScore(config.moduleIndex, firstTryCorrect, parts.length);
+    showScoreMessage(scoreMessage, result, !nextModule);
 
     // Complete the module the first time; afterwards this is just revision.
     if (!completedModules.has(config.moduleIndex)) {
@@ -1249,8 +1266,330 @@ function buildEngineActivity(container) {
 }
 
 
+/* ===========================================================================
+   15. TRAINEE LOGIN AND SAVED PROGRESS (new)
+
+   The first time a trainee opens this page they see the login screen. They
+   type their full name and trainee ID and click Begin Training. We save
+   them in localStorage (storage built into the browser that keeps data
+   after the page is closed) and show the welcome screen.
+
+   On a return visit we find the saved trainee ID, skip the login screen,
+   put back their completed modules and go straight to the learning area.
+
+   localStorage only stores text, so we turn our data into text with
+   JSON.stringify when saving, and back into an object with JSON.parse when
+   loading. Everything stays in this browser on this device: nothing is
+   sent anywhere.
+
+   Two localStorage "keys" (names) are used:
+     aircraft-training-trainees    every trainee who has signed in on this
+                                   device, stored by trainee ID, e.g.
+       {
+         "S1234": {
+           id: "S1234",
+           name: "Jane Tan",
+           completed: ["Aircraft Parts"],      titles of the finished modules
+           scores: { "Aircraft Parts": 91 },   highest score (%) per module
+           lastActive: "2026-10-05T09:30:00.000Z"
+         }
+       }
+     aircraft-training-current-id  the ID of the trainee signed in now
+
+   Completed modules and scores are stored by module TITLE (from MODULES in
+   section 1), so the dashboard can show them by name. dashboard.js reads
+   the same keys and titles: if you rename a key or a module, change it in
+   dashboard.js too.
+   =========================================================================== */
+
+// The localStorage key names (see above).
+const TRAINEES_KEY   = "aircraft-training-trainees";
+const CURRENT_ID_KEY = "aircraft-training-current-id";
+
+// The trainee signed in right now (one object from the list above), or
+// null before anyone has signed in.
+let currentTrainee = null;
+
+// The login screen and the trainee badge in the top bar (see index.html).
+const loginScreen         = document.getElementById("login-screen");
+const loginForm           = document.getElementById("login-form");
+const nameInput           = document.getElementById("trainee-name");
+const idInput             = document.getElementById("trainee-id");
+const loginError          = document.getElementById("login-error");
+const traineeBadge        = document.getElementById("trainee-badge");
+const traineeBadgeName    = document.getElementById("trainee-badge-name");
+const switchTraineeButton = document.getElementById("switch-trainee-button");
+
+// Read every saved trainee. Always returns an object, even if nothing is
+// saved yet, the saved text is damaged, or the browser blocks storage
+// ("try ... catch" catches the error instead of stopping the page).
+function loadAllTrainees() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(TRAINEES_KEY));
+    // Only accept a plain object (not null, and not a list).
+    if (saved && typeof saved === "object" && !Array.isArray(saved)) {
+      return saved;
+    }
+  } catch (error) {
+    // Storage blocked or damaged: carry on with an empty list.
+  }
+  return {};
+}
+
+// Save every trainee. If the browser blocks storage, the page still works;
+// progress just won't be remembered after it is closed.
+function saveAllTrainees(allTrainees) {
+  try {
+    localStorage.setItem(TRAINEES_KEY, JSON.stringify(allTrainees));
+  } catch (error) {
+    // Storage blocked or full: nothing more we can do.
+  }
+}
+
+// Read, save or forget the ID of the trainee signed in now.
+function loadCurrentId() {
+  try {
+    return localStorage.getItem(CURRENT_ID_KEY);
+  } catch (error) {
+    return null;
+  }
+}
+function saveCurrentId(id) {
+  try {
+    localStorage.setItem(CURRENT_ID_KEY, id);
+  } catch (error) {
+    // Storage blocked: the trainee will see the login screen next time.
+  }
+}
+function forgetCurrentId() {
+  try {
+    localStorage.removeItem(CURRENT_ID_KEY);
+  } catch (error) {
+    // Storage blocked: nothing was saved anyway.
+  }
+}
+
+// Save the signed-in trainee. We load the full list first and replace only
+// this trainee's entry, so other trainees on this device are kept.
+function saveCurrentTrainee() {
+  if (!currentTrainee) {
+    return;
+  }
+  currentTrainee.lastActive = new Date().toISOString();
+  const allTrainees = loadAllTrainees();
+  allTrainees[currentTrainee.id] = currentTrainee;
+  saveAllTrainees(allTrainees);
+}
+
+// Tidy a typed trainee ID so the same ID always matches: remove spaces and
+// use capital letters (so " s1234 " and "S1234" are the same trainee).
+function tidyTraineeId(text) {
+  return text.replace(/\s+/g, "").toUpperCase();
+}
+
+// Sign a trainee in: find their saved record (or start a new one), remember
+// them as the current trainee, and put back their completed modules.
+function signIn(name, id) {
+  const saved = loadAllTrainees()[id];
+
+  // Start from the saved record if there is one. The "|| []" and "|| {}"
+  // parts give an empty list or object if something is missing.
+  currentTrainee = {
+    id: id,
+    name: name,
+    completed: (saved && Array.isArray(saved.completed)) ? saved.completed : [],
+    scores: (saved && saved.scores && typeof saved.scores === "object") ? saved.scores : {}
+  };
+
+  saveCurrentId(id);
+  saveCurrentTrainee();
+  restoreProgress();
+
+  // Put the name and trainee ID on the portal's progress file too (the file
+  // the trainee downloads from My progress), so the instructor dashboard
+  // can match the file to this trainee. The group (class) is left as it is.
+  // "if (window.Tracker ...)" skips this if the portal's tracker didn't load.
+  if (window.Tracker && window.Tracker.setTraineeId) {
+    const portalTrainee = window.Tracker.load().trainee || {};
+    window.Tracker.setTrainee(name, portalTrainee.group);
+    window.Tracker.setTraineeId(id);
+  }
+
+  // Show "Jane Tan (S1234)" in the top bar. textContent (not innerHTML)
+  // shows the name exactly as typed, safely.
+  traineeBadgeName.textContent = name + " (" + id + ")";
+  traineeBadge.hidden = false;
+}
+
+// Mark the trainee's saved modules as completed on the page, then refresh
+// the module buttons and the progress bar so they show it.
+function restoreProgress() {
+  completedModules.clear();
+  MODULES.forEach(function (module, index) {
+    if (currentTrainee.completed.indexOf(module.title) !== -1) {
+      completedModules.add(index);
+    }
+  });
+  updateModuleButtons();
+  updateProgress();
+}
+
+// Save a finished module (called from completeCurrentModule in section 7).
+function recordModuleComplete(index) {
+  if (!currentTrainee) {
+    return;
+  }
+  const title = MODULES[index].title;
+  if (currentTrainee.completed.indexOf(title) === -1) {
+    currentTrainee.completed.push(title);
+  }
+  saveCurrentTrainee();
+}
+
+// Show a message under the login boxes and put the cursor in the box that
+// needs fixing.
+function showLoginError(message, input) {
+  loginError.textContent = message;
+  loginError.hidden = false;
+  input.focus();
+}
+
+// Runs when Begin Training is clicked (or Enter is pressed in a box).
+function handleLoginSubmit(event) {
+  // A form normally reloads the page when submitted; this stops that.
+  event.preventDefault();
+
+  // trim() removes spaces from the start and end.
+  const name = nameInput.value.trim();
+  const id = tidyTraineeId(idInput.value);
+
+  // Check both boxes before going any further.
+  if (name === "") {
+    showLoginError("Please enter your full name.", nameInput);
+    return;
+  }
+  if (id === "") {
+    showLoginError("Please enter your trainee ID number.", idInput);
+    return;
+  }
+  // /^[A-Z0-9-]+$/ is a "regular expression": it only matches text made of
+  // capital letters, digits and hyphens (the ID is already in capitals).
+  if (!/^[A-Z0-9-]+$/.test(id)) {
+    showLoginError("Your trainee ID can only use letters, numbers and hyphens.", idInput);
+    return;
+  }
+
+  loginError.hidden = true;
+  signIn(name, id);
+
+  // Move on to the existing welcome screen.
+  loginScreen.hidden = true;
+  welcomeScreen.hidden = false;
+  startButton.focus();
+}
+
+// "Not you? Switch trainee": forget who is signed in (their saved progress
+// is kept) and reload the page, which starts again at the login screen.
+function switchTrainee() {
+  forgetCurrentId();
+  location.reload();
+}
+
+// Runs once when the page loads: decide which screen to show first.
+function showFirstScreen() {
+  const savedId = loadCurrentId();
+  const saved = savedId ? loadAllTrainees()[savedId] : null;
+
+  if (saved && typeof saved.name === "string") {
+    // A returning trainee: skip the login screen, put back their progress
+    // and go straight to the learning area.
+    signIn(saved.name, savedId);
+    loginScreen.hidden = true;
+    startLearning();
+  } else {
+    // Nobody signed in yet: the login screen is already showing, so just
+    // put the cursor in the first box.
+    nameInput.focus();
+  }
+}
+
+
+/* ===========================================================================
+   16. SCORE SAVING AFTER EACH PARTS CHECK (new)
+
+   When a Parts Check is finished, finishCheck (section 11) calls these two
+   functions:
+     saveQuizScore     works out the score as a percentage and saves it under
+                       the trainee's ID, linked to the module's title. Only
+                       the HIGHEST score for each module is kept.
+     showScoreMessage  shows the score with a green message (80% or more) or
+                       an amber one (below 80%). The existing "Try the Check
+                       Again" button lets the trainee retake the check.
+   =========================================================================== */
+
+// The pass mark, as a percentage. dashboard.js uses the same number.
+const PASS_MARK = 80;
+
+// Work out and save the score. Returns an object describing the result,
+// for showScoreMessage to display.
+function saveQuizScore(moduleIndex, correct, total) {
+  // e.g. 9 right out of 11 = 81.8..., which rounds to 82.
+  const percent = Math.round((correct / total) * 100);
+  let best = percent;
+
+  if (currentTrainee) {
+    const title = MODULES[moduleIndex].title;
+    const previous = currentTrainee.scores[title];
+
+    // Keep the old score if it was higher; otherwise save the new one.
+    // (typeof ... === "number" checks there is an old score at all.)
+    if (typeof previous === "number" && previous > percent) {
+      best = previous;
+    } else {
+      currentTrainee.scores[title] = percent;
+      saveCurrentTrainee();
+    }
+  }
+
+  return { percent: percent, best: best, correct: correct, total: total };
+}
+
+// Fill in the score box under the Parts Check and show it.
+//   box           the score box (data-role="score-message")
+//   result        the object returned by saveQuizScore
+//   isLastModule  true for the last module, which has no "next module"
+function showScoreMessage(box, result, isLastModule) {
+  const passed = result.percent >= PASS_MARK;
+
+  // The CSS class picks the colour: "is-pass" is green, "is-review" amber.
+  box.className = "score-message " + (passed ? "is-pass" : "is-review");
+  box.textContent = "";   // remove the previous message
+
+  // First line: the main message, in bold.
+  const headline = document.createElement("strong");
+  if (passed) {
+    headline.textContent = isLastModule
+      ? "Well done, you have passed the final module."
+      : "Well done, you may proceed to the next module.";
+  } else {
+    headline.textContent = "Please review the material and try again.";
+  }
+
+  // Second line: the score itself and the trainee's best so far.
+  const details = document.createElement("span");
+  details.textContent =
+    "Your score: " + result.percent + "% (" + result.correct + " of " +
+    result.total + " parts right first time). Your highest score for this " +
+    "module: " + result.best + "%.";
+
+  box.appendChild(headline);
+  box.appendChild(details);
+  box.hidden = false;
+}
+
+
 /* ---------------------------------------------------------------------------
-   15. CONNECT EVERYTHING (runs once when the page loads)
+   17. CONNECT EVERYTHING (runs once when the page loads)
    "addEventListener" means: when this event happens, run this function.
    --------------------------------------------------------------------------- */
 startButton.addEventListener("click", startLearning);
@@ -1259,3 +1598,9 @@ completeButton.addEventListener("click", completeCurrentModule);
 buildModuleButtons();   // create the three module buttons
 updateModuleButtons();  // show every module as "Not started"
 updateProgress();       // show 0% in the progress bar and footer
+
+// New: the login form, the "Switch trainee" button, and choosing the first
+// screen (login for a new trainee, or the learning area for a returning one).
+loginForm.addEventListener("submit", handleLoginSubmit);
+switchTraineeButton.addEventListener("click", switchTrainee);
+showFirstScreen();

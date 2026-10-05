@@ -166,6 +166,192 @@
 
 
   <!-- =====================================================================
+       MODULE 1 ACTIVITY TEMPLATE: AIRCRAFT PARTS
+       A <template> is never shown on its own. app.js copies ("clones") it
+       into the main content area when Module 1 is opened. Keeping the
+       markup here means the HTML file still holds the page's structure.
+
+       Elements app.js needs are marked with data-role="..." so they can
+       be found inside the copy.
+       ===================================================================== -->
+  <template id="aircraft-parts-template">
+    <div class="activity">
+
+      <!-- Which step the trainee is on, and what to do. -->
+      <p class="activity-step" data-role="step"></p>
+      <p class="activity-instructions" data-role="instructions"></p>
+
+      <!-- The "Find the ..." question shown during the parts check.
+           tabindex="-1" lets app.js move keyboard focus here. -->
+      <p class="check-prompt" data-role="prompt" tabindex="-1" hidden></p>
+
+      <!-- ---------------------------------------------------------------
+           THE AIRCRAFT DIAGRAMS (SVG): SIDE VIEW AND TOP VIEW
+           SVG draws pictures with shapes. Each picture's viewBox sets which
+           area of the drawing is shown, and the picture scales to fit any
+           screen.
+
+           The two views are lined up like a technical drawing: the nose is
+           on the left in both, and both use the same left-to-right scale
+           (x from 70 to 790), so the wing and tail sit at the same place
+           across the page in each view.
+
+           Each clickable part is a <g> (group) with class="part" and a
+           data-part name that matches an id in AIRCRAFT_PARTS in app.js.
+           tabindex="0" and role="button" let keyboard users reach and
+           press each part too.
+
+           Shapes are drawn in order, so later shapes sit on top of
+           earlier ones (the fin is drawn first, behind the body).
+           Shapes with class="deco" are decoration only and ignore clicks.
+           A part appears in both views with the same data-part name, so
+           clicking it in either view does the same thing.
+           --------------------------------------------------------------- -->
+      <div class="diagrams">
+
+      <!-- ===== SIDE VIEW ===== -->
+      <figure class="diagram">
+        <figcaption class="diagram-caption">Side view</figcaption>
+        <svg class="aircraft-svg" viewBox="70 34 720 262" role="group" aria-label="Side view of an aircraft">
+
+          <!-- The ground (decoration). -->
+          <line class="deco ground" x1="80" y1="288" x2="780" y2="288" />
+
+          <!-- VERTICAL STABILISER (FIN): the tall upright surface at the back. -->
+          <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
+            <path class="shape" d="M 628 144 L 690 42 L 734 42 L 748 126 Z" />
+          </g>
+
+          <!-- FUSELAGE: the long main body. The back end (tail cone) curves upward. -->
+          <g class="part" data-part="fuselage" tabindex="0" role="button">
+            <path class="shape" d="M 195 142 L 630 142 Q 690 140 746 118 L 754 136 Q 712 196 620 198 L 195 198 Z" />
+          </g>
+
+          <!-- Passenger windows (decoration): a row of small circles. -->
+          <g class="deco windows">
+            <circle cx="220" cy="162" r="4" /><circle cx="244" cy="162" r="4" />
+            <circle cx="268" cy="162" r="4" /><circle cx="292" cy="162" r="4" />
+            <circle cx="316" cy="162" r="4" /><circle cx="340" cy="162" r="4" />
+            <circle cx="364" cy="162" r="4" /><circle cx="388" cy="162" r="4" />
+            <circle cx="412" cy="162" r="4" /><circle cx="436" cy="162" r="4" />
+            <circle cx="460" cy="162" r="4" /><circle cx="484" cy="162" r="4" />
+            <circle cx="508" cy="162" r="4" /><circle cx="532" cy="162" r="4" />
+            <circle cx="556" cy="162" r="4" /><circle cx="580" cy="162" r="4" />
+            <circle cx="604" cy="162" r="4" />
+          </g>
+
+          <!-- COCKPIT: the rounded nose section where the pilots sit. -->
+          <g class="part" data-part="cockpit" tabindex="0" role="button">
+            <path class="shape" d="M 195 142 L 150 142 Q 92 144 82 172 Q 94 198 150 198 L 195 198 Z" />
+          </g>
+          <!-- Cockpit windscreen (decoration). -->
+          <path class="deco windscreen" d="M 100 162 L 116 151 L 150 150 L 150 161 Z" />
+
+          <!-- HORIZONTAL STABILISER: the small flat wing at the tail. -->
+          <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
+            <path class="shape" d="M 668 150 L 748 132 L 778 137 L 706 166 Z" />
+          </g>
+
+          <!-- WING: the near-side wing, angled down and back toward us. -->
+          <g class="part" data-part="wing" tabindex="0" role="button">
+            <path class="shape" d="M 320 182 L 460 182 L 580 262 L 545 268 Z" />
+          </g>
+
+          <!-- ENGINE: the pod hanging under the wing, plus the pylon that holds it. -->
+          <g class="part" data-part="engine" tabindex="0" role="button">
+            <rect class="shape" x="342" y="194" width="46" height="16" />
+            <rect class="shape" x="300" y="206" width="104" height="40" rx="18" />
+          </g>
+          <!-- Engine air intake at the front (decoration). -->
+          <ellipse class="deco intake" cx="304" cy="226" rx="6" ry="16" />
+
+          <!-- LANDING GEAR: the nose wheel and the main wheels.
+               The see-through "hit" rectangles make these thin parts
+               easier to tap on a tablet. -->
+          <g class="part" data-part="landing-gear" tabindex="0" role="button">
+            <rect class="hit" x="138" y="196" width="44" height="80" />
+            <rect class="hit" x="470" y="196" width="60" height="92" />
+            <rect class="shape" x="156" y="198" width="8" height="50" />
+            <circle class="shape" cx="160" cy="262" r="12" />
+            <rect class="shape" x="496" y="198" width="8" height="60" />
+            <circle class="shape" cx="488" cy="272" r="13" />
+            <circle class="shape" cx="512" cy="272" r="13" />
+          </g>
+        </svg>
+      </figure>
+
+      <!-- ===== TOP VIEW =====
+           Looking down on the aircraft from above. The centre line of the
+           fuselage runs along y = 165, and each shape on one side has a
+           mirror-image partner on the other (y becomes 330 - y). -->
+      <figure class="diagram">
+        <figcaption class="diagram-caption">Top view <span class="diagram-note">(the landing gear is underneath, so it only shows in the side view)</span></figcaption>
+        <svg class="aircraft-svg" viewBox="70 8 720 314" role="group" aria-label="Top view of an aircraft">
+
+          <!-- ENGINES: drawn first, because from above each engine hangs
+               underneath its wing, so the wing hides the back of the pod. -->
+          <g class="part" data-part="engine" tabindex="0" role="button">
+            <rect class="shape" x="300" y="76" width="104" height="28" rx="12" />
+            <rect class="shape" x="300" y="226" width="104" height="28" rx="12" />
+          </g>
+
+          <!-- WINGS: one on each side, swept back toward the tips. -->
+          <g class="part" data-part="wing" tabindex="0" role="button">
+            <path class="shape" d="M 320 137 L 500 18 L 530 18 L 460 137 Z" />
+            <path class="shape" d="M 320 193 L 500 312 L 530 312 L 460 193 Z" />
+          </g>
+
+          <!-- HORIZONTAL STABILISERS: the two small wings at the tail. -->
+          <g class="part" data-part="horizontal-stabiliser" tabindex="0" role="button">
+            <path class="shape" d="M 670 146 L 735 80 L 758 80 L 744 152 Z" />
+            <path class="shape" d="M 670 184 L 735 250 L 758 250 L 744 178 Z" />
+          </g>
+
+          <!-- FUSELAGE: the long body, narrowing toward the tail. -->
+          <g class="part" data-part="fuselage" tabindex="0" role="button">
+            <path class="shape" d="M 195 137 L 640 137 Q 720 145 756 159 L 756 171 Q 720 185 640 193 L 195 193 Z" />
+          </g>
+
+          <!-- COCKPIT: the rounded nose section at the front. -->
+          <g class="part" data-part="cockpit" tabindex="0" role="button">
+            <path class="shape" d="M 195 137 L 150 137 Q 92 140 82 165 Q 92 190 150 193 L 195 193 Z" />
+          </g>
+          <!-- Windscreen seen from above (decoration). -->
+          <path class="deco windscreen" d="M 116 152 L 148 146 L 148 184 L 116 178 Z" />
+
+          <!-- VERTICAL STABILISER (FIN): from above it is only a thin strip
+               along the centre of the tail. The see-through "hit" rectangle
+               makes it easier to click. -->
+          <g class="part" data-part="vertical-stabiliser" tabindex="0" role="button">
+            <rect class="hit" x="626" y="155" width="126" height="20" />
+            <path class="shape" d="M 628 165 L 690 159 L 750 161 L 750 169 L 690 171 Z" />
+          </g>
+        </svg>
+      </figure>
+      </div>
+
+      <!-- Feedback after an answer in the parts check (hints and "Correct!"). -->
+      <p class="activity-feedback" data-role="feedback" hidden></p>
+
+      <!-- Name buttons for every part (explore step only). They do the same
+           as clicking the diagram, and show which parts have been explored. -->
+      <ul class="part-chips" data-role="chips"></ul>
+
+      <!-- "3 of 7 parts explored" or "Question 2 of 7". -->
+      <p class="activity-count" data-role="count"></p>
+
+      <!-- Buttons that appear at the right moments. -->
+      <div class="activity-actions">
+        <button type="button" class="button button-primary" data-role="start-check" hidden>Start the Parts Check</button>
+        <button type="button" class="button button-secondary" data-role="explore-again" hidden>Explore Again</button>
+        <button type="button" class="button button-secondary" data-role="retry" hidden>Try the Check Again</button>
+        <button type="button" class="button button-primary" data-role="next-module" hidden>Go to Module 2: Wing Structure</button>
+      </div>
+    </div>
+  </template>
+
+
+  <!-- =====================================================================
        FOOTER
        Always visible at the bottom. app.js keeps both lines up to date.
        ===================================================================== -->

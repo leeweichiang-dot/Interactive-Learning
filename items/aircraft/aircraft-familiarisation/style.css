@@ -39,6 +39,10 @@
   --part-fill: #dfe4ec;     /* a part nobody has clicked yet */
   --part-line: #46526a;     /* outline of each part */
   --part-selected: #c3d2ec; /* the part currently selected */
+  --control-fill: #f3dcb6;  /* control surfaces (flaps, ailerons, elevators, rudder) */
+  --control-line: #8a5a14;  /* outline of control surfaces */
+  --control-done: #b5dcc2;  /* explored control surface: a deeper green than
+                               the wing, so the two stay easy to tell apart */
   --window: #46526a;        /* passenger windows and windscreen */
 
   --radius: 10px;           /* how rounded the corners are */
@@ -70,6 +74,9 @@
     --part-fill: #2a3445;
     --part-line: #9aa6b8;
     --part-selected: #34507f;
+    --control-fill: #4a3a20;
+    --control-line: #e0b867;
+    --control-done: #2b6142;
     --window: #9aa6b8;
   }
 
@@ -540,6 +547,14 @@ h1, h2 { line-height: 1.25; margin: 0; }
   transition: fill 0.2s ease;
 }
 
+/* Control surfaces (the hinged parts that move) get their own colour, so
+   they stand out from the fixed structure. This rule comes BEFORE the
+   is-done and is-selected rules below, so those colours still win. */
+.part.control .shape {
+  fill: var(--control-fill);
+  stroke: var(--control-line);
+}
+
 /* See-through tap areas around thin parts (landing gear). */
 .part .hit { fill: transparent; stroke: none; }
 
@@ -558,8 +573,14 @@ h1, h2 { line-height: 1.25; margin: 0; }
   stroke: var(--success-text);
 }
 
+/* An explored or found control surface: a deeper green.
+   (.part.control.is-selected is listed in the next rule so that the
+   "selected" colour still wins over this one.) */
+.part.control.is-done .shape { fill: var(--control-done); }
+
 /* The part currently selected: pale navy with a thick outline. */
-.part.is-selected .shape {
+.part.is-selected .shape,
+.part.control.is-selected .shape {
   fill: var(--part-selected);
   stroke: var(--navy);
   stroke-width: 4;
@@ -572,6 +593,35 @@ h1, h2 { line-height: 1.25; margin: 0; }
 .ground { stroke: var(--border); stroke-width: 3; stroke-dasharray: 10 8; }
 
 /* --- Part name buttons ("chips") under the diagram --- */
+
+/* The two groups ("Main parts", "Control surfaces"), one above the other. */
+.chip-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* The small heading above each group. */
+.chip-group-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 0 0 0.4rem;
+}
+
+/* A small colour swatch beside the "Control surfaces" heading, matching
+   the colour of the control surfaces on the diagrams. */
+.chip-group-title .swatch {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-right: 0.35em;
+  vertical-align: -0.1em;
+  border-radius: 3px;
+  background: var(--control-fill);
+  border: 2px solid var(--control-line);
+}
+
 .part-chips {
   list-style: none;
   margin: 0;

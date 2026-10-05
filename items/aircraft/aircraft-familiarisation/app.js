@@ -37,7 +37,8 @@ const MODULES = [
     explanation:
       "An aircraft is made of a few main parts. The long body in the middle is " +
       "the fuselage. The wings stick out from each side. The engines push the " +
-      "aircraft forward, and the tail at the back keeps it steady.",
+      "aircraft forward, and the tail at the back keeps it steady. Hinged " +
+      "panels called control surfaces move to steer the aircraft.",
     // buildAircraftPartsActivity is written further down this file (section 11).
     // JavaScript lets you refer to a function before the line that defines it.
     activity: buildAircraftPartsActivity
@@ -337,6 +338,8 @@ function startLearning() {
 /* ---------------------------------------------------------------------------
    11a. PART DATA
    One object per part. The id must match a data-part="..." in index.html.
+     group        "main" for the fixed main parts, or "control" for the
+                  control surfaces (the hinged parts that move to steer)
      name         shown in the learning panel and on the name buttons
      explanation  what the part is and does, in plain English
      short        a one-line reminder, used in the "Correct!" message
@@ -345,6 +348,7 @@ function startLearning() {
 const AIRCRAFT_PARTS = [
   {
     id: "fuselage",
+    group: "main",
     name: "Fuselage",
     explanation:
       "The fuselage is the main body of the aircraft: a long tube that carries " +
@@ -356,6 +360,7 @@ const AIRCRAFT_PARTS = [
   },
   {
     id: "cockpit",
+    group: "main",
     name: "Cockpit",
     explanation:
       "The cockpit, also called the flight deck, is at the very front of the " +
@@ -366,17 +371,21 @@ const AIRCRAFT_PARTS = [
   },
   {
     id: "wing",
+    group: "main",
     name: "Wing",
     explanation:
       "The wings stick out from each side of the fuselage. As the aircraft " +
       "moves forward, air flowing over the wings creates lift: the upward " +
       "force that holds the aircraft in the air. Most airliners also carry " +
-      "their fuel inside the wings. You will look inside a wing in Module 2.",
+      "their fuel inside the wings. Hinged panels on the back edge, the " +
+      "flaps and ailerons, help control the aircraft. You will look inside a " +
+      "wing in Module 2.",
     short: "it creates the lift that holds the aircraft up.",
     hint: "Look for the large surface that sticks out from the side of the body."
   },
   {
     id: "engine",
+    group: "main",
     name: "Engine",
     explanation:
       "The engines push the aircraft forward. This push is called thrust. On " +
@@ -387,28 +396,30 @@ const AIRCRAFT_PARTS = [
   },
   {
     id: "horizontal-stabiliser",
+    group: "main",
     name: "Horizontal stabiliser",
     explanation:
       "The horizontal stabilisers are the two small flat wings at the tail. " +
       "They stop the nose bobbing up and down, keeping the aircraft steady. " +
-      "A hinged part on them, the elevator, lets the pilot point the nose up " +
-      "or down. You will meet it in Module 3.",
+      "The hinged panels on their back edge are the elevators.",
     short: "it stops the nose bobbing up and down.",
     hint: "Look at the very back for a small, flat, wing-like surface."
   },
   {
     id: "vertical-stabiliser",
+    group: "main",
     name: "Vertical stabiliser (fin)",
     explanation:
       "The vertical stabiliser, usually called the fin, is the tall upright " +
       "surface at the tail. It stops the aircraft swinging from side to side, " +
-      "like the feathers on an arrow. A hinged part on it, the rudder, lets " +
-      "the pilot turn the nose left or right.",
+      "like the feathers on an arrow. The hinged panel on its back edge is " +
+      "the rudder.",
     short: "it stops the aircraft swinging from side to side.",
     hint: "Look at the back for the tall surface that points straight up."
   },
   {
     id: "landing-gear",
+    group: "main",
     name: "Landing gear",
     explanation:
       "The landing gear is the set of wheels, legs and shock absorbers the " +
@@ -416,7 +427,61 @@ const AIRCRAFT_PARTS = [
       "the bump of landing. After take-off it folds up into the aircraft.",
     short: "the wheels and legs the aircraft stands and lands on.",
     hint: "Look underneath the aircraft for the wheels."
+  },
+
+  // ----- Control surfaces: hinged panels the pilot moves to steer -----
+  {
+    id: "flaps",
+    group: "control",
+    name: "Flaps",
+    explanation:
+      "Flaps are hinged panels on the back edge of each wing, close to the " +
+      "body. For take-off and landing they slide back and down. This makes " +
+      "the wing bigger and more curved, so it gives more lift at low speed " +
+      "and the aircraft can fly slowly without dropping.",
+    short: "they give extra lift at low speed, for take-off and landing.",
+    hint: "Look along the back edge of the wing, on the inner part close to the body."
+  },
+  {
+    id: "ailerons",
+    group: "control",
+    name: "Ailerons",
+    explanation:
+      "Ailerons are hinged panels on the back edge of each wing, near the " +
+      "tips. They move in opposite directions: when the left one goes up, " +
+      "the right one goes down. This tips the aircraft to one side, called " +
+      "rolling, which is how it starts a turn.",
+    short: "they roll the aircraft to one side to start a turn.",
+    hint: "Look along the back edge of the wing, on the outer part near the wing tip."
+  },
+  {
+    id: "elevators",
+    group: "control",
+    name: "Elevators",
+    explanation:
+      "The elevators are hinged panels on the back edge of the horizontal " +
+      "stabilisers. When they move up, the nose points up; when they move " +
+      "down, the nose points down. This up-and-down movement is called pitch.",
+    short: "they point the nose up or down (pitch).",
+    hint: "In the top view, look along the back edge of the small wings at the tail."
+  },
+  {
+    id: "rudder",
+    group: "control",
+    name: "Rudder",
+    explanation:
+      "The rudder is the hinged panel on the back edge of the fin. Moving it " +
+      "left or right swings the nose left or right, like the rudder on a " +
+      "boat. This side-to-side movement is called yaw.",
+    short: "it swings the nose left or right (yaw).",
+    hint: "In the side view, look along the back edge of the tall fin."
   }
+];
+
+// The two groups of name buttons, in the order they are shown.
+const PART_GROUPS = [
+  { id: "main", title: "Main parts" },
+  { id: "control", title: "Control surfaces (hinged panels that move)" }
 ];
 
 
@@ -485,17 +550,41 @@ function buildAircraftPartsActivity(container) {
   let missedThisQuestion = false;
 
 
-  // --- Build one name button ("chip") per part ---
-  AIRCRAFT_PARTS.forEach(function (part) {
-    const item = document.createElement("li");
-    const chip = document.createElement("button");
-    chip.type = "button";
-    chip.className = "part-chip";
-    chip.dataset.part = part.id;
-    chip.textContent = part.name;
-    chip.addEventListener("click", function () { handlePartChosen(part.id); });
-    item.appendChild(chip);
-    chipList.appendChild(item);
+  // --- Build the name buttons ("chips"), one group at a time ---
+  PART_GROUPS.forEach(function (group) {
+    // A heading for the group, e.g. "Main parts".
+    const title = document.createElement("p");
+    title.className = "chip-group-title";
+    title.textContent = group.title;
+    if (group.id === "control") {
+      // Add a small colour swatch matching the control surfaces' colour.
+      const swatch = document.createElement("span");
+      swatch.className = "swatch";
+      title.prepend(swatch);
+    }
+
+    // A list holding one button per part in this group.
+    const list = document.createElement("ul");
+    list.className = "part-chips";
+    AIRCRAFT_PARTS.forEach(function (part) {
+      if (part.group !== group.id) {
+        return;   // skip parts that belong to the other group
+      }
+      const item = document.createElement("li");
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.className = "part-chip";
+      chip.dataset.part = part.id;
+      chip.textContent = part.name;
+      chip.addEventListener("click", function () { handlePartChosen(part.id); });
+      item.appendChild(chip);
+      list.appendChild(item);
+    });
+
+    const wrapper = document.createElement("div");
+    wrapper.appendChild(title);
+    wrapper.appendChild(list);
+    chipList.appendChild(wrapper);
   });
 
 
@@ -637,7 +726,7 @@ function buildAircraftPartsActivity(container) {
       }
       feedback.hidden = false;
       feedback.className = "activity-feedback is-correct";
-      feedback.textContent = "Correct! That is the " + currentQuestion.name.toLowerCase() + ".";
+      feedback.textContent = "Correct! You found the " + currentQuestion.name.toLowerCase() + ".";
       showPanelMessage(
         "Well done! The " + currentQuestion.name.toLowerCase() + ": " + currentQuestion.short
       );
@@ -673,9 +762,10 @@ function buildAircraftPartsActivity(container) {
 
     showPanelTopic(
       "Aircraft Parts",
-      "You can now name the seven main parts of an aircraft: fuselage, cockpit, " +
-      "wings, engines, horizontal stabiliser, vertical stabiliser (fin) and " +
-      "landing gear."
+      "You can now name the seven main parts of an aircraft (fuselage, " +
+      "cockpit, wings, engines, horizontal stabiliser, vertical stabiliser " +
+      "and landing gear) and its four main control surfaces (flaps, " +
+      "ailerons, elevators and rudder)."
     );
 
     // Complete Module 1 the first time; afterwards this is just revision.

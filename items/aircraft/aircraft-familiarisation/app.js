@@ -1405,7 +1405,7 @@ function signIn(name, id) {
   saveCurrentTrainee();
   restoreProgress();
 
-  // Sign in to the portal too (tracker.js), so the module pages and
+  // Sign in to the portal too (tracker.js), so the portal pages and
   // My progress know who this is, and the progress file the trainee
   // downloads carries their name and ID for the instructor dashboard.
   // If the portal already has this trainee signed in, nothing changes.
@@ -1500,7 +1500,7 @@ function switchTrainee() {
 
 // Runs once when the page loads: decide which screen to show first.
 function showFirstScreen() {
-  // Who is signed in? The portal's sign-in (from a module page) decides,
+  // Who is signed in? The portal's sign-in (from the home page) decides,
   // so signing in or switching trainee there also counts here. Only if the
   // portal's tracker didn't load do we use the ID this page saved itself.
   let savedId = null;
@@ -1523,7 +1523,7 @@ function showFirstScreen() {
     loginScreen.hidden = true;
     startLearning();
   } else if (savedId && portalName) {
-    // Signed in on the module page, but new to this training: skip the
+    // Signed in on the home page, but new to this training: skip the
     // login screen and show the welcome screen first.
     signIn(portalName, savedId);
     loginScreen.hidden = true;

@@ -19,7 +19,7 @@
  * Items must keep working if this file fails to load, so guard calls with
  * `if (window.Tracker)`.
  *
- * Sign-in: module pages (and the aircraft training) ask for a name and
+ * Sign-in: the home page (and the aircraft training) ask for a name and
  * trainee ID and call Tracker.signIn(name, id). Progress belongs to whoever
  * is signed in. On a shared device each trainee's progress is kept apart:
  * signing in puts the previous trainee's progress aside under their ID and

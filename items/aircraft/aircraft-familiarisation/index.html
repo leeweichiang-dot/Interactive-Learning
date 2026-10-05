@@ -416,10 +416,12 @@
 
       <!-- ===== FUSELAGE: SIDE VIEW, SKIN PARTLY REMOVED =====
            A section of the fighter's centre fuselage. On the left the skin
-           is still on; on the right it has been removed to show the frames,
-           the heavy bulkheads and the longerons running front to back. -->
+           is still on, with a fuel tank shown dashed behind it in the lower
+           fuselage; on the right the skin has been removed to show the
+           frames, the heavy bulkheads and the longerons running front to
+           back. -->
       <figure class="diagram">
-        <figcaption class="diagram-caption">Fuselage <span class="diagram-note">(side view, part of the skin removed)</span></figcaption>
+        <figcaption class="diagram-caption">Fuselage <span class="diagram-note">(side view, part of the skin removed; dashed = fuel tank inside)</span></figcaption>
         <svg class="aircraft-svg" viewBox="20 24 520 192" role="group" aria-label="Side view of a fighter fuselage section with part of the skin removed">
 
         <!-- FRAMES: light upright hoops spaced along the body. -->
@@ -469,6 +471,13 @@
           <line x1="46" y1="82" x2="244" y2="82" />
           <line x1="46" y1="158" x2="244" y2="158" />
         </g>
+
+        <!-- FUEL TANKS (1 of 2): a tank in the lower fuselage, hidden behind the skin
+             (dashed, because it is inside). -->
+        <g class="part" data-part="fuel-tank" tabindex="0" role="button">
+          <path class="shape inside" d="M 54 164 L 244 164 L 244 192 L 54 192 Z" />
+        </g>
+        <text class="deco section-label" x="149" y="183" text-anchor="middle">Fuel</text>
         <!-- The cut ends of the section (decoration). -->
         <ellipse class="deco cut-edge" cx="40" cy="120" rx="16" ry="80" />
         <ellipse class="deco cut-edge" cx="520" cy="120" rx="16" ry="80" />
@@ -477,8 +486,8 @@
 
       <!-- ===== FUSELAGE: CROSS-SECTION =====
            Looking straight along the body, as if it had been sliced through.
-           A fighter's fuselage is packed: a fuel tank at the top and the two
-           engines side by side underneath. Centre point: (120, 120). -->
+           A fighter's fuselage is packed; here the two engines sit side by
+           side inside the frames. Centre point: (120, 120). -->
       <figure class="diagram">
         <figcaption class="diagram-caption">Fuselage <span class="diagram-note">(cross-section)</span></figcaption>
         <svg class="aircraft-svg is-compact" viewBox="6 22 228 196" role="group" aria-label="Cross-section of a fighter fuselage">
@@ -493,19 +502,13 @@
           <path class="shape" fill-rule="evenodd" d="M 18 120 a 102 84 0 1 0 204 0 a 102 84 0 1 0 -204 0 Z M 30 120 a 90 72 0 1 0 180 0 a 90 72 0 1 0 -180 0 Z" />
         </g>
 
-        <!-- FUEL TANK: fills the space at the top, above the engines. -->
-        <g class="part" data-part="fuel-tank" tabindex="0" role="button">
-          <path class="shape" d="M 70 66 Q 120 46 170 66 L 170 100 L 70 100 Z" />
-        </g>
-
         <!-- The two engines, side by side (decoration). -->
         <g class="deco engine-bays">
-          <circle cx="84" cy="146" r="30" />
-          <circle cx="156" cy="146" r="30" />
+          <circle cx="84" cy="120" r="30" />
+          <circle cx="156" cy="120" r="30" />
         </g>
-        <text class="deco section-label" x="84" y="150" text-anchor="middle">Engine</text>
-        <text class="deco section-label" x="156" y="150" text-anchor="middle">Engine</text>
-        <text class="deco section-label" x="120" y="90" text-anchor="middle">Fuel</text>
+        <text class="deco section-label" x="84" y="124" text-anchor="middle">Engine</text>
+        <text class="deco section-label" x="156" y="124" text-anchor="middle">Engine</text>
 
         <!-- LONGERONS: seen end-on, each beam is a small block in a corner. -->
         <g class="part" data-part="longerons" tabindex="0" role="button">
@@ -532,11 +535,19 @@
            removed to show the spars and ribs. The flaps and ailerons are
            hinged along the trailing (back) edge. -->
       <figure class="diagram">
-        <figcaption class="diagram-caption">Wing <span class="diagram-note">(top view, part of the skin removed)</span></figcaption>
+        <figcaption class="diagram-caption">Wing <span class="diagram-note">(top view, part of the skin removed; dashed = fuel tank between the spars)</span></figcaption>
         <svg class="aircraft-svg" viewBox="10 14 580 216" role="group" aria-label="Top view of a fighter wing with part of the skin removed">
 
         <!-- Wing outline (decoration). -->
         <path class="deco wing-outline" d="M 30 30 L 560 165 L 560 200 L 30 210 Z" />
+
+        <!-- FUEL TANKS (2 of 2): the sealed box between the front and back spars holds
+             fuel (a "wet wing"). Here, where the skin is off, it is drawn before the
+             ribs and spars so they stay on top; nearer the root it is drawn again,
+             dashed, behind the skin. -->
+        <g class="part" data-part="fuel-tank" tabindex="0" role="button">
+          <polygon class="shape inside" points="250,108 520,165.7 520,186.6 250,175.5" />
+        </g>
 
         <!-- RIBS: only a few cross-pieces, running from the front edge to the back edge. -->
         <g class="part" data-part="ribs" tabindex="0" role="button">
@@ -581,6 +592,13 @@
         <g class="part control" data-part="ailerons" tabindex="0" role="button">
           <polygon class="shape" points="320,190.4 520,194.3 520,200.8 320,204.5" />
         </g>
+
+
+        <!-- FUEL TANKS (2 of 2, continued): the same wing tank behind the skin near the root. -->
+        <g class="part" data-part="fuel-tank" tabindex="0" role="button">
+          <polygon class="shape inside" points="44,64 246,107.2 246,175.3 44,167" />
+        </g>
+        <text class="deco section-label" x="196" y="140.5" text-anchor="middle">Fuel</text>
 
         <!-- Section line A-A (decoration): shows where the cross-section on the right is cut. -->
         <g class="deco section-line">

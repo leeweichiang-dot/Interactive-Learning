@@ -31,6 +31,15 @@
   --success-bg: #e3f2e8;    /* encouraging message background (soft green) */
   --success-text: #1d5b34;  /* encouraging message text */
   --focus: #3b6fd4;         /* outline shown when using the keyboard */
+  --hint-bg: #fff3d6;       /* "not quite" hint background (soft amber) */
+  --hint-text: #6e4600;     /* "not quite" hint text */
+
+  /* Aircraft diagram (Module 1 activity) */
+  --sky: #f4f6f9;           /* diagram background */
+  --part-fill: #dfe4ec;     /* a part nobody has clicked yet */
+  --part-line: #46526a;     /* outline of each part */
+  --part-selected: #c3d2ec; /* the part currently selected */
+  --window: #46526a;        /* passenger windows and windscreen */
 
   --radius: 10px;           /* how rounded the corners are */
 }
@@ -54,6 +63,14 @@
     --success-bg: #173523;
     --success-text: #9fe0b6;
     --focus: #9ab8ff;
+    --hint-bg: #3a2a08;
+    --hint-text: #ffd27a;
+
+    --sky: #131922;
+    --part-fill: #2a3445;
+    --part-line: #9aa6b8;
+    --part-selected: #34507f;
+    --window: #9aa6b8;
   }
 
   /* The top bar keeps a deep navy in dark mode so it still feels "navy". */
@@ -116,6 +133,14 @@ h1, h2 { line-height: 1.25; margin: 0; }
   color: var(--on-navy);
 }
 .button-primary:hover { background: var(--navy-dark); }
+
+/* A quieter button: white with a navy outline. */
+.button-secondary {
+  background: var(--surface);
+  color: var(--navy);
+  border-color: var(--navy);
+}
+.button-secondary:hover { background: var(--navy-soft); }
 
 .button-large {
   font-size: 1.25rem;
@@ -427,7 +452,162 @@ h1, h2 { line-height: 1.25; margin: 0; }
 
 
 /* ---------------------------------------------------------------------------
-   10. FOOTER
+   10. MODULE 1 ACTIVITY: AIRCRAFT PARTS
+   --------------------------------------------------------------------------- */
+
+/* When an activity is loaded, the content box drops its dashed
+   "placeholder" look and simply holds the activity. */
+.content-body.has-activity {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: left;
+}
+
+.activity {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity p { margin: 0; }
+
+/* "Step 1 of 2: Explore" label. */
+.activity-step {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* The big "Find the ..." question in the parts check. */
+.check-prompt {
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  background: var(--navy-soft);
+  border-left: 5px solid var(--navy);
+  border-radius: 6px;
+}
+
+/* The box around the aircraft picture. */
+.diagram {
+  background: var(--sky);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+}
+
+/* Make the SVG fill the box width; its height follows automatically. */
+.aircraft-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* --- Parts of the aircraft --- */
+
+/* Every clickable part: a pointer cursor, and no browser focus box
+   (we draw our own highlight below instead). */
+.part { cursor: pointer; outline: none; }
+
+/* The visible shapes inside each part. */
+.part .shape {
+  fill: var(--part-fill);
+  stroke: var(--part-line);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  transition: fill 0.2s ease;
+}
+
+/* See-through tap areas around thin parts (landing gear). */
+.part .hit { fill: transparent; stroke: none; }
+
+/* Hover, or keyboard focus: a thicker navy outline. */
+.part:hover .shape,
+.part:focus-visible .shape {
+  stroke: var(--navy);
+  stroke-width: 4;
+}
+
+/* A part the trainee has already explored, or found in the check: green. */
+.part.is-done .shape {
+  fill: var(--success-bg);
+  stroke: var(--success-text);
+}
+
+/* The part currently selected: pale navy with a thick outline. */
+.part.is-selected .shape {
+  fill: var(--part-selected);
+  stroke: var(--navy);
+  stroke-width: 4;
+}
+
+/* Decoration ignores the mouse, so clicks pass through to the part below. */
+.deco { pointer-events: none; }
+.windows circle, .windscreen { fill: var(--window); }
+.intake { fill: var(--part-line); }
+.ground { stroke: var(--border); stroke-width: 3; stroke-dasharray: 10 8; }
+
+/* --- Part name buttons ("chips") under the diagram --- */
+.part-chips {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.part-chip {
+  font: inherit;
+  font-size: 1rem;
+  min-height: 44px;
+  padding: 0.4rem 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.part-chip:hover { border-color: var(--navy); }
+.part-chip.is-done {
+  border-color: var(--success-text);
+  color: var(--success-text);
+  font-weight: 600;
+}
+.part-chip[aria-pressed="true"] {
+  background: var(--navy-soft);
+  border-color: var(--navy);
+}
+
+/* --- Feedback line in the parts check --- */
+.activity-feedback {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border-left: 5px solid currentColor;
+  font-weight: 600;
+}
+.activity-feedback.is-correct { background: var(--success-bg); color: var(--success-text); }
+.activity-feedback.is-hint    { background: var(--hint-bg);    color: var(--hint-text); }
+
+.activity-count {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Row of action buttons; they wrap onto new lines on small screens. */
+.activity-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+
+/* ---------------------------------------------------------------------------
+   11. FOOTER
    --------------------------------------------------------------------------- */
 .footer {
   display: flex;
@@ -443,7 +623,7 @@ h1, h2 { line-height: 1.25; margin: 0; }
 
 
 /* ---------------------------------------------------------------------------
-   11. RESPONSIVE LAYOUT (TABLETS AND PHONES)
+   12. RESPONSIVE LAYOUT (TABLETS AND PHONES)
    "@media (max-width: 860px)" means: only use these rules when the screen is
    860 pixels wide or less (portrait tablets and phones).
    --------------------------------------------------------------------------- */

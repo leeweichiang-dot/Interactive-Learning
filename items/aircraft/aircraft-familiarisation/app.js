@@ -1405,14 +1405,13 @@ function signIn(name, id) {
   saveCurrentTrainee();
   restoreProgress();
 
-  // Put the name and trainee ID on the portal's progress file too (the file
-  // the trainee downloads from My progress), so the instructor dashboard
-  // can match the file to this trainee. The group (class) is left as it is.
+  // Sign in to the portal too (tracker.js), so the module pages and
+  // My progress know who this is, and the progress file the trainee
+  // downloads carries their name and ID for the instructor dashboard.
+  // If the portal already has this trainee signed in, nothing changes.
   // "if (window.Tracker ...)" skips this if the portal's tracker didn't load.
-  if (window.Tracker && window.Tracker.setTraineeId) {
-    const portalTrainee = window.Tracker.load().trainee || {};
-    window.Tracker.setTrainee(name, portalTrainee.group);
-    window.Tracker.setTraineeId(id);
+  if (window.Tracker && window.Tracker.signIn) {
+    window.Tracker.signIn(name, id);
   }
 
   // Show "Jane Tan (S1234)" in the top bar. textContent (not innerHTML)
@@ -1488,24 +1487,48 @@ function handleLoginSubmit(event) {
   startButton.focus();
 }
 
-// "Not you? Switch trainee": forget who is signed in (their saved progress
-// is kept) and reload the page, which starts again at the login screen.
+// "Not you? Switch trainee": forget who is signed in, here and on the
+// portal (everyone's saved progress is kept), and reload the page, which
+// starts again at the login screen.
 function switchTrainee() {
   forgetCurrentId();
+  if (window.Tracker && window.Tracker.signOut) {
+    window.Tracker.signOut();
+  }
   location.reload();
 }
 
 // Runs once when the page loads: decide which screen to show first.
 function showFirstScreen() {
-  const savedId = loadCurrentId();
+  // Who is signed in? The portal's sign-in (from a module page) decides,
+  // so signing in or switching trainee there also counts here. Only if the
+  // portal's tracker didn't load do we use the ID this page saved itself.
+  let savedId = null;
+  let portalName = "";
+  if (window.Tracker && window.Tracker.current) {
+    const portalTrainee = window.Tracker.current();   // null if nobody
+    if (portalTrainee) {
+      savedId = portalTrainee.id;
+      portalName = portalTrainee.name;
+    }
+  } else {
+    savedId = loadCurrentId();
+  }
   const saved = savedId ? loadAllTrainees()[savedId] : null;
 
   if (saved && typeof saved.name === "string") {
     // A returning trainee: skip the login screen, put back their progress
     // and go straight to the learning area.
-    signIn(saved.name, savedId);
+    signIn(portalName || saved.name, savedId);
     loginScreen.hidden = true;
     startLearning();
+  } else if (savedId && portalName) {
+    // Signed in on the module page, but new to this training: skip the
+    // login screen and show the welcome screen first.
+    signIn(portalName, savedId);
+    loginScreen.hidden = true;
+    welcomeScreen.hidden = false;
+    startButton.focus();
   } else {
     // Nobody signed in yet: the login screen is already showing, so just
     // put the cursor in the first box.

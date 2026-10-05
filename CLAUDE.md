@@ -16,12 +16,16 @@ A portal where students browse and try a growing collection of small learning it
   - Don't `fetch()` local data files (blocked on `file://`). Data lives in `.js` files that set a global, like `catalogue.js`.
 - **Progress stays on the trainee's device.** No accounts, no server, no external requests, no analytics.
   - `tracker.js` saves progress and quiz results in `localStorage` only. This is the main place student data is stored.
+  - Sign-in: each module page asks for full name + trainee ID before listing items (`Tracker.signIn` / `signOut` /
+    `current`). This is labelling, not authentication. Progress belongs to whoever is signed in: other trainees'
+    progress on the same device is kept aside under `interactive-learning-progress:<ID>`, and progress made while
+    signed out is merged into the next sign-in. The trainee ID goes into the progress file as `trainee.id`.
   - Exception: `items/aircraft/aircraft-familiarisation/` also has a trainee sign-in (name + trainee ID) and saves each
     trainee's completed modules and best Parts Check scores in its own `localStorage` keys (`aircraft-training-*`).
     Its `dashboard.html` (password-gated, client-side only, so not real security) reads those keys (trainees who used
     that same browser and device) and also reads trainees' portal progress files in memory only, working out per-module
-    scores from the `"<module title>: find the …"` question prefix. Sign-in also writes the trainee ID into the
-    tracker (`Tracker.setTraineeId`, an optional `trainee.id` in the progress file). Keep module titles, question
+    scores from the `"<module title>: find the …"` question prefix. Its own login only shows when nobody is signed in
+    to the portal; it uses `Tracker.signIn`/`signOut`, so both sign-ins stay in step. Keep module titles, question
     wording and keys in sync between its `app.js` and `dashboard.js`.
   - A trainee shares progress by downloading a file from `progress.html` and handing it in (e.g. via the LMS).
   - `instructor.html` reads those files in the browser and keeps them in memory only: it never saves or uploads them.
@@ -32,7 +36,7 @@ A portal where students browse and try a growing collection of small learning it
 
 ```
 index.html                    Home page: lists modules
-module.html?m=<module-id>     One module's items, grouped as Tools / Lessons / Quizzes
+module.html?m=<module-id>     Trainee sign-in, then one module's items, grouped as Tools / Lessons / Quizzes
 progress.html                 Trainee's own progress and weak topics; downloads their progress file
 instructor.html               Class overview built from trainees' progress files
 catalogue.js                  The list of modules and items: the only file edited to register content

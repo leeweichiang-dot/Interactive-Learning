@@ -16,8 +16,8 @@ A portal where students browse and try a growing collection of small learning it
   - Don't `fetch()` local data files (blocked on `file://`). Data lives in `.js` files that set a global, like `catalogue.js`.
 - **Progress stays on the trainee's device.** No accounts, no server, no external requests, no analytics.
   - `tracker.js` saves progress and quiz results in `localStorage` only. This is the main place student data is stored.
-  - Sign-in: each module page asks for full name + trainee ID before listing items (`Tracker.signIn` / `signOut` /
-    `current`). This is labelling, not authentication. Progress belongs to whoever is signed in: other trainees'
+  - Sign-in: the home page asks for full name + trainee ID before listing modules (`Tracker.signIn` / `signOut` /
+    `current`); a module page opened while signed out sends the trainee there and back (`index.html?next=…`). This is labelling, not authentication. Progress belongs to whoever is signed in: other trainees'
     progress on the same device is kept aside under `interactive-learning-progress:<ID>`, and progress made while
     signed out is merged into the next sign-in. The trainee ID goes into the progress file as `trainee.id`.
   - Exception: `items/aircraft/aircraft-familiarisation/` also has a trainee sign-in (name + trainee ID) and saves each
@@ -35,8 +35,8 @@ A portal where students browse and try a growing collection of small learning it
 ## Layout
 
 ```
-index.html                    Home page: lists modules
-module.html?m=<module-id>     Trainee sign-in, then one module's items, grouped as Tools / Lessons / Quizzes
+index.html                    Home page: trainee sign-in, then lists modules
+module.html?m=<module-id>     One module's items, grouped as Tools / Lessons / Quizzes
 progress.html                 Trainee's own progress and weak topics; downloads their progress file
 instructor.html               Class overview built from trainees' progress files
 catalogue.js                  The list of modules and items: the only file edited to register content

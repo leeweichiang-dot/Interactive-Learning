@@ -34,6 +34,16 @@
     const list = document.getElementById("modules");
     const shown = modules.filter(function (mod) { return !mod.hidden; });
 
+    // Sign-in comes first: a trainee who isn't signed in sees the login form
+    // instead of the modules. Skipped if this browser can't save, since the
+    // sign-in would be forgotten straight away.
+    if (signInNeeded()) {
+      list.replaceWith(signInForm());
+      return;
+    }
+    const trainee = window.Tracker && window.Tracker.current();
+    if (trainee) list.before(traineeBar(trainee));
+
     if (shown.length === 0) {
       list.replaceWith(notice("No modules yet."));
       return;
@@ -76,18 +86,13 @@
       mod.description ? el("p", { className: "lead", text: mod.description }) : null
     ]));
 
-    // Sign-in comes first: a trainee who isn't signed in sees the login form
-    // instead of the items. Skipped if this browser can't save, since the
-    // sign-in would be forgotten straight away.
-    const Tracker = window.Tracker;
-    if (Tracker && Tracker.available()) {
-      const trainee = Tracker.current();
-      if (!trainee) {
-        content.append(signInForm());
-        return;
-      }
-      content.append(traineeBar(trainee));
+    // Not signed in: sign in on the home page first, which then comes back here.
+    if (signInNeeded()) {
+      location.replace("index.html?next=" + encodeURIComponent(moduleHref(mod)));
+      return;
     }
+    const trainee = window.Tracker && window.Tracker.current();
+    if (trainee) content.append(traineeBar(trainee));
 
     const modItems = visibleItems(mod.id);
     if (modItems.length === 0) {
@@ -235,7 +240,19 @@
 
   // Sign-in
 
-  // Full name + trainee ID. Signing in reloads the page so it shows this trainee's progress.
+  // True when the trainee must sign in before seeing any module.
+  function signInNeeded() {
+    return !!(window.Tracker && window.Tracker.available() && !window.Tracker.current());
+  }
+
+  // Where to go after signing in: the module page that sent the trainee here
+  // (only a module link is accepted), or the home page.
+  function afterSignIn() {
+    const next = new URLSearchParams(location.search).get("next") || "";
+    return /^module\.html\?m=[\w-]+$/.test(next) ? next : "index.html";
+  }
+
+  // Full name + trainee ID, shown on the home page before the modules.
   function signInForm() {
     const nameInput = el("input", { id: "signin-name", attrs: { autocomplete: "name", maxlength: "80" } });
     const idInput = el("input", { id: "signin-id", attrs: { autocomplete: "off", autocapitalize: "characters", spellcheck: "false", maxlength: "30" } });
@@ -245,7 +262,7 @@
     button.type = "submit";
 
     const form = el("form", { className: "panel signin" }, [
-      el("h2", { text: "Sign in to start this module" }),
+      el("h2", { text: "Sign in to start training" }),
       el("div", { className: "form-row" }, [
         el("label", { className: "field" }, [el("span", { text: "Full name" }), nameInput]),
         el("label", { className: "field" }, [el("span", { text: "Trainee ID number" }), idInput])
@@ -273,7 +290,7 @@
         return;
       }
       window.Tracker.signIn(name, id);
-      location.reload();
+      location.href = afterSignIn();
     });
 
     setTimeout(function () { nameInput.focus(); }, 0);
@@ -286,7 +303,7 @@
     button.type = "button";
     button.addEventListener("click", function () {
       window.Tracker.signOut();
-      location.reload();
+      location.href = "index.html";
     });
     return el("p", { className: "trainee-bar" }, [
       el("span", { text: "Signed in as " + trainee.name + " (" + trainee.id + ")" }),

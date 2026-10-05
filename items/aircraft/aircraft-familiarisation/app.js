@@ -934,17 +934,6 @@ const STRUCTURE_PARTS = [
     short: "the outer covering that also carries load.",
     hint: "Look for the smooth outer covering of the body, or the outer ring of the cross-section."
   },
-  {
-    id: "fuel-tank",
-    group: "fuselage",
-    name: "Fuel tank",
-    explanation:
-      "Much of the space inside a fighter's fuselage is used for fuel tanks, " +
-      "here above the two engines. Often the structure itself is sealed so " +
-      "that the space between frames and skin holds the fuel directly.",
-    short: "the space inside the body that holds fuel.",
-    hint: "In the cross-section, look at the top, above the two engines."
-  },
 
   // ----- Wing structure -----
   {
@@ -1008,13 +997,30 @@ const STRUCTURE_PARTS = [
       "down in opposite directions on each wing to roll the aircraft.",
     short: "hinged panels on the outer back edge that roll the aircraft.",
     hint: "Look along the back edge of the wing, on the outer part near the tip."
+  },
+
+  // ----- Fuel: tanks in the wings and lower fuselage -----
+  {
+    id: "fuel-tank",
+    group: "fuel",
+    name: "Fuel tanks",
+    explanation:
+      "A fighter carries its fuel in the wings and in the lower fuselage " +
+      "(the dashed areas marked \"Fuel\"). In the wing, the box between the " +
+      "front and back spars is sealed so it holds fuel directly: this is " +
+      "called an integral tank, or a \"wet wing\". Tanks in the lower " +
+      "fuselage sit inside the structure, behind the skin. Extra tanks can " +
+      "also be hung under the wings or body.",
+    short: "they hold fuel, in the wings and the lower fuselage.",
+    hint: "Look for the dashed areas marked Fuel: inside the wing between the spars, and in the lower part of the fuselage side view."
   }
 ];
 
 const STRUCTURE_PART_GROUPS = [
   { id: "fuselage", title: "Fuselage structure" },
   { id: "wing", title: "Wing structure" },
-  { id: "wing-control", title: "Wing control surfaces (hinged panels)", swatch: true }
+  { id: "wing-control", title: "Wing control surfaces (hinged panels)", swatch: true },
+  { id: "fuel", title: "Fuel" }
 ];
 
 function buildStructureActivity(container) {
@@ -1035,10 +1041,11 @@ function buildStructureActivity(container) {
       "wing structure on the pictures.",
     summary:
       "You can now name the parts that make up a fighter's fuselage " +
-      "(frames, bulkheads, longerons, skin and fuel tank) and wing (spars, " +
-      "ribs and skin, with the flaps and ailerons hinged behind the last " +
-      "spar). Together they form a strong, light skeleton with a skin that " +
-      "shares the load."
+      "(frames, bulkheads, longerons and skin) and wing (spars, ribs and " +
+      "skin, with the flaps and ailerons hinged behind the last spar), and " +
+      "say where its fuel is carried: in the wings and the lower fuselage. " +
+      "Together they form a strong, light skeleton with a skin that shares " +
+      "the load."
   });
 }
 

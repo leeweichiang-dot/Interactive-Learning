@@ -566,3 +566,32 @@ select {
     transform: none;
   }
 }
+
+/* Sign-in (module pages) */
+
+.signin {
+  margin-top: 24px;
+  max-width: 640px;
+}
+
+.signin h2 {
+  margin-top: 0;
+}
+
+.signin-error {
+  padding: 10px 14px;
+  background: var(--mid-soft);
+  border-left: 4px solid var(--mid);
+  border-radius: 8px;
+  color: var(--mid);
+  font-weight: 600;
+}
+
+.trainee-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 16px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}

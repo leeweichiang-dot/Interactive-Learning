@@ -76,6 +76,19 @@
       mod.description ? el("p", { className: "lead", text: mod.description }) : null
     ]));
 
+    // Sign-in comes first: a trainee who isn't signed in sees the login form
+    // instead of the items. Skipped if this browser can't save, since the
+    // sign-in would be forgotten straight away.
+    const Tracker = window.Tracker;
+    if (Tracker && Tracker.available()) {
+      const trainee = Tracker.current();
+      if (!trainee) {
+        content.append(signInForm());
+        return;
+      }
+      content.append(traineeBar(trainee));
+    }
+
     const modItems = visibleItems(mod.id);
     if (modItems.length === 0) {
       content.append(notice("Nothing here yet. Check back later."));
@@ -114,6 +127,10 @@
       content.append(notice("This browser isn't saving progress, so there's nothing to show. " +
         "This can happen when the pages are opened straight from disk in some browsers; ask your instructor for the web link."));
     }
+
+    // Whose progress this is, when someone has signed in on a module page.
+    const trainee = Tracker.current();
+    if (trainee) content.append(traineeBar(trainee));
 
     // Name and class, so the instructor can match the file to the trainee.
     const nameInput = el("input", { id: "trainee-name" });
@@ -204,7 +221,7 @@
     const clearButton = el("button", { className: "button", text: "Clear my progress" });
     clearButton.type = "button";
     clearButton.addEventListener("click", function () {
-      if (!confirm("Clear all progress saved on this device? This can't be undone.")) return;
+      if (!confirm("Clear your progress saved on this device? This can't be undone.")) return;
       Tracker.clear();
       location.reload();
     });
@@ -214,6 +231,67 @@
       el("div", { className: "actions" }, [downloadButton, clearButton]),
       message
     ]));
+  }
+
+  // Sign-in
+
+  // Full name + trainee ID. Signing in reloads the page so it shows this trainee's progress.
+  function signInForm() {
+    const nameInput = el("input", { id: "signin-name", attrs: { autocomplete: "name", maxlength: "80" } });
+    const idInput = el("input", { id: "signin-id", attrs: { autocomplete: "off", autocapitalize: "characters", spellcheck: "false", maxlength: "30" } });
+    const error = el("p", { className: "signin-error", attrs: { role: "alert" } });
+    error.hidden = true;
+    const button = el("button", { className: "button primary", text: "Begin Training" });
+    button.type = "submit";
+
+    const form = el("form", { className: "panel signin" }, [
+      el("h2", { text: "Sign in to start this module" }),
+      el("div", { className: "form-row" }, [
+        el("label", { className: "field" }, [el("span", { text: "Full name" }), nameInput]),
+        el("label", { className: "field" }, [el("span", { text: "Trainee ID number" }), idInput])
+      ]),
+      error,
+      el("div", { className: "actions" }, [button]),
+      el("p", { className: "hint", text: "Your name, trainee ID and progress are saved in this browser on this device only. " +
+        "Sign in with the same trainee ID next time to carry on where you left off." })
+    ]);
+    form.noValidate = true;
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const name = nameInput.value.trim();
+      const id = window.Tracker.tidyId(idInput.value);
+      let problem = "";
+      let input = null;
+      if (!name) { problem = "Please enter your full name."; input = nameInput; }
+      else if (!id) { problem = "Please enter your trainee ID number."; input = idInput; }
+      else if (!/^[A-Z0-9-]+$/.test(id)) { problem = "Your trainee ID can only use letters, numbers and hyphens."; input = idInput; }
+      if (problem) {
+        error.textContent = problem;
+        error.hidden = false;
+        input.focus();
+        return;
+      }
+      window.Tracker.signIn(name, id);
+      location.reload();
+    });
+
+    setTimeout(function () { nameInput.focus(); }, 0);
+    return form;
+  }
+
+  // "Signed in as Jane Tan (S1234)" with a way to hand the device to someone else.
+  function traineeBar(trainee) {
+    const button = el("button", { className: "link-button", text: "Not you? Switch trainee" });
+    button.type = "button";
+    button.addEventListener("click", function () {
+      window.Tracker.signOut();
+      location.reload();
+    });
+    return el("p", { className: "trainee-bar" }, [
+      el("span", { text: "Signed in as " + trainee.name + " (" + trainee.id + ")" }),
+      button
+    ]);
   }
 
   // Progress helpers

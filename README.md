@@ -93,3 +93,17 @@ so it reaches its stall angle at a higher speed. The extra weight also slows the
 
 The extra drag is small but is there on every flight. Over many flights, a small extra fuel burn adds up to a lot of
 fuel and cost. Small defects also add together. Several "small" ones can cost as much as one big one.
+
+## Seeing how the class did
+
+Answers in Predict First, Mystery Aircraft and Fix & Verify are saved on each trainee's device and show up
+under **My progress** on the portal. At the end of the lesson, ask trainees to add their name there and
+download their progress file, then collect the files (for example through the LMS).
+
+Open **Instructor** (`instructor.html`) and add the files to see the class at a glance: who has done what,
+scores, the weakest topics and the questions most often missed, with details for each trainee. Use
+**Try with sample class** to explore it before you have real files. The files are read in your browser only;
+nothing is uploaded.
+
+Saving progress works when the portal is served from a web host, and in Chrome or Edge when it is opened
+from disk. Other browsers may not keep progress for files opened from disk.

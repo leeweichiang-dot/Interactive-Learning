@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Binary Check-up</title>
+  <script src="../../../tracker.js" data-module="sample" data-item="binary-quiz" data-type="quiz"></script>
   <style>
     :root {
       color-scheme: light dark;
@@ -93,7 +94,7 @@
   <main>
     <a class="back" href="../../../module.html?m=sample">&larr; Sample Module</a>
     <h1>Binary Check-up</h1>
-    <p class="lead">Pick an answer for each question. You'll see straight away whether it's right. Nothing is saved.</p>
+    <p class="lead">Pick an answer for each question. You'll see straight away whether it's right. Your result is saved on this device for My progress.</p>
 
     <ol id="questions"></ol>
 
@@ -107,16 +108,17 @@
     "use strict";
 
     // To write a new quiz, replace these questions. "answer" is the index of the correct option.
+    // "topic" groups questions for the progress pages, so the instructor can see weak areas.
     const QUESTIONS = [
-      { prompt: "What is binary 101 in decimal?", options: ["3", "5", "6", "101"], answer: 1,
+      { prompt: "What is binary 101 in decimal?", options: ["3", "5", "6", "101"], answer: 1, topic: "Binary to decimal",
         explain: "101 = 4 + 0 + 1 = 5." },
-      { prompt: "What is decimal 8 in binary?", options: ["100", "111", "1000", "1010"], answer: 2,
+      { prompt: "What is decimal 8 in binary?", options: ["100", "111", "1000", "1010"], answer: 2, topic: "Decimal to binary",
         explain: "8 is exactly the 8s place, so it's 1000." },
-      { prompt: "How many different values can 4 bits hold?", options: ["4", "8", "15", "16"], answer: 3,
+      { prompt: "How many different values can 4 bits hold?", options: ["4", "8", "15", "16"], answer: 3, topic: "Bits and range",
         explain: "Each bit doubles the count: 2 × 2 × 2 × 2 = 16 (from 0 to 15)." },
-      { prompt: "What is hexadecimal F in decimal?", options: ["15", "16", "6", "F isn't a number"], answer: 0,
+      { prompt: "What is hexadecimal F in decimal?", options: ["15", "16", "6", "F isn't a number"], answer: 0, topic: "Hexadecimal",
         explain: "Hex counts 0–9 then A–F, so F is 15." },
-      { prompt: "What is the largest number 8 bits can hold?", options: ["128", "255", "256", "512"], answer: 1,
+      { prompt: "What is the largest number 8 bits can hold?", options: ["128", "255", "256", "512"], answer: 1, topic: "Bits and range",
         explain: "11111111 = 128 + 64 + 32 + 16 + 8 + 4 + 2 + 1 = 255." }
     ];
 
@@ -125,11 +127,13 @@
     const scoreEl = document.getElementById("score");
     let answered = 0;
     let correct = 0;
+    let answers = [];
 
     function render() {
       list.replaceChildren();
       answered = 0;
       correct = 0;
+      answers = [];
       result.hidden = true;
 
       QUESTIONS.forEach(function (q, qi) {
@@ -176,9 +180,11 @@
 
       answered += 1;
       if (right) correct += 1;
+      answers.push({ q: q.prompt, topic: q.topic, correct: right });
       if (answered === QUESTIONS.length) {
         scoreEl.textContent = "You scored " + correct + " out of " + QUESTIONS.length + ".";
         result.hidden = false;
+        if (window.Tracker) window.Tracker.quizResult(correct, QUESTIONS.length, answers);
       }
     }
 

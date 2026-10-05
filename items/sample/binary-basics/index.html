@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Counting in Binary</title>
+  <script src="../../../tracker.js" data-module="sample" data-item="binary-basics" data-type="lesson"></script>
   <style>
     :root {
       color-scheme: light dark;
@@ -151,6 +152,7 @@
       progress.textContent = "Step " + (current + 1) + " of " + steps.length;
       prev.disabled = current === 0;
       next.disabled = current === steps.length - 1;
+      if (current === steps.length - 1 && window.Tracker) window.Tracker.complete();
     }
 
     prev.addEventListener("click", function () { show(current - 1); });

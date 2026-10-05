@@ -8,8 +8,10 @@
      - running the diagram activities for Modules 1, 2 and 3 (sections 11-14)
      - updating the progress bar and footer
 
-   Nothing is saved. All progress lives in memory, so reloading the page
-   starts again from the beginning. (This portal never stores trainee data.)
+   The page itself keeps its progress in memory, so reloading it starts
+   again from the beginning. Each Parts Check result, and finishing all the
+   modules, is also sent to the portal's tracker (../../../tracker.js), which
+   saves it on this device for the trainee's My progress page.
    =========================================================================== */
 
 // "use strict" asks the browser to point out common mistakes as errors.
@@ -259,6 +261,10 @@ function completeCurrentModule() {
       "Excellent work! You have completed all " + MODULES.length +
       " modules of Aircraft Familiarisation Training."
     );
+    // Tell the portal's tracker the whole lesson is done (if it loaded).
+    if (window.Tracker) {
+      window.Tracker.complete();
+    }
   }
 
   updateModuleButtons();
@@ -378,6 +384,12 @@ function buildDiagramActivity(container, config) {
   const parts = config.parts;
   const module = MODULES[config.moduleIndex];
 
+  // A group's title without the part in brackets, e.g. "Control surfaces".
+  function groupTitle(id) {
+    const group = config.groups.find(function (g) { return g.id === id; });
+    return group ? group.title.replace(/\s*\(.*\)$/, "") : module.title;
+  }
+
   // Find a part's data object from its id, e.g. findPart("ribs").
   function findPart(id) {
     return parts.find(function (part) { return part.id === id; });
@@ -425,6 +437,7 @@ function buildDiagramActivity(container, config) {
   const found = new Set();     // parts found so far in this check
   let firstTryCorrect = 0;     // answers right without a wrong click first
   let missedThisQuestion = false;
+  let checkAnswers = [];       // one { q, topic, correct } per part, for the tracker
 
 
   // --- Build the name buttons ("chips"), one group at a time ---
@@ -555,6 +568,7 @@ function buildDiagramActivity(container, config) {
     selectedId = null;
     found.clear();
     firstTryCorrect = 0;
+    checkAnswers = [];
     questions = shuffled(parts);
 
     stepLabel.textContent = "Step 2 of 2: Parts Check";
@@ -593,6 +607,13 @@ function buildDiagramActivity(container, config) {
       if (!missedThisQuestion) {
         firstTryCorrect = firstTryCorrect + 1;
       }
+      // Right first time counts as correct on the trainee's progress page.
+      // The part's group (e.g. "Wing structure") is the topic.
+      checkAnswers.push({
+        q: module.title + ": find the " + currentQuestion.name.toLowerCase(),
+        topic: groupTitle(currentQuestion.group),
+        correct: !missedThisQuestion
+      });
       feedback.hidden = false;
       feedback.className = "activity-feedback is-correct";
       feedback.textContent = "Correct! You found the " + currentQuestion.name.toLowerCase() + ".";
@@ -629,6 +650,11 @@ function buildDiagramActivity(container, config) {
     retryBtn.hidden = false;
 
     showPanelTopic(module.title, config.summary);
+
+    // Save the result on this device for My progress (if the tracker loaded).
+    if (window.Tracker) {
+      window.Tracker.quizResult(firstTryCorrect, parts.length, checkAnswers);
+    }
 
     // Complete the module the first time; afterwards this is just revision.
     if (!completedModules.has(config.moduleIndex)) {
@@ -868,7 +894,7 @@ function buildAircraftPartsActivity(container) {
       "name buttons under the pictures. Parts you have explored turn green.",
     checkInstructions:
       "Find each part on either picture. If you pick the wrong one, you will " +
-      "get a hint. Nothing is saved.",
+      "get a hint.",
     checkExplanation:
       "Use what you learned in Step 1. Find each part on the side view or the top view.",
     summary:
@@ -1035,7 +1061,7 @@ function buildStructureActivity(container) {
       "find out what it does. Parts you have explored turn green.",
     checkInstructions:
       "Find each part on any of the pictures. If you pick the wrong one, you " +
-      "will get a hint. Nothing is saved.",
+      "will get a hint.",
     checkExplanation:
       "Use what you learned in Step 1. Find each part of the fuselage and " +
       "wing structure on the pictures.",
@@ -1210,7 +1236,7 @@ function buildEngineActivity(container) {
       "you have explored turn green.",
     checkInstructions:
       "Find each part on any of the pictures. If you pick the wrong one, you " +
-      "will get a hint. Nothing is saved.",
+      "will get a hint.",
     checkExplanation:
       "Use what you learned in Step 1. Find each part of the engine and the " +
       "empennage on the pictures.",

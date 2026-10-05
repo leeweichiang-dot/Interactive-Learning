@@ -31,6 +31,8 @@
     Load our JavaScript. "defer" means: download it now, but only run it once
     the whole page has been read. That way app.js can find every element below.
   -->
+  <!-- The portal's progress tracker: saves Parts Check results on this device. -->
+  <script src="../../../tracker.js" data-module="aircraft" data-item="aircraft-familiarisation" data-type="lesson"></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -80,8 +82,8 @@
         Start Learning
       </button>
 
-      <!-- A reminder that nothing is saved (this portal never stores trainee data). -->
-      <p class="welcome-note">Your progress is not saved. Reloading the page starts again from the beginning.</p>
+      <!-- What is saved: Parts Check results go to My progress on the portal. -->
+      <p class="welcome-note">Reloading the page starts again from the beginning. Your Parts Check results are saved on this device under My progress.</p>
     </div>
   </main>
 

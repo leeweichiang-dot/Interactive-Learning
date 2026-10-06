@@ -1,7 +1,7 @@
 /*
  * Landing Gear Systems: three sections shown as tabs.
  *   1. Components: where the gear is on a fighter, nose and main gear close-ups with
- *      clickable parts and cut-away pictures, and a 3-question check.
+ *      clickable parts and animated cut-away pictures, and a 3-question check.
  *   2. Hydraulics: the whole gear hydraulic system, animated for GEAR DOWN / GEAR UP,
  *      with three actuating cylinders moving the gear legs.
  *   3. Indication: cockpit gear lights and handle, the gear moving on the aircraft,
@@ -83,7 +83,7 @@
       what: "This is the leg's shock absorber. Inside it are oil and gas. When the wheels hit the ground, the inner tube (the piston) is pushed up. The oil has to squeeze through a small hole, which slows the push down. The gas squashes like a spring, then pushes back.",
       why: "Landings are bumpy. The oleo strut soaks up the bump, so it doesn't damage the aircraft or hurt the pilot.",
       like: "the springs and shock absorbers on a car or a bike.",
-      caption: "Cut in half: gas on top, oil below, and a small hole between them."
+      caption: "Cut in half: watch the piston slide up when the aircraft lands."
     },
     {
       id: "drag", label: "Drag brace", name: "Drag Brace",
@@ -91,7 +91,7 @@
       what: "A strong bar that runs at an angle from the leg up to the aircraft. It stops the leg being pushed backwards or forwards. It has a hinge in the middle so it can fold when the gear goes up. When the gear is down, a lock holds it straight.",
       why: "When the wheels touch the runway and the brakes go on, the leg gets a big push backwards. The drag brace stops the leg folding over.",
       like: "a stick propping up a fence.",
-      caption: "Seen from the side: the brace takes the push from braking."
+      caption: "Seen from the side: the brace holds the leg, then folds to let it go up."
     },
     {
       id: "side", label: "Side brace", name: "Side Brace",
@@ -99,7 +99,7 @@
       what: "A bar like the drag brace, but it stops the leg moving sideways. It also folds when the gear goes up, and a lock holds it straight when the gear is down.",
       why: "Turning on the ground, or landing in a side wind, pushes the wheels sideways. The side brace keeps the leg standing straight.",
       like: "the bar that stops a shelf wobbling from side to side.",
-      caption: "Seen from the front: the brace takes the sideways push."
+      caption: "Seen from the front: the brace holds the leg, then folds to let it go up."
     },
     {
       id: "torque", label: "Torque links", name: "Torque Links",
@@ -115,7 +115,7 @@
       what: "The wheels hold the aircraft up on the ground, and the tyres grip the runway. The main wheels have brakes inside them. The tyres are filled with nitrogen gas, not normal air.",
       why: "Tyres take a big hit on every landing. If the pressure is wrong, or a tyre is cut or worn, it could burst. That's why they are checked often. Nitrogen is used because it doesn't help a fire burn, and its pressure stays steady when it gets hot or cold.",
       like: "car tyres, but much stronger.",
-      caption: "Cut through the middle: tyre, wheel, brakes and axle."
+      caption: "Cut through the middle: the tyre squashes on landing, then the brakes squeeze."
     },
     {
       id: "door", label: "Wheel well door", name: "Wheel Well Door",
@@ -123,7 +123,7 @@
       what: "A panel that covers the space where the gear is kept in flight (the wheel well). It opens to let the gear in or out, then closes again.",
       why: "A closed door keeps the bottom of the aircraft smooth, so air flows past easily. If a door doesn't open, the gear could hit it. If it doesn't close, the aircraft burns more fuel.",
       like: "a garage door that opens for the car and shuts behind it.",
-      caption: "Door shut in flight, door open when the gear is down."
+      caption: "The door opens and closes around the gear. Watch the airflow."
     },
     {
       id: "actuator", label: "Actuating cylinder", name: "Actuating Cylinder",
@@ -131,120 +131,508 @@
       what: "This is the 'muscle' that moves the gear. It is a tube with a piston and a rod inside. Fluid pushed in at one end pushes the rod out. Fluid pushed in at the other end pulls the rod back in. This swings the gear down or up.",
       why: "Landing gear is very heavy, too heavy to move by hand. The actuating cylinder uses fluid pressure to move it smoothly. You'll see it working in Section 2.",
       like: "the arm of a digger, which is moved the same way.",
-      caption: "Cut in half: fluid in on one side pushes the piston and rod."
+      caption: "Cut in half: fluid pushes the piston one way, then the other."
     }
   ];
 
-  // Cross-section pictures shown in the explanation panel (fixed markup, no user content).
-  const FIG_DEFS =
-    '<defs>' +
-    '<marker id="xa-w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#f3f6fb"/></marker>' +
-    '<marker id="xa-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#3ee06b"/></marker>' +
-    '<marker id="xa-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#ff4b4b"/></marker>' +
-    '<marker id="xa-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#ffb627"/></marker>' +
-    '</defs>';
+  /* ----- Animated cut-away pictures for the explanation panel ----- */
+  // Each scene draws itself once with build(svg) and returns update(t) and step(t),
+  // where t runs from 0 to 1 over one loop of the animation.
 
-  const FIGURES = {
-    oleo:
-      '<rect x="120" y="20" width="90" height="10" class="x-metal"/>' +
-      '<rect x="128" y="30" width="74" height="40" class="x-gas"/>' +
-      '<rect x="128" y="70" width="74" height="72" class="x-oil"/>' +
-      '<rect x="144" y="100" width="42" height="105" class="x-oil"/>' +
-      '<rect x="128" y="88" width="30" height="6" class="x-dark"/><rect x="172" y="88" width="30" height="6" class="x-dark"/>' +
-      '<rect x="136" y="100" width="8" height="113" class="x-chrome"/><rect x="186" y="100" width="8" height="113" class="x-chrome"/>' +
-      '<rect x="136" y="205" width="58" height="8" class="x-chrome"/>' +
-      '<rect x="120" y="20" width="8" height="125" class="x-metal"/><rect x="202" y="20" width="8" height="125" class="x-metal"/>' +
-      '<line x1="165" y1="112" x2="165" y2="80" class="x-arrow" marker-end="url(#xa-w)"/>' +
-      '<text x="165" y="55" class="x-in" text-anchor="middle">GAS</text>' +
-      '<text x="165" y="135" class="x-in" text-anchor="middle">OIL</text>' +
-      '<line x1="95" y1="210" x2="95" y2="150" class="x-arrow amber" marker-end="url(#xa-a)"/>' +
-      '<text x="10" y="172" class="x-text">Bump from</text><text x="10" y="187" class="x-text">landing</text>' +
-      '<line x1="210" y1="45" x2="226" y2="45" class="x-lead"/><text x="230" y="42" class="x-head">Gas</text><text x="230" y="56" class="x-text">acts like a spring</text>' +
-      '<line x1="202" y1="91" x2="226" y2="91" class="x-lead"/><text x="230" y="88" class="x-head">Small hole</text><text x="230" y="102" class="x-text">slows the oil down</text>' +
-      '<line x1="194" y1="175" x2="226" y2="175" class="x-lead"/><text x="230" y="172" class="x-head">Piston</text><text x="230" y="186" class="x-text">slides up on landing</text>',
-    drag:
-      '<rect x="0" y="10" width="360" height="20" class="x-body"/>' +
-      '<text x="10" y="50" class="x-text">&#9664; front</text>' +
-      '<rect x="110" y="30" width="22" height="140" class="x-metal"/>' +
-      '<circle cx="121" cy="188" r="28" class="x-tyre"/><circle cx="121" cy="188" r="10" class="x-hub"/>' +
-      '<polyline points="250,30 210,88 132,122" class="x-brace hl"/>' +
-      '<rect x="201" y="80" width="18" height="16" rx="3" class="x-lock"/>' +
-      '<line x1="40" y1="200" x2="88" y2="200" class="x-arrow red" marker-end="url(#xa-r)"/>' +
-      '<text x="10" y="226" class="x-text">Braking pushes the leg back</text>' +
-      '<line x1="226" y1="88" x2="244" y2="100" class="x-lead"/><text x="248" y="104" class="x-head">Hinge + lock</text><text x="248" y="118" class="x-text">folds to go up,</text><text x="248" y="132" class="x-text">locks straight</text>' +
-      '<line x1="170" y1="104" x2="186" y2="140" class="x-lead"/><text x="160" y="154" class="x-head">Drag brace</text>',
-    side:
-      '<rect x="0" y="10" width="360" height="20" class="x-body"/>' +
-      '<rect x="169" y="30" width="22" height="140" class="x-metal"/>' +
-      '<line x1="140" y1="190" x2="220" y2="190" class="x-axle"/>' +
-      '<rect x="134" y="164" width="28" height="52" rx="9" class="x-tyre"/><rect x="198" y="164" width="28" height="52" rx="9" class="x-tyre"/>' +
-      '<polyline points="50,30 104,86 169,122" class="x-brace hl"/>' +
-      '<rect x="95" y="78" width="18" height="16" rx="3" class="x-lock"/>' +
-      '<line x1="340" y1="190" x2="236" y2="190" class="x-arrow red" marker-end="url(#xa-r)"/>' +
-      '<text x="244" y="164" class="x-text">Sideways push</text><text x="244" y="178" class="x-text">(turning or wind)</text>' +
-      '<line x1="60" y1="64" x2="76" y2="60" class="x-lead"/><text x="8" y="62" class="x-head">Side</text><text x="8" y="76" class="x-head">brace</text>' +
-      '<line x1="104" y1="96" x2="104" y2="118" class="x-lead"/><text x="70" y="132" class="x-head">Lock</text>' +
-      '<text x="8" y="208" class="x-text">The brace holds</text><text x="8" y="222" class="x-text">the leg upright</text>',
-    torque:
-      '<rect x="140" y="10" width="60" height="100" class="x-metal"/>' +
-      '<rect x="152" y="100" width="36" height="105" class="x-chrome"/>' +
-      '<polyline points="200,82 248,128 188,176" class="x-link"/>' +
-      '<circle cx="200" cy="82" r="5" class="x-pin"/><circle cx="248" cy="128" r="6" class="x-pin"/><circle cx="188" cy="176" r="5" class="x-pin"/>' +
-      '<line x1="120" y1="120" x2="120" y2="196" class="x-arrow green" marker-start="url(#xa-g)" marker-end="url(#xa-g)"/>' +
-      '<text x="8" y="150" class="x-head good">Slides up</text><text x="8" y="164" class="x-head good">and down &#10003;</text>' +
-      '<path d="M146 210 Q170 228 194 210" class="x-arrow red" marker-end="url(#xa-r)"/>' +
-      '<text x="210" y="208" class="x-head bad">Can&#8217;t twist</text><text x="210" y="222" class="x-head bad">round &#10007;</text>' +
-      '<line x1="252" y1="128" x2="270" y2="128" class="x-lead"/><text x="274" y="125" class="x-head">Torque</text><text x="274" y="139" class="x-head">links</text>' +
-      '<text x="210" y="30" class="x-text">Top of the leg</text><text x="210" y="44" class="x-text">(fixed)</text>' +
-      '<text x="8" y="40" class="x-text">Piston</text><text x="8" y="54" class="x-text">(moves)</text><line x1="58" y1="48" x2="150" y2="140" class="x-lead"/>',
-    wheel:
-      '<rect x="110" y="10" width="140" height="56" rx="20" class="x-tyre"/><rect x="122" y="22" width="116" height="44" rx="10" class="x-n2"/>' +
-      '<rect x="110" y="154" width="140" height="56" rx="20" class="x-tyre"/><rect x="122" y="154" width="116" height="44" rx="10" class="x-n2"/>' +
-      '<rect x="116" y="62" width="128" height="96" rx="4" class="x-rim"/>' +
-      '<rect x="140" y="74" width="6" height="72" class="x-brake-a"/><rect x="150" y="74" width="6" height="72" class="x-brake-b"/>' +
-      '<rect x="160" y="74" width="6" height="72" class="x-brake-a"/><rect x="170" y="74" width="6" height="72" class="x-brake-b"/>' +
-      '<rect x="180" y="74" width="6" height="72" class="x-brake-a"/><rect x="190" y="74" width="6" height="72" class="x-brake-b"/>' +
-      '<rect x="200" y="74" width="6" height="72" class="x-brake-a"/><rect x="210" y="74" width="6" height="72" class="x-brake-b"/>' +
-      '<rect x="60" y="104" width="250" height="12" rx="3" class="x-chrome"/>' +
-      '<line x1="44" y1="22" x2="112" y2="28" class="x-lead"/><text x="8" y="26" class="x-head">Tyre</text>' +
-      '<line x1="84" y1="54" x2="140" y2="46" class="x-lead"/><text x="8" y="52" class="x-head">Nitrogen</text><text x="8" y="66" class="x-text">gas inside</text>' +
-      '<line x1="244" y1="70" x2="268" y2="70" class="x-lead"/><text x="272" y="74" class="x-head">Wheel</text>' +
-      '<line x1="216" y1="140" x2="268" y2="150" class="x-lead"/><text x="272" y="148" class="x-head">Brakes</text><text x="272" y="162" class="x-text">(discs)</text>' +
-      '<line x1="40" y1="110" x2="60" y2="110" class="x-lead"/><text x="8" y="114" class="x-head">Axle</text>',
-    door:
-      '<rect x="10" y="20" width="160" height="50" class="x-body"/>' +
-      '<rect x="50" y="46" width="80" height="24" class="x-bay"/><circle cx="90" cy="58" r="10" class="x-tyre"/>' +
-      '<rect x="50" y="70" width="80" height="6" class="x-door"/>' +
-      '<line x1="20" y1="96" x2="160" y2="96" class="x-arrow" marker-end="url(#xa-w)"/>' +
-      '<line x1="20" y1="112" x2="160" y2="112" class="x-arrow" marker-end="url(#xa-w)"/>' +
-      '<text x="90" y="140" class="x-text" text-anchor="middle">air flows past smoothly</text>' +
-      '<text x="90" y="200" class="x-head" text-anchor="middle">GEAR UP:</text><text x="90" y="214" class="x-text" text-anchor="middle">door shut</text>' +
-      '<rect x="190" y="20" width="160" height="50" class="x-body"/>' +
-      '<rect x="230" y="46" width="80" height="24" class="x-bay"/>' +
-      '<rect x="306" y="70" width="6" height="64" class="x-door"/>' +
-      '<line x1="262" y1="60" x2="262" y2="140" class="x-leg"/><circle cx="262" cy="156" r="20" class="x-tyre"/>' +
-      '<text x="270" y="200" class="x-head" text-anchor="middle">GEAR DOWN:</text><text x="270" y="214" class="x-text" text-anchor="middle">door open</text>' +
-      '<text x="318" y="106" class="x-head">Door</text>',
-    actuator:
-      '<rect x="40" y="70" width="210" height="60" rx="6" class="x-metal"/>' +
-      '<rect x="46" y="76" width="94" height="48" class="x-oil"/>' +
-      '<rect x="152" y="76" width="92" height="48" class="x-out"/>' +
-      '<rect x="140" y="74" width="12" height="52" class="x-chrome"/>' +
-      '<rect x="152" y="92" width="178" height="16" rx="3" class="x-chrome"/>' +
-      '<circle cx="336" cy="100" r="9" class="x-pin"/>' +
-      '<rect x="54" y="36" width="12" height="36" class="x-metal"/><rect x="228" y="36" width="12" height="36" class="x-metal"/>' +
-      '<line x1="60" y1="16" x2="60" y2="62" class="x-arrow blue" marker-end="url(#xa-w)"/>' +
-      '<line x1="234" y1="62" x2="234" y2="16" class="x-arrow red" marker-end="url(#xa-r)"/>' +
-      '<text x="74" y="22" class="x-head">Fluid in</text>' +
-      '<text x="250" y="22" class="x-head">Fluid out</text>' +
-      '<line x1="70" y1="100" x2="128" y2="100" class="x-arrow" marker-end="url(#xa-w)"/>' +
-      '<line x1="146" y1="130" x2="146" y2="150" class="x-lead"/><text x="146" y="164" class="x-head" text-anchor="middle">Piston</text>' +
-      '<line x1="290" y1="110" x2="290" y2="132" class="x-lead"/><text x="290" y="146" class="x-head" text-anchor="middle">Rod</text>' +
-      '<line x1="270" y1="176" x2="340" y2="176" class="x-arrow amber" marker-end="url(#xa-a)"/>' +
-      '<text x="8" y="182" class="x-text">The rod pushes out: the gear swings down.</text>' +
-      '<text x="8" y="206" class="x-text">Send the fluid to the other end and the</text>' +
-      '<text x="8" y="220" class="x-text">rod pulls back in: the gear swings up.</text>'
+  const clamp01 = (x) => Math.min(1, Math.max(0, x));
+  const smooth = (x) => { x = clamp01(x); return x * x * (3 - 2 * x); };
+  const span = (t, a, b) => smooth((t - a) / (b - a));     // 0 before a, 1 after b
+  const wave = (x) => (1 - Math.cos(2 * Math.PI * clamp01(x))) / 2;   // 0 -> 1 -> 0
+  const deg = (d) => d * Math.PI / 180;
+
+  function el(parent, tag, attrs, text) {
+    const node = svgEl(tag, attrs || {}, parent);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+  function at(node, attrs) {
+    Object.keys(attrs).forEach((k) => {
+      const v = attrs[k];
+      node.setAttribute(k, typeof v === "number" ? v.toFixed(1) : v);
+    });
+  }
+  function lineTo(node, a, b) { at(node, { x1: a.x, y1: a.y, x2: b.x, y2: b.y }); }
+
+  function addMarkers(svg) {
+    const defs = el(svg, "defs");
+    [["w", "#f3f6fb"], ["g", "#3ee06b"], ["r", "#ff4b4b"], ["a", "#ffb627"], ["b", "#3ea6ff"]].forEach(([k, c]) => {
+      const m = el(defs, "marker", { id: "xa-" + k, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 5, markerHeight: 5, orient: "auto-start-reverse" });
+      el(m, "path", { d: "M0 0 L10 5 L0 10 Z", fill: c });
+    });
+  }
+  function arrow(parent, cls, mk, a, b) {
+    const n = el(parent, "line", { class: "x-arrow " + cls, "marker-end": "url(#xa-" + mk + ")" });
+    if (a) lineTo(n, a, b);
+    return n;
+  }
+  function label(parent, x, y, head, sub, anchor) {
+    const o = anchor ? { "text-anchor": anchor } : {};
+    el(parent, "text", Object.assign({ x: x, y: y, class: "x-head" }, o), head);
+    if (sub) el(parent, "text", Object.assign({ x: x, y: y + 14, class: "x-text" }, o), sub);
+  }
+
+  // Knee of a folding brace: the point K with |A-K| = l1 and |K-B| = l2, on the given side of A-B.
+  function knee(A, l1, B, l2, side) {
+    const dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy);
+    const a = (l1 * l1 - l2 * l2 + d * d) / (2 * d);
+    const h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+    const mx = A.x + a * dx / d, my = A.y + a * dy / d;
+    const k1 = { x: mx - h * dy / d, y: my + h * dx / d };
+    const k2 = { x: mx + h * dy / d, y: my - h * dx / d };
+    const cross = (k) => Math.sign(dx * (k.y - A.y) - dy * (k.x - A.x));
+    return cross(k1) === side ? k1 : k2;
+  }
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+  const sideOf = (A, B, K) => Math.sign((B.x - A.x) * (K.y - A.y) - (B.y - A.y) * (K.x - A.x));
+  const along = (P, len, angle) => ({ x: P.x + len * Math.cos(deg(angle)), y: P.y + len * Math.sin(deg(angle)) });
+
+  // Gear that swings up and back down, used by the two brace scenes.
+  // Returns progress up (0 = down and locked, 1 = up) and whether the brace lock is engaged.
+  function retractCycle(t) {
+    const up = t < 0.24 ? 0 : t < 0.5 ? span(t, 0.24, 0.5) : t < 0.62 ? 1 : t < 0.88 ? 1 - span(t, 0.62, 0.88) : 0;
+    const locked = t < 0.2 || t >= 0.92;
+    return { up, locked };
+  }
+
+  const SCENES = {
+    oleo: {
+      period: 5200,
+      build(svg) {
+        el(svg, "rect", { x: 120, y: 20, width: 90, height: 10, class: "x-metal" });
+        const gas = el(svg, "rect", { x: 128, y: 30, width: 74, height: 40, class: "x-gas" });
+        const oil = el(svg, "rect", { x: 128, y: 70, width: 74, height: 72, class: "x-oil" });
+        const gasText = el(svg, "text", { x: 165, y: 54, class: "x-in", "text-anchor": "middle" }, "GAS");
+        const piston = el(svg, "g");
+        el(piston, "rect", { x: 144, y: 100, width: 42, height: 105, class: "x-oil" });
+        el(piston, "rect", { x: 136, y: 100, width: 8, height: 113, class: "x-chrome" });
+        el(piston, "rect", { x: 186, y: 100, width: 8, height: 113, class: "x-chrome" });
+        el(piston, "rect", { x: 136, y: 205, width: 58, height: 8, class: "x-chrome" });
+        el(piston, "rect", { x: 136, y: 96, width: 22, height: 6, class: "x-dark" });
+        el(piston, "rect", { x: 172, y: 96, width: 22, height: 6, class: "x-dark" });
+        el(piston, "text", { x: 165, y: 165, class: "x-in", "text-anchor": "middle" }, "OIL");
+        el(svg, "rect", { x: 120, y: 20, width: 8, height: 125, class: "x-metal" });
+        el(svg, "rect", { x: 202, y: 20, width: 8, height: 125, class: "x-metal" });
+        const flow = arrow(svg, "", "w");
+        const bump = arrow(svg, "amber", "a", { x: 95, y: 212 }, { x: 95, y: 150 });
+        el(svg, "text", { x: 10, y: 172, class: "x-text" }, "Bump from");
+        el(svg, "text", { x: 10, y: 187, class: "x-text" }, "landing");
+        el(svg, "line", { x1: 210, y1: 40, x2: 226, y2: 40, class: "x-lead" });
+        label(svg, 230, 37, "Gas", "acts like a spring");
+        const holeLead = el(svg, "line", { class: "x-lead" });
+        label(svg, 230, 88, "Small hole", "slows the oil down");
+        const pistonLead = el(svg, "line", { class: "x-lead" });
+        label(svg, 230, 172, "Piston", "slides in and out");
+
+        const squash = (t) => (t < 0.3 ? smooth(t / 0.3) : t < 0.45 ? 1 : t < 0.85 ? 1 - span(t, 0.45, 0.85) : 0);
+        return {
+          update(t) {
+            const c = squash(t), off = 35 * c;
+            const gasH = 40 - 22 * c;
+            at(gas, { height: gasH });
+            at(oil, { y: 30 + gasH, height: 112 - gasH });
+            at(gasText, { y: 30 + gasH / 2 + 4 });
+            piston.setAttribute("transform", "translate(0 " + (-off).toFixed(1) + ")");
+            const holeY = 99 - off;
+            const squashing = t < 0.3, stretching = t >= 0.45 && t < 0.85;
+            if (squashing) lineTo(flow, { x: 165, y: holeY + 18 }, { x: 165, y: holeY - 16 });
+            else lineTo(flow, { x: 165, y: holeY - 16 }, { x: 165, y: holeY + 18 });
+            flow.style.opacity = squashing || stretching ? 1 : 0;
+            bump.style.opacity = squashing ? 1 : 0.15;
+            lineTo(holeLead, { x: 226, y: 91 }, { x: 190, y: holeY });
+            lineTo(pistonLead, { x: 226, y: 175 }, { x: 194, y: 175 - off });
+          },
+          step(t) {
+            if (t < 0.3) return "Touch-down! The bump pushes the piston up. Oil is forced up through the small hole, which slows the push down.";
+            if (t < 0.45) return "The gas at the top is squashed, like a spring being pressed.";
+            if (t < 0.85) return "The squashed gas pushes back. The leg stretches out again, and the oil flows back down through the hole.";
+            return "Ready for the next bump.";
+          }
+        };
+      }
+    },
+
+    drag: {
+      period: 8000,
+      build(svg) {
+        el(svg, "rect", { x: 0, y: 10, width: 360, height: 20, class: "x-body" });
+        el(svg, "rect", { x: 150, y: 30, width: 170, height: 62, class: "x-baydash" });
+        el(svg, "text", { x: 10, y: 50, class: "x-text" }, "◀ front");
+        const P = { x: 121, y: 30 }, A = { x: 250, y: 30 };
+        const B0 = { x: 121, y: 122 }, K0 = { x: 210, y: 88 };
+        const l1 = dist(A, K0), l2 = dist(K0, B0), side = sideOf(A, B0, K0);
+        const leg = el(svg, "line", { class: "x-legbar" });
+        const tyre = el(svg, "circle", { r: 26, class: "x-tyre" });
+        const hub = el(svg, "circle", { r: 9, class: "x-hub" });
+        const brace = el(svg, "polyline", { class: "x-brace hl" });
+        const lock = el(svg, "rect", { width: 18, height: 14, rx: 3, class: "x-lock" });
+        el(svg, "circle", { cx: P.x, cy: P.y, r: 5, class: "x-pin" });
+        const push = arrow(svg, "red", "r", { x: 30, y: 200 }, { x: 80, y: 200 });
+        const pushText = el(svg, "text", { x: 8, y: 226, class: "x-text" }, "Braking pushes the leg back");
+        const braceLead = el(svg, "line", { class: "x-lead" });
+        el(svg, "text", { x: 190, y: 182, class: "x-head" }, "Drag brace");
+        const lockLead = el(svg, "line", { class: "x-lead" });
+        label(svg, 262, 118, "Hinge + lock");
+
+        return {
+          update(t) {
+            const { up, locked } = retractCycle(t);
+            const ang = 90 - 78 * up;
+            const B = along(P, 92, ang), E = along(P, 150, ang);
+            const K = knee(A, l1, B, l2, side);
+            lineTo(leg, P, E);
+            at(tyre, { cx: E.x, cy: E.y }); at(hub, { cx: E.x, cy: E.y });
+            brace.setAttribute("points", [A, K, B].map((p) => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" "));
+            const rot = Math.atan2(B.y - K.y, B.x - K.x) * 180 / Math.PI;
+            at(lock, { x: K.x - 9, y: K.y - 7 });
+            lock.setAttribute("transform", "rotate(" + rot.toFixed(1) + " " + K.x.toFixed(1) + " " + K.y.toFixed(1) + ")");
+            lock.classList.toggle("open", !locked);
+            const down = up === 0;
+            push.style.opacity = down && t < 0.2 ? 0.4 + 0.6 * wave((t % 0.1) / 0.1) : 0;
+            pushText.style.opacity = down && t < 0.2 ? 1 : 0;
+            lineTo(braceLead, { x: 214, y: 172 }, { x: (K.x + B.x) / 2, y: (K.y + B.y) / 2 });
+            lineTo(lockLead, { x: 258, y: 114 }, K);
+          },
+          step(t) {
+            if (t < 0.2) return "Gear down. When the brakes push the leg backwards (red arrow), the locked drag brace stops it folding.";
+            if (t < 0.24) return "To raise the gear, the lock lets go of the hinge.";
+            if (t < 0.5) return "The brace folds at its hinge as the gear swings up into its bay.";
+            if (t < 0.62) return "Gear up and tucked away for flight.";
+            if (t < 0.88) return "Lowering: the gear swings down and the brace opens out straight…";
+            return "…and the lock clicks in, holding the brace straight again.";
+          }
+        };
+      }
+    },
+
+    side: {
+      period: 8000,
+      build(svg) {
+        el(svg, "rect", { x: 0, y: 10, width: 360, height: 20, class: "x-body" });
+        el(svg, "rect", { x: 22, y: 30, width: 190, height: 52, class: "x-baydash" });
+        el(svg, "text", { x: 352, y: 50, class: "x-text", "text-anchor": "end" }, "wing tip ▶");
+        const P = { x: 200, y: 30 }, A = { x: 60, y: 30 };
+        const B0 = { x: 200, y: 110 }, K0 = { x: 115, y: 80 };
+        const l1 = dist(A, K0), l2 = dist(K0, B0), side = sideOf(A, B0, K0);
+        const legG = el(svg, "g");
+        el(legG, "rect", { x: 191, y: 30, width: 18, height: 128, class: "x-metal" });
+        el(legG, "line", { x1: 160, y1: 162, x2: 240, y2: 162, class: "x-axle" });
+        el(legG, "rect", { x: 150, y: 138, width: 24, height: 50, rx: 8, class: "x-tyre" });
+        el(legG, "rect", { x: 226, y: 138, width: 24, height: 50, rx: 8, class: "x-tyre" });
+        const brace = el(svg, "polyline", { class: "x-brace hl" });
+        const lock = el(svg, "rect", { width: 18, height: 14, rx: 3, class: "x-lock" });
+        el(svg, "circle", { cx: P.x, cy: P.y, r: 5, class: "x-pin" });
+        const push = arrow(svg, "red", "r", { x: 340, y: 163 }, { x: 262, y: 163 });
+        const pushText = el(svg, "g");
+        el(pushText, "text", { x: 262, y: 136, class: "x-text" }, "Sideways push");
+        el(pushText, "text", { x: 262, y: 150, class: "x-text" }, "(turning or wind)");
+        const braceLead = el(svg, "line", { class: "x-lead" });
+        label(svg, 8, 196, "Side brace");
+        const lockLead = el(svg, "line", { class: "x-lead" });
+        el(svg, "text", { x: 8, y: 220, class: "x-head" }, "Hinge + lock");
+
+        return {
+          update(t) {
+            const { up, locked } = retractCycle(t);
+            const ang = 90 + 82 * up;                 // swings in towards the body
+            const B = along(P, 80, ang);
+            const K = knee(A, l1, B, l2, side);
+            legG.setAttribute("transform", "rotate(" + (ang - 90).toFixed(1) + " 200 30)");
+            brace.setAttribute("points", [A, K, B].map((p) => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" "));
+            const rot = Math.atan2(B.y - K.y, B.x - K.x) * 180 / Math.PI;
+            at(lock, { x: K.x - 9, y: K.y - 7 });
+            lock.setAttribute("transform", "rotate(" + rot.toFixed(1) + " " + K.x.toFixed(1) + " " + K.y.toFixed(1) + ")");
+            lock.classList.toggle("open", !locked);
+            const showPush = up === 0 && t < 0.2;
+            push.style.opacity = showPush ? 0.4 + 0.6 * wave((t % 0.1) / 0.1) : 0;
+            pushText.style.opacity = showPush ? 1 : 0;
+            lineTo(braceLead, { x: 40, y: 186 }, { x: (A.x + K.x) / 2, y: (A.y + K.y) / 2 });
+            lineTo(lockLead, { x: 60, y: 210 }, K);
+          },
+          step(t) {
+            if (t < 0.2) return "Gear down. A sideways push (turning, or a side wind) tries to fold the leg. The locked side brace holds it upright.";
+            if (t < 0.24) return "To raise the gear, the lock lets go of the hinge.";
+            if (t < 0.5) return "The side brace folds, and the gear swings in sideways into its bay.";
+            if (t < 0.62) return "Gear up and tucked away for flight.";
+            if (t < 0.88) return "Lowering: the gear swings out and down, and the brace opens out straight…";
+            return "…and the lock clicks in, holding the leg upright again.";
+          }
+        };
+      }
+    },
+
+    torque: {
+      period: 7000,
+      build(svg) {
+        el(svg, "rect", { x: 140, y: 10, width: 60, height: 100, class: "x-metal" });
+        const U = { x: 200, y: 82 }, L0 = { x: 188, y: 176 }, E0 = { x: 248, y: 128 };
+        const lu = dist(U, E0), ll = dist(E0, L0), side = sideOf(U, L0, E0);
+        const piston = el(svg, "g");
+        el(piston, "rect", { x: 152, y: 100, width: 36, height: 105, class: "x-chrome" });
+        el(svg, "rect", { x: 140, y: 96, width: 60, height: 14, class: "x-metal" });
+        const links = el(svg, "polyline", { class: "x-link" });
+        el(svg, "circle", { cx: U.x, cy: U.y, r: 5, class: "x-pin" });
+        const pinE = el(svg, "circle", { r: 6, class: "x-pin" });
+        const pinL = el(svg, "circle", { r: 5, class: "x-pin" });
+        const slide = el(svg, "g");
+        el(slide, "line", { x1: 120, y1: 122, x2: 120, y2: 194, class: "x-arrow green", "marker-start": "url(#xa-g)", "marker-end": "url(#xa-g)" });
+        el(slide, "text", { x: 8, y: 150, class: "x-head good" }, "Slides up");
+        el(slide, "text", { x: 8, y: 164, class: "x-head good" }, "and down ✓");
+        const twist = el(svg, "g");
+        el(twist, "path", { d: "M146 214 Q170 230 194 214", class: "x-arrow red", "marker-end": "url(#xa-r)" });
+        el(twist, "text", { x: 214, y: 208, class: "x-head bad" }, "Can’t twist");
+        el(twist, "text", { x: 214, y: 222, class: "x-head bad" }, "round ✗");
+        const blocked = el(svg, "text", { x: 286, y: 178, class: "x-head bad", "text-anchor": "middle" }, "HELD!");
+        const linkLead = el(svg, "line", { class: "x-lead" });
+        label(svg, 290, 118, "Torque", null);
+        el(svg, "text", { x: 290, y: 132, class: "x-head" }, "links");
+        label(svg, 214, 30, "Top of the leg", "(fixed)");
+        label(svg, 8, 40, "Piston", "(moves)");
+
+        return {
+          update(t) {
+            let c = 0, jx = 0, slideOn = 0, twistOn = 0;
+            if (t < 0.5) { c = wave(t / 0.5); slideOn = 1; }
+            else { twistOn = wave((t - 0.5) / 0.5); jx = 2.5 * Math.sin((t - 0.5) * Math.PI * 24) * twistOn; }
+            const off = 36 * c;
+            piston.setAttribute("transform", "translate(" + jx.toFixed(1) + " " + (-off).toFixed(1) + ")");
+            const L = { x: L0.x + jx, y: L0.y - off };
+            const E = knee(U, lu, L, ll, side);
+            links.setAttribute("points", [U, E, L].map((p) => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" "));
+            at(pinE, { cx: E.x, cy: E.y }); at(pinL, { cx: L.x, cy: L.y });
+            links.classList.toggle("strain", twistOn > 0.3);
+            slide.style.opacity = 0.25 + 0.75 * slideOn;
+            twist.style.opacity = 0.25 + 0.75 * twistOn;
+            blocked.style.opacity = twistOn > 0.3 ? 1 : 0;
+            lineTo(linkLead, { x: 286, y: 122 }, E);
+          },
+          step(t) {
+            if (t < 0.5) return "As the strut squashes and stretches, the piston slides up and down. The torque links fold and open like a knee.";
+            return "Now something tries to twist the wheel round. The links hold the piston, so it can only wobble a tiny bit: it can't turn.";
+          }
+        };
+      }
+    },
+
+    wheel: {
+      period: 7000,
+      build(svg) {
+        el(svg, "line", { x1: 60, y1: 212, x2: 300, y2: 212, class: "x-ground" });
+        const tyreB = el(svg, "rect", { rx: 20, class: "x-tyre" });
+        const n2B = el(svg, "rect", { rx: 10, class: "x-n2" });
+        const wheel = el(svg, "g");
+        el(wheel, "rect", { x: 110, y: 10, width: 140, height: 56, rx: 20, class: "x-tyre" });
+        el(wheel, "rect", { x: 122, y: 22, width: 116, height: 44, rx: 10, class: "x-n2" });
+        el(wheel, "rect", { x: 116, y: 62, width: 128, height: 96, rx: 4, class: "x-rim" });
+        const discs = [];
+        for (let i = 0; i < 8; i++) discs.push(el(wheel, "rect", { y: 74, width: 6, height: 72, class: i % 2 ? "x-brake-b" : "x-brake-a" }));
+        const heat = el(wheel, "rect", { x: 132, y: 72, width: 96, height: 76, rx: 6, class: "x-heat" });
+        el(wheel, "rect", { x: 60, y: 104, width: 250, height: 12, rx: 3, class: "x-chrome" });
+        const squeeze = el(wheel, "g");
+        arrow(squeeze, "red", "r", { x: 118, y: 88 }, { x: 134, y: 88 });
+        arrow(squeeze, "red", "r", { x: 242, y: 88 }, { x: 226, y: 88 });
+        const hot = el(wheel, "text", { x: 180, y: 70, class: "x-head bad", "text-anchor": "middle" }, "HOT!");
+        el(svg, "line", { x1: 44, y1: 22, x2: 112, y2: 28, class: "x-lead" }); label(svg, 8, 26, "Tyre");
+        el(svg, "line", { x1: 84, y1: 54, x2: 140, y2: 46, class: "x-lead" }); label(svg, 8, 52, "Nitrogen", "gas inside");
+        el(svg, "line", { x1: 244, y1: 70, x2: 268, y2: 70, class: "x-lead" }); label(svg, 272, 74, "Wheel");
+        el(svg, "line", { x1: 216, y1: 140, x2: 268, y2: 150, class: "x-lead" }); label(svg, 272, 148, "Brakes", "(discs)");
+        el(svg, "line", { x1: 40, y1: 110, x2: 60, y2: 110, class: "x-lead" }); label(svg, 8, 114, "Axle");
+        el(svg, "text", { x: 304, y: 216, class: "x-text" }, "runway");
+
+        return {
+          update(t) {
+            const k = t < 0.45 ? wave(t / 0.45) : 0;
+            const b = t >= 0.5 ? wave((t - 0.5) / 0.5) : 0;
+            const sink = 8 * k;
+            wheel.setAttribute("transform", "translate(0 " + sink.toFixed(1) + ")");
+            at(tyreB, { x: 110 - 5 * k, y: 154 + sink, width: 140 + 10 * k, height: 56 - sink });
+            at(n2B, { x: 122 - 5 * k, y: 154 + sink, width: 116 + 10 * k, height: 44 - 0.9 * sink });
+            const gap = 10 - 3 * b;
+            discs.forEach((d, i) => at(d, { x: 180 + (i - 3.5) * gap - 3 }));
+            heat.style.opacity = (0.6 * b).toFixed(2);
+            squeeze.style.opacity = b > 0.05 ? 1 : 0;
+            hot.style.opacity = b > 0.5 ? 1 : 0;
+          },
+          step(t) {
+            if (t < 0.45) return "Landing: the tyre hits the runway and squashes a little. The nitrogen inside acts like a cushion.";
+            if (t < 0.5) return "Rolling along the runway…";
+            return "Braking: the brakes squeeze the discs together. The rubbing slows the wheel down, and the discs get very hot.";
+          }
+        };
+      }
+    },
+
+    door: {
+      period: 9000,
+      build(svg) {
+        const air = [el(svg, "path", { class: "x-air" }), el(svg, "path", { class: "x-air" })];
+        el(svg, "text", { x: 10, y: 172, class: "x-text" }, "airflow →");
+        el(svg, "rect", { x: 10, y: 20, width: 340, height: 50, class: "x-body" });
+        el(svg, "rect", { x: 222, y: 40, width: 90, height: 30, class: "x-bay" });
+        el(svg, "text", { x: 130, y: 50, class: "x-text", "text-anchor": "middle" }, "aircraft body");
+        const P = { x: 296, y: 52 }, H = { x: 312, y: 70 };
+        const leg = el(svg, "line", { class: "x-leg" });
+        const tyre = el(svg, "circle", { r: 12, class: "x-tyre" });
+        const door = el(svg, "line", { class: "x-door-line" });
+        el(svg, "circle", { cx: H.x, cy: H.y, r: 4, class: "x-pin" });
+        const doorText = el(svg, "text", { class: "x-head" }, "Door");
+        const state = el(svg, "text", { x: 180, y: 226, class: "x-head", "text-anchor": "middle" });
+
+        function timeline(t) {
+          const gear = t < 0.12 ? 1 : t < 0.32 ? 1 - span(t, 0.12, 0.32) : t < 0.68 ? 0 : t < 0.88 ? span(t, 0.68, 0.88) : 1;
+          const open = t < 0.32 ? 1 : t < 0.42 ? 1 - span(t, 0.32, 0.42) : t < 0.58 ? 0 : t < 0.68 ? span(t, 0.58, 0.68) : 1;
+          return { gear, open };
+        }
+        return {
+          update(t) {
+            const { gear, open } = timeline(t);
+            const E = along(P, 62, 180 - 90 * gear);
+            lineTo(leg, P, E);
+            at(tyre, { cx: E.x, cy: E.y });
+            const D = along(H, 90, 180 - 90 * open);
+            lineTo(door, H, D);
+            at(doorText, { x: (H.x + D.x) / 2 + 10, y: (H.y + D.y) / 2 + 20 });
+            const rough = Math.max(open, gear);
+            air.forEach((p, i) => {
+              const y0 = 186 + i * 18;
+              let d = "M10 " + y0;
+              for (let x = 20; x <= 350; x += 10) {
+                const wob = x > 210 ? rough * 7 * Math.sin(x / 9 + t * 60 + i * 2) : 0;
+                d += " L" + x + " " + (y0 + wob).toFixed(1);
+              }
+              p.setAttribute("d", d);
+              p.classList.toggle("rough", rough > 0.05);
+            });
+            state.textContent = open > 0.02 ? "Door open: rough air, more drag" : "Door shut: smooth air";
+            state.setAttribute("class", "x-head " + (open > 0.02 ? "bad" : "good"));
+          },
+          step(t) {
+            if (t < 0.12) return "Gear down, door open. The open bay makes the air rough (wavy lines), which slows the aircraft.";
+            if (t < 0.32) return "After take-off, the gear swings up into its bay…";
+            if (t < 0.42) return "…then the door closes behind it.";
+            if (t < 0.58) return "Door shut: the bottom of the aircraft is smooth, so the air flows past easily.";
+            if (t < 0.68) return "Before landing, the door opens first, so the gear won't hit it…";
+            return "…then the gear swings down.";
+          }
+        };
+      }
+    },
+
+    actuator: {
+      period: 7000,
+      build(svg) {
+        el(svg, "rect", { x: 30, y: 70, width: 200, height: 60, rx: 6, class: "x-metal" });
+        const left = el(svg, "rect", { x: 36, y: 76, height: 48 });
+        const right = el(svg, "rect", { y: 76, height: 48 });
+        const piston = el(svg, "rect", { y: 74, width: 12, height: 52, class: "x-chrome" });
+        const rod = el(svg, "rect", { y: 92, width: 190, height: 16, rx: 3, class: "x-chrome" });
+        const eye = el(svg, "circle", { cy: 100, r: 9, class: "x-pin" });
+        el(svg, "rect", { x: 44, y: 36, width: 12, height: 36, class: "x-metal" });
+        el(svg, "rect", { x: 204, y: 36, width: 12, height: 36, class: "x-metal" });
+        const portL = el(svg, "line", { class: "x-arrow" });
+        const portR = el(svg, "line", { class: "x-arrow" });
+        const textL = el(svg, "text", { x: 62, y: 22, class: "x-head" });
+        const textR = el(svg, "text", { x: 222, y: 22, class: "x-head" });
+        const push = arrow(svg, "", "w");
+        const pistonLead = el(svg, "line", { class: "x-lead" });
+        const pistonText = el(svg, "text", { y: 164, class: "x-head", "text-anchor": "middle" }, "Piston");
+        const rodText = el(svg, "text", { y: 146, class: "x-head", "text-anchor": "middle" }, "Rod");
+        const status = el(svg, "text", { x: 180, y: 200, class: "x-head", "text-anchor": "middle" });
+        const statusSub = el(svg, "text", { x: 180, y: 216, class: "x-text", "text-anchor": "middle" });
+
+        return {
+          update(t) {
+            const out = t < 0.4 ? span(t, 0, 0.4) : t < 0.5 ? 1 : t < 0.9 ? 1 - span(t, 0.5, 0.9) : 0;
+            const extending = t < 0.45, moving = (t < 0.4) || (t >= 0.5 && t < 0.9);
+            const px = 40 + 80 * out, pr = px + 12;
+            at(left, { width: px - 36 });
+            at(right, { x: pr, width: 224 - pr });
+            at(piston, { x: px });
+            at(rod, { x: pr });
+            at(eye, { cx: pr + 194 });
+            left.setAttribute("class", extending ? "x-oil" : "x-out");
+            right.setAttribute("class", extending ? "x-out" : "x-oil");
+            // Ports: blue arrow = fluid in, red arrow = fluid out.
+            const inL = extending;
+            lineTo(portL, inL ? { x: 50, y: 14 } : { x: 50, y: 64 }, inL ? { x: 50, y: 64 } : { x: 50, y: 14 });
+            lineTo(portR, inL ? { x: 210, y: 64 } : { x: 210, y: 14 }, inL ? { x: 210, y: 14 } : { x: 210, y: 64 });
+            portL.setAttribute("class", "x-arrow " + (inL ? "blue" : "red"));
+            portR.setAttribute("class", "x-arrow " + (inL ? "red" : "blue"));
+            portL.setAttribute("marker-end", "url(#xa-" + (inL ? "b" : "r") + ")");
+            portR.setAttribute("marker-end", "url(#xa-" + (inL ? "r" : "b") + ")");
+            portL.style.opacity = portR.style.opacity = moving ? 1 : 0.3;
+            textL.textContent = inL ? "Fluid in" : "Fluid out";
+            textR.textContent = inL ? "Fluid out" : "Fluid in";
+            if (extending) lineTo(push, { x: Math.max(44, px - 46), y: 100 }, { x: px - 6, y: 100 });
+            else lineTo(push, { x: Math.min(224, pr + 52), y: 116 }, { x: pr + 6, y: 116 });
+            push.style.opacity = moving ? 1 : 0;
+            lineTo(pistonLead, { x: px + 6, y: 130 }, { x: px + 6, y: 150 });
+            at(pistonText, { x: px + 6 });
+            at(rodText, { x: pr + 150 });
+            status.textContent = moving ? (extending ? "Rod sliding OUT: gear going DOWN ▼" : "Rod sliding IN: gear coming UP ▲")
+              : (extending ? "Gear DOWN" : "Gear UP");
+            statusSub.textContent = moving ? "fluid pushes on the piston" : "the fluid holds it there";
+          },
+          step(t) {
+            if (t < 0.45) return "Fluid is pushed in at the left end (blue). It pushes the piston, the rod slides out, and the gear swings DOWN. Fluid on the other side is squeezed out (red).";
+            return "Now the fluid is sent to the right end instead. It pushes the piston back, the rod slides in, and the gear swings UP.";
+          }
+        };
+      }
+    }
   };
+
+  // Plays the scene for the chosen part. Pauses when Section 1 isn't on screen.
+  const figAnim = { scene: null, period: 6000, t: 0, playing: !reduceMotion, last: 0, stepText: "" };
+
+  function drawFigure() {
+    if (!figAnim.scene) return;
+    figAnim.scene.update(figAnim.t);
+    $("fig-scrub").value = String(Math.round(figAnim.t * 1000));
+    const s = figAnim.scene.step(figAnim.t);
+    if (s !== figAnim.stepText) { figAnim.stepText = s; $("fig-step").textContent = s; }
+  }
+
+  function figureLoop(now) {
+    requestAnimationFrame(figureLoop);
+    const dt = now - figAnim.last;
+    figAnim.last = now;
+    if (!figAnim.playing || !figAnim.scene || $("sec-1").hidden) return;
+    figAnim.t = (figAnim.t + dt / figAnim.period) % 1;
+    drawFigure();
+  }
+
+  function setPlaying(on) {
+    figAnim.playing = on;
+    $("fig-play").textContent = on ? "❚❚ Pause" : "▶ Play";
+    $("fig-play").setAttribute("aria-pressed", on ? "false" : "true");
+  }
+
+  function showFigure(part) {
+    const box = $("info-fig");
+    box.textContent = "";
+    const svg = el(box, "svg", { class: "xsec-svg", viewBox: "0 0 360 230", role: "img", "aria-label": part.name + ": moving cut-away picture" });
+    addMarkers(svg);
+    const scene = SCENES[part.id];
+    figAnim.scene = scene.build(svg);
+    figAnim.period = scene.period;
+    figAnim.t = 0;
+    figAnim.stepText = "";
+    drawFigure();
+  }
+
+  $("fig-play").addEventListener("click", () => setPlaying(!figAnim.playing));
+  $("fig-scrub").addEventListener("input", () => {
+    setPlaying(false);
+    figAnim.t = Number($("fig-scrub").value) / 1000;
+    drawFigure();
+  });
+  setPlaying(figAnim.playing);
+  requestAnimationFrame((now) => { figAnim.last = now; figureLoop(now); });
 
   // Labels on each close-up window. x, y: top-left of the label; ax, ay: the point it points at.
   const WINDOW_LABELS = {
@@ -394,8 +782,7 @@
     $("info-what").textContent = part.what;
     $("info-why").textContent = part.why;
     $("info-like").textContent = part.like;
-    $("info-fig").innerHTML = '<svg class="xsec-svg" viewBox="0 0 360 230" role="img" aria-label="' +
-      part.name + ' cut-away picture">' + FIG_DEFS + FIGURES[part.id] + '</svg>';
+    showFigure(part);
     $("info-fig-cap").textContent = part.caption;
     $("explored-count").textContent = String(seen.size);
     $("explored-count-2").textContent = String(seen.size);

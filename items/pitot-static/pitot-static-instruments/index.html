@@ -117,6 +117,7 @@
     }
     button.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
     button:disabled { opacity: 0.4; cursor: default; }
+    button[hidden], .btn[hidden] { display: none; }
 
     /* System overview: pressure cards and instrument table */
     .cards .card { border-left: 5px solid var(--grey); }
@@ -230,14 +231,14 @@
     .sim text.val { font-size: 15px; font-weight: 700; }
 
     /* Fault Investigation (section 4) */
-    .fault-note {
+    .fault-note, .notice {
       margin: 12px 0; padding: 14px 16px;
       background: var(--warn-soft);
       border: 2px solid var(--warn);
       border-radius: 8px;
       font-size: 1.02rem; font-weight: 600;
     }
-    .fault-note strong { color: var(--warn); }
+    .fault-note strong, .notice strong { color: var(--warn); }
     .f-form { margin: 14px 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
     .f-form h4 { margin: 0 0 4px; font-size: 1.1rem; }
     .f-q { margin: 0 0 14px; padding: 0; border: 0; min-width: 0; }
@@ -272,7 +273,55 @@
     .sim text.flag { font-size: 12px; font-weight: 700; fill: var(--warn); }
     .sim .part.affected { stroke: var(--warn); stroke-width: 5; }
 
+    /* Competency check (section 5) */
+    .a-progress { margin: 0 0 6px; }
+    .a-bar { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .a-bar span { display: block; height: 100%; width: 0; background: var(--accent); }
+    .a-count { margin: 0 0 8px; color: var(--muted); font-size: 0.92rem; }
+    .a-prompt { margin: 0 0 12px; font-size: 1.2rem; line-height: 1.35; }
+    .a-prompt:focus { outline: none; }
+    .a-choices { display: grid; gap: 6px; margin: 0 0 12px; }
+    .a-choices label { display: block; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; }
+    .a-choices label:hover { border-color: var(--accent); }
+    .a-rows { display: grid; gap: 10px; margin: 0 0 12px; }
+    .a-row { display: grid; grid-template-columns: minmax(130px, 1fr) minmax(170px, 1.4fr) minmax(90px, auto); gap: 10px; align-items: center; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+    .a-row select { width: 100%; padding: 8px; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; }
+    .a-status { font-size: 0.88rem; font-weight: 600; }
+    .a-status.ok { color: var(--success); }
+    .a-status.check { color: var(--warn); }
+    .a-alt { margin: 10px 0; }
+    .a-alt summary { cursor: pointer; color: var(--accent); }
+    .a-alt .a-choices { margin-top: 8px; }
+    .a-feedback { margin: 0 0 12px; padding: 0; }
+    .a-feedback.good, .a-feedback.try, .a-feedback.fail { padding: 12px 14px; background: var(--accent-soft); border-radius: 8px; border-left: 5px solid var(--success); }
+    .a-feedback.try, .a-feedback.fail { border-left-color: var(--warn); }
+    .a-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+    .a-footer { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 0.9rem; color: var(--muted); }
+    .a-label { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .a-score { margin: 0; font-size: 3rem; font-weight: 700; line-height: 1.1; }
+    .a-verdict { margin: 4px 0 8px; font-weight: 600; }
+    .a-verdict.pass { color: var(--success); }
+    .a-verdict.below { color: var(--warn); }
+    .a-cats { margin: 0 0 14px; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .a-cats li { padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; border-left: 5px solid var(--success); }
+    .a-cats li.low { border-left-color: var(--warn); }
+    .a-cats .a-pct { float: right; font-weight: 700; }
+    .a-catbar { height: 8px; margin: 6px 0; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .a-catbar span { display: block; height: 100%; background: var(--success); }
+    .a-cats li.low .a-catbar span { background: var(--warn); }
+    .a-catnote { font-size: 0.9rem; color: var(--muted); }
+    .a-links { margin: 6px 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .a-links button { padding: 6px 12px; font-size: 0.92rem; }
+    .sim .part.chosen, .sim .line.chosen { stroke: var(--accent); stroke-width: 6; }
+    .sim .part.wrong, .sim .line.wrong { stroke: var(--warn); stroke-width: 6; }
+    .sim .part.right, .sim .line.right { stroke: var(--success); stroke-width: 6; }
+    .sim .hit-fill { fill: transparent; stroke: none; pointer-events: all; }
+    .sim.locked [data-sel] { cursor: default; }
+    .sim [data-sel] { cursor: pointer; }
+    .a-diagram-note { margin: 0 0 8px; color: var(--muted); font-size: 0.92rem; }
+
     @media (max-width: 600px) {
+      .a-row { grid-template-columns: 1fr; }
       .steps .label { display: none; }
       .nav button, .nav .btn { padding: 10px 12px; }
     }
@@ -667,9 +716,58 @@
 
     <section class="step" data-title="Competency Check" aria-labelledby="s5" hidden>
       <h2 id="s5">5. Competency Check</h2>
-      <p>A short set of questions to show that you understand how the system works and how faults show up.</p>
-      <div class="soon"><strong>Coming soon:</strong> the scored check.</div>
-      <p class="note">You have now seen all five sections.</p>
+      <p>Answer 12 short questions to show what you have learned about pitot and static pressure. You see one question at a time and get feedback straight away.</p>
+
+      <div class="notice" role="note">
+        <strong>Please note:</strong> This learning tool supports training but does not replace practical assessment or approved technical publications.
+      </div>
+
+      <div id="assess">
+        <div id="aIntro">
+          <p id="aPass"></p>
+          <p id="aSaved"></p>
+          <p id="aMeta"></p>
+          <div class="a-actions"><button type="button" class="primary" id="aStart">Start the check</button></div>
+        </div>
+
+        <div id="aQuestion" hidden>
+          <div class="a-progress">
+            <div class="a-bar" id="aProg" role="progressbar" aria-label="Progress through the check" aria-valuemin="0" aria-valuemax="12" aria-valuenow="0"><span id="aBar"></span></div>
+          </div>
+          <p class="a-count"><span id="aCount"></span> &middot; <span id="aCategory"></span></p>
+          <h3 class="a-prompt" id="aPrompt" tabindex="-1"></h3>
+          <div id="aDiagramWrap" hidden>
+            <p class="a-diagram-note">Click or tap the part on the diagram. Red lines carry total pressure and blue lines carry static pressure.</p>
+            <div id="aDiagram"></div>
+          </div>
+          <div id="aAnswer"></div>
+          <p class="a-feedback" id="aFeedback" aria-live="polite"></p>
+          <div class="a-actions">
+            <button type="button" class="primary" id="aCheck">Check answer</button>
+            <button type="button" class="primary" id="aNext" hidden>Next question</button>
+          </div>
+        </div>
+
+        <div id="aResults" hidden>
+          <h3 id="aResultTitle" tabindex="-1">Your results</h3>
+          <p class="a-label">Your score</p>
+          <p class="a-score" id="aScore"></p>
+          <p class="a-verdict" id="aVerdict"></p>
+          <p id="aResultMeta"></p>
+          <h4>Performance by category</h4>
+          <ul class="a-cats" id="aCats"></ul>
+          <h4>What to revisit</h4>
+          <div id="aRevisit"></div>
+          <div class="a-actions"><button type="button" class="primary" id="aRetry">Retry the complete assessment</button></div>
+          <div class="notice" role="note"><strong>Please note:</strong> This learning tool supports training but does not replace practical assessment or approved technical publications.</div>
+        </div>
+
+        <div class="a-footer">
+          <button type="button" id="aClear">Clear Progress</button>
+          <span id="aStorageNote"></span>
+          <span id="aCleared" role="status"></span>
+        </div>
+      </div>
     </section>
 
     <div class="nav">
@@ -996,5 +1094,7 @@
   <script src="simcommon.js"></script>
   <script src="guided.js"></script>
   <script src="faults.js"></script>
+  <script src="competency-config.js"></script>
+  <script src="competency.js"></script>
 </body>
 </html>

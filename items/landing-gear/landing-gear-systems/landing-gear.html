@@ -245,11 +245,13 @@
           <h2 id="info-title"></h2>
           <p class="info-where"><strong>Where to find it:</strong> <span id="info-where"></span></p>
           <div class="info-cols">
+            <figure class="xsec">
+              <div id="info-fig"></div>
+              <figcaption id="info-fig-cap"></figcaption>
+            </figure>
             <div>
               <h3>What it does</h3>
               <p id="info-what"></p>
-            </div>
-            <div>
               <h3>Why it matters</h3>
               <p id="info-why"></p>
             </div>
@@ -278,92 +280,117 @@
     <section class="panel" id="sec-2" role="tabpanel" aria-labelledby="tab-2" hidden>
       <h1>Section 2: Hydraulic System Visualisation</h1>
       <p class="intro">
-        Landing gear is heavy, so most aircraft move it with <strong>hydraulics</strong>: a special oil (hydraulic fluid)
-        pushed under high pressure through pipes. Liquid can't be squashed, so pushing it at one end makes it push
-        just as hard at the other end, strong enough to lift the whole gear leg.
+        Landing gear is heavy, so most aircraft move it with <strong>hydraulics</strong>: a special oil, called
+        hydraulic fluid, pushed hard through pipes. You can't squash a liquid, so when you push it at one end, it pushes
+        just as hard at the other end. That push is strong enough to swing a whole gear leg.
       </p>
-      <p class="hint">Press <strong>GEAR DOWN</strong> or <strong>GEAR UP</strong> and watch the fluid move, one stage at a time.</p>
+      <p class="hint">Press <strong>GEAR DOWN</strong> or <strong>GEAR UP</strong> and follow the fluid, one stage at a time.</p>
 
       <div class="controls">
         <button type="button" class="btn gear-btn" id="hyd-down">&#9660; GEAR DOWN</button>
         <button type="button" class="btn gear-btn" id="hyd-up">&#9650; GEAR UP</button>
         <div class="legend">
-          <span><i class="swatch blue"></i>Pressure (fluid going to work)</span>
-          <span><i class="swatch red"></i>Return (fluid going back)</span>
+          <span><i class="swatch blue"></i>Pressure: fluid going to work</span>
+          <span><i class="swatch red"></i>Return: fluid going back</span>
           <span><i class="swatch grey"></i>No flow</span>
         </div>
       </div>
-      <p class="status" id="hyd-status" aria-live="polite">Gear is UP (aircraft in flight). Selector valve: NEUTRAL.</p>
+      <p class="status" id="hyd-status" aria-live="polite">All three gears are UP (the aircraft is flying). Selector valve: NEUTRAL.</p>
 
       <figure class="diagram-card">
-        <svg id="hyd-svg" class="diagram" viewBox="0 0 900 430" role="img" aria-labelledby="hyd-svg-title">
-          <title id="hyd-svg-title">Hydraulic system: reservoir, pump, selector valve, actuating cylinder and return line</title>
+        <svg id="hyd-svg" class="diagram" viewBox="0 0 1000 600" role="img" aria-labelledby="hyd-svg-title">
+          <title id="hyd-svg-title">Landing gear hydraulic system: reservoir, pump, filter, check valve, relief valve, pressure gauge, selector valve, and three actuating cylinders moving the nose, left and right main gears</title>
+          <defs id="hyd-defs"></defs>
 
-          <!-- Pipes (drawn in the direction fluid flows when used as pressure) -->
-          <path id="pipe-supply" class="pipe" d="M95 150 L95 222"/>
-          <path id="pipe-pressure" class="pipe" d="M131 260 L300 260"/>
-          <path id="pipe-a" class="pipe" d="M440 240 L505 240 L505 205 L560 205"/>
-          <path id="pipe-b" class="pipe" d="M440 290 L735 290 L735 237"/>
-          <path id="pipe-return" class="pipe" d="M300 300 L250 300 L250 385 L22 385 L22 120 L40 120"/>
+          <!-- Pipes. Each is drawn in the direction fluid flows when it carries pressure. -->
+          <path id="pipe-relief" class="pipe relief" d="M300 230 L300 330 L340 330"/>
+          <path id="pipe-gauge" class="pipe thin" d="M300 230 L300 200"/>
+          <path id="pipe-supply" class="pipe" d="M95 130 L95 196"/>
+          <path id="pipe-pressure" class="pipe" d="M129 230 L380 230"/>
+          <path id="pipe-return" class="pipe" d="M380 270 L340 270 L340 570 L20 570 L20 85 L40 85"/>
+          <g id="down-lines">
+            <path class="pipe" d="M500 230 L540 230"/>
+            <path class="pipe" d="M540 230 L540 100 L600 100"/>
+            <path class="pipe" d="M540 230 L540 260 L600 260"/>
+            <path class="pipe" d="M540 260 L540 420 L600 420"/>
+          </g>
+          <g id="up-lines">
+            <path class="pipe" d="M500 270 L565 270"/>
+            <path class="pipe" d="M565 270 L565 130 L690 130 L690 118"/>
+            <path class="pipe" d="M565 270 L565 290 L690 290 L690 278"/>
+            <path class="pipe" d="M565 270 L565 450 L690 450 L690 438"/>
+          </g>
 
-          <!-- Reservoir -->
+          <!-- 1. Reservoir -->
           <g class="hyd-part" data-stage="1">
-            <rect x="40" y="55" width="110" height="95" rx="8" class="tank"/>
-            <rect x="44" y="85" width="102" height="61" rx="5" class="fluid" id="res-fluid"/>
-            <text x="95" y="45" class="svg-label" text-anchor="middle">RESERVOIR</text>
-            <text x="95" y="122" class="svg-small dark" text-anchor="middle">fluid store</text>
+            <rect x="40" y="40" width="110" height="90" rx="8" class="tank"/>
+            <rect x="44" y="68" width="102" height="58" rx="5" class="fluid"/>
+            <text x="95" y="30" class="svg-label" text-anchor="middle">RESERVOIR</text>
+            <text x="95" y="103" class="svg-small dark" text-anchor="middle">fluid store</text>
           </g>
 
-          <!-- Pump -->
+          <!-- 2. Pump and gauge -->
           <g class="hyd-part" data-stage="2">
-            <circle cx="95" cy="260" r="36" class="pump"/>
+            <circle cx="95" cy="230" r="34" class="pump"/>
             <g id="impeller">
-              <line x1="95" y1="236" x2="95" y2="284" class="blade"/>
-              <line x1="71" y1="260" x2="119" y2="260" class="blade"/>
-              <line x1="78" y1="243" x2="112" y2="277" class="blade"/>
-              <line x1="112" y1="243" x2="78" y2="277" class="blade"/>
+              <line x1="95" y1="208" x2="95" y2="252" class="blade"/>
+              <line x1="73" y1="230" x2="117" y2="230" class="blade"/>
+              <line x1="80" y1="215" x2="110" y2="245" class="blade"/>
+              <line x1="110" y1="215" x2="80" y2="245" class="blade"/>
             </g>
-            <circle cx="95" cy="260" r="7" class="hub"/>
-            <text x="95" y="320" class="svg-label" text-anchor="middle">PUMP</text>
+            <circle cx="95" cy="230" r="6" class="hub"/>
+            <text x="95" y="284" class="svg-label" text-anchor="middle">PUMP</text>
+            <text x="95" y="300" class="svg-tiny" text-anchor="middle">turned by the engine</text>
+            <circle cx="300" cy="180" r="20" class="gauge"/>
+            <line id="gauge-needle" x1="300" y1="180" x2="300" y2="166" class="needle" transform="rotate(-120 300 180)"/>
+            <circle cx="300" cy="180" r="3" class="needle-hub"/>
+            <text x="300" y="148" class="svg-small" text-anchor="middle">PRESSURE GAUGE</text>
+            <text x="274" y="185" class="svg-small mono" text-anchor="end" id="gauge-value">0 psi</text>
           </g>
 
-          <!-- Selector valve -->
+          <!-- 3. Filter, check valve, relief valve -->
           <g class="hyd-part" data-stage="3">
-            <rect x="300" y="215" width="140" height="100" rx="8" class="valve"/>
-            <text x="370" y="205" class="svg-label" text-anchor="middle">SELECTOR VALVE</text>
-            <!-- Inner passages: straight for DOWN, crossed for UP -->
+            <rect x="172" y="216" width="36" height="28" rx="3" class="filter"/>
+            <path d="M178 238 L202 222 M178 230 L194 220 M186 242 L202 232" class="filter-mesh"/>
+            <text x="190" y="206" class="svg-small" text-anchor="middle">FILTER</text>
+            <rect x="236" y="218" width="28" height="24" rx="3" class="valve-box"/>
+            <path d="M242 222 L256 230 L242 238 Z M258 222 L258 238" class="check-mark"/>
+            <text x="250" y="262" class="svg-small" text-anchor="middle">CHECK VALVE</text>
+            <rect x="286" y="286" width="28" height="28" rx="3" class="valve-box"/>
+            <path d="M292 291 L308 296 L292 301 L308 306 L292 311" class="spring"/>
+            <text x="280" y="304" class="svg-small" text-anchor="end">RELIEF VALVE</text>
+            <text x="280" y="318" class="svg-tiny" text-anchor="end">opens only if pressure is too high</text>
+          </g>
+
+          <!-- 4. Selector valve -->
+          <g class="hyd-part" data-stage="4">
+            <rect x="380" y="190" width="120" height="100" rx="8" class="valve"/>
+            <text x="440" y="180" class="svg-label" text-anchor="middle">SELECTOR VALVE</text>
             <g id="valve-down" class="passages" opacity="0">
-              <path id="pass-down-p" class="pipe inner" d="M300 260 L370 260 L370 240 L440 240"/>
-              <path id="pass-down-r" class="pipe inner" d="M440 290 L400 290 L400 300 L300 300"/>
+              <path id="pass-down-p" class="pipe inner" d="M380 230 L500 230"/>
+              <path id="pass-down-r" class="pipe inner" d="M500 270 L380 270"/>
             </g>
             <g id="valve-up" class="passages" opacity="0">
-              <path id="pass-up-p" class="pipe inner" d="M300 260 L360 260 L410 290 L440 290"/>
-              <path id="pass-up-r" class="pipe inner" d="M440 240 L410 240 L340 300 L300 300"/>
+              <path id="pass-up-p" class="pipe inner" d="M380 230 L420 230 L460 270 L500 270"/>
+              <path id="pass-up-r" class="pipe inner" d="M500 230 L460 230 L420 270 L380 270"/>
             </g>
-            <rect x="336" y="322" width="68" height="24" rx="5" class="valve-tag"/>
-            <text x="370" y="339" class="svg-small mono" text-anchor="middle" id="valve-text">NEUTRAL</text>
-            <text x="292" y="255" class="svg-tiny" text-anchor="end">IN</text>
-            <text x="292" y="314" class="svg-tiny" text-anchor="end">OUT</text>
+            <rect x="406" y="298" width="68" height="24" rx="5" class="valve-tag"/>
+            <text x="440" y="315" class="svg-small mono" text-anchor="middle" id="valve-text">NEUTRAL</text>
+            <text x="372" y="226" class="svg-tiny" text-anchor="end">IN</text>
+            <text x="372" y="285" class="svg-tiny" text-anchor="end">OUT</text>
           </g>
 
-          <!-- Actuating cylinder -->
-          <g class="hyd-part" data-stage="4">
-            <rect x="560" y="180" width="200" height="56" rx="8" class="cylinder"/>
-            <g id="piston-group">
-              <rect id="piston" x="572" y="184" width="14" height="48" rx="2" class="piston"/>
-              <rect id="rod" x="586" y="201" width="190" height="14" rx="3" class="rod"/>
-              <circle cx="776" cy="208" r="9" class="joint-lg"/>
-            </g>
-            <text x="660" y="168" class="svg-label" text-anchor="middle">ACTUATING CYLINDER</text>
-            <text x="590" y="256" class="svg-tiny" text-anchor="middle">"down" side</text>
-            <text x="725" y="256" class="svg-tiny" text-anchor="middle">"up" side</text>
-          </g>
-          <text x="830" y="150" class="svg-small" text-anchor="middle" id="mini-gear-text" aria-hidden="true">GEAR UP</text>
+          <!-- 5. Three actuating cylinders and gear legs (drawn by landing-gear.js) -->
+          <g class="hyd-part" data-stage="5" id="actuators"></g>
 
-          <text x="160" y="375" class="svg-label" text-anchor="middle" data-stage-label="5">RETURN LINE</text>
-          <text x="200" y="250" class="svg-small" text-anchor="middle">pressure line</text>
+          <text x="180" y="560" class="svg-label" text-anchor="middle" data-stage-label="6">RETURN LINE</text>
         </svg>
       </figure>
+      <p class="muted small fig-note">
+        Inside each actuating cylinder: <span class="key blue">blue</span> is fluid flowing in and pushing the piston;
+        <span class="key red">red</span> is fluid being pushed out. The rod is joined to the gear leg, so as the piston
+        moves, the leg swings down into the airflow or up into its bay.
+      </p>
 
       <ol class="stages" id="stages"></ol>
 
@@ -377,14 +404,15 @@
     <section class="panel" id="sec-3" role="tabpanel" aria-labelledby="tab-3" hidden>
       <h1>Section 3: Landing Gear Indication</h1>
       <p class="intro">
-        The crew can't see the wheels from the cockpit, so <strong>lights</strong> tell them where the gear is.
-        Sensors on each leg switch the lights on only when that leg is truly locked in place.
+        The pilot can't see the wheels from the cockpit, so <strong>lights</strong> show where the gear is.
+        A sensor on each leg turns its green light on only when that leg is locked down.
         The golden rule: <strong>three greens = safe to land</strong>.
       </p>
-      <p class="hint">Use the buttons (or click the gear handle) to run a sequence. Watch the lights.</p>
+      <p class="hint">Move the gear handle (or use the buttons). Watch the lights in the cockpit and the real gear on the aircraft.</p>
 
-      <div class="cockpit-wrap">
+      <div class="ind-layout">
         <figure class="diagram-card cockpit-card">
+          <figcaption class="fig-cap">In the cockpit</figcaption>
           <svg id="panel-svg" class="diagram" viewBox="0 0 420 330" role="img" aria-labelledby="panel-svg-title">
             <title id="panel-svg-title">Simulated cockpit landing gear panel with three green lights, a red warning light and a gear handle</title>
             <rect x="6" y="6" width="408" height="318" rx="16" class="cp-panel"/>
@@ -428,21 +456,74 @@
           </svg>
         </figure>
 
-        <div class="cockpit-side">
-          <div class="controls stack">
-            <button type="button" class="btn gear-btn" id="ind-down">&#9660; GEAR DOWN</button>
-            <button type="button" class="btn gear-btn" id="ind-up">&#9650; GEAR UP</button>
-            <button type="button" class="btn ghost" id="ind-fault">Simulate a fault</button>
-            <button type="button" class="btn ghost" id="ind-test">Lamp test</button>
-          </div>
-          <div class="readout" aria-live="polite">
-            <p class="readout-label">Gear status</p>
-            <p class="readout-value" id="ind-state">UP AND LOCKED</p>
-            <p id="ind-explain">All lights off with the handle UP: the gear is tucked away and locked. Normal for flight.</p>
-          </div>
-          <p class="muted small" id="ind-progress">To complete this section: run a GEAR DOWN and a GEAR UP sequence.</p>
+        <figure class="diagram-card jet-card">
+          <figcaption class="fig-cap">On the aircraft <span class="muted">(seen from behind, so left and right match the lights)</span></figcaption>
+          <svg id="ind-jet" class="diagram" viewBox="0 0 520 290" role="img" aria-labelledby="ind-jet-title">
+            <title id="ind-jet-title">Fighter jet seen from behind, showing the nose gear and the left and right main gears moving</title>
+            <line x1="10" y1="252" x2="510" y2="252" class="jet-ground"/>
+            <polygon class="jet-shape" points="232,118 196,30 214,30 246,118"/>
+            <polygon class="jet-shape" points="288,118 324,30 306,30 274,118"/>
+            <polygon class="jet-shape" points="205,138 24,150 24,158 205,170"/>
+            <polygon class="jet-shape" points="315,138 496,150 496,158 315,170"/>
+            <ellipse cx="260" cy="152" rx="62" ry="38" class="jet-shape"/>
+            <circle cx="236" cy="150" r="17" class="nozzle"/>
+            <circle cx="284" cy="150" r="17" class="nozzle"/>
+            <circle cx="236" cy="150" r="9" class="nozzle-in"/>
+            <circle cx="284" cy="150" r="9" class="nozzle-in"/>
+
+            <!-- Nose gear: far away at the front, so it folds forward "into" the picture -->
+            <g id="jg-nose" class="jg">
+              <line x1="260" y1="188" x2="260" y2="232" class="jg-leg"/>
+              <rect x="252" y="222" width="16" height="26" rx="5" class="jg-tyre"/>
+            </g>
+            <line id="jd-left" x1="246" y1="189" x2="260" y2="189" class="jg-door"/>
+            <line id="jd-right" x1="274" y1="189" x2="260" y2="189" class="jg-door"/>
+            <!-- Main gears: drawn hanging down; landing-gear.js swings them in towards the centre -->
+            <g id="jg-left" class="jg">
+              <line x1="176" y1="166" x2="176" y2="222" class="jg-leg"/>
+              <rect x="167" y="218" width="18" height="30" rx="6" class="jg-tyre"/>
+              <circle cx="176" cy="166" r="4" class="jg-pivot"/>
+            </g>
+            <g id="jg-right" class="jg">
+              <line x1="344" y1="166" x2="344" y2="222" class="jg-leg"/>
+              <rect x="335" y="218" width="18" height="30" rx="6" class="jg-tyre"/>
+              <circle cx="344" cy="166" r="4" class="jg-pivot"/>
+            </g>
+
+            <text x="176" y="274" class="jg-label" text-anchor="middle" id="jl-left">LEFT MAIN</text>
+            <text x="260" y="274" class="jg-label" text-anchor="middle" id="jl-nose">NOSE</text>
+            <text x="344" y="274" class="jg-label" text-anchor="middle" id="jl-right">RIGHT MAIN</text>
+          </svg>
+        </figure>
+      </div>
+
+      <div class="ind-bottom">
+        <div class="controls ind-controls">
+          <button type="button" class="btn gear-btn" id="ind-down">&#9660; GEAR DOWN</button>
+          <button type="button" class="btn gear-btn" id="ind-up">&#9650; GEAR UP</button>
+          <button type="button" class="btn ghost" id="ind-test">Lamp test</button>
+          <button type="button" class="btn ghost" id="ind-fault">Simulate a fault</button>
+          <button type="button" class="btn warn" id="ind-emergency" hidden>Emergency extension</button>
+          <button type="button" class="btn ghost" id="ind-reset" hidden>Reset (fix everything)</button>
+        </div>
+        <div class="readout" aria-live="polite">
+          <p class="readout-label">What the lights are telling you</p>
+          <p class="readout-value" id="ind-state">UP AND LOCKED</p>
+          <p id="ind-explain">All lights off with the handle UP: the gear is tucked away and locked. Normal for flight.</p>
         </div>
       </div>
+
+      <div class="fault-card" id="fault-card" hidden aria-live="polite">
+        <p class="fault-kicker" id="fault-kicker">Fault</p>
+        <h2 id="fault-title"></h2>
+        <dl class="fault-grid">
+          <dt>What you see</dt><dd id="fault-see"></dd>
+          <dt>What it means</dt><dd id="fault-means"></dd>
+          <dt>What to do</dt><dd id="fault-do"></dd>
+        </dl>
+        <p class="fault-try" id="fault-try"></p>
+      </div>
+      <p class="muted small" id="ind-progress">To complete this section: run a normal GEAR DOWN and a normal GEAR UP.</p>
 
       <div class="card">
         <h2>What the lights mean</h2>
@@ -477,8 +558,8 @@
                 <td>Forgetting to lower the gear leads to a wheels-up (belly) landing.</td>
               </tr>
               <tr data-row="none">
-                <td><span class="dot off"></span><span class="dot off"></span><span class="dot off"></span> All off, handle DOWN</td>
-                <td>Something is wrong: a <strong>blown bulb</strong>, a power fault, or the gear did not come down.</td>
+                <td><span class="dot g"></span><span class="dot g"></span><span class="dot off"></span> Red off, but fewer than three greens, handle DOWN</td>
+                <td>Something is wrong with the lights: often a <strong>blown bulb</strong> or a power fault. The gear may be fine, but you can't be sure.</td>
                 <td>Treat it as unsafe. Press lamp test to check the bulbs, check the circuit breaker, and report it.</td>
                 <td>You might land with gear that is not locked.</td>
               </tr>
@@ -507,7 +588,8 @@
           <li><strong>Hydraulic fluid</strong> flows from the <strong>reservoir</strong> to the <strong>pump</strong>, which pressurises it. The <strong>selector valve</strong> sends it to the correct side of the <strong>actuating cylinder</strong>.</li>
           <li>Fluid pushed out of the other side of the cylinder returns to the reservoir through the <strong>return line</strong>. The system is a closed loop.</li>
           <li><strong>Three greens</strong> = down and locked. <strong>Red</strong> = in transit or unsafe. <strong>All off with the handle up</strong> = up and locked.</li>
-          <li>Never ignore a red light or a missing green. Check the bulbs, follow the checklist and report it.</li>
+          <li>The pump, filter, check valve and relief valve keep the fluid pushing hard, clean, one-way and at a safe pressure.</li>
+          <li>Never ignore a red light or a missing green. Do a lamp test, try the gear again, and if it still won't lock, use the <strong>emergency extension</strong>, which lets the gear fall by its own weight. Report every fault.</li>
         </ol>
       </div>
       <div class="next-row">

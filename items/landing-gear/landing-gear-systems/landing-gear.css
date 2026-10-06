@@ -19,6 +19,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html { scroll-behavior: smooth; }
 
@@ -304,7 +305,46 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 .label-pill:focus-visible rect { stroke: var(--blue); stroke-width: 4; }
 
 .info-panel { padding: 1rem 1.1rem; margin-top: 1rem; scroll-margin-top: 9rem; }
-.info-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; }
+.info-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 0.5rem 1.5rem; align-items: start; }
+.info-cols h3:first-child { margin-top: 0.4rem; }
+
+/* Cut-away pictures in the explanation panel */
+.xsec { margin: 0.6rem 0 0; padding: 0.5rem; border-radius: 10px; background: var(--bg-2); border: 1px solid var(--border); }
+.xsec-svg { display: block; width: 100%; height: auto; }
+.xsec figcaption { font-size: 0.85rem; color: var(--muted); text-align: center; margin-top: 0.25rem; }
+.x-metal { fill: #5d6f88; stroke: #8fa1ba; stroke-width: 1.5; }
+.x-dark { fill: #2a3240; }
+.x-chrome { fill: #dfe6ee; stroke: #8e9aab; stroke-width: 1; }
+.x-oil { fill: var(--blue); fill-opacity: 0.75; }
+.x-out { fill: var(--red); fill-opacity: 0.55; }
+.x-gas { fill: #cfe3ff; fill-opacity: 0.3; }
+.x-n2 { fill: #9fd6f5; fill-opacity: 0.3; }
+.x-body { fill: #2c4266; stroke: #4c6a96; stroke-width: 1.5; }
+.x-bay { fill: #050c18; }
+.x-door { fill: var(--amber); }
+.x-tyre { fill: #151a22; stroke: #4a5568; stroke-width: 3; }
+.x-hub { fill: #9aa8bb; }
+.x-rim { fill: #3c4a5e; stroke: #9aa8bb; stroke-width: 2; }
+.x-brake-a { fill: #c96f3b; }
+.x-brake-b { fill: #8e9aab; }
+.x-axle { stroke: #8e9aab; stroke-width: 8; }
+.x-leg { stroke: #8fa1ba; stroke-width: 10; stroke-linecap: round; }
+.x-brace { fill: none; stroke: #8fa1ba; stroke-width: 9; stroke-linecap: round; stroke-linejoin: round; }
+.x-brace.hl { stroke: var(--amber); }
+.x-lock { fill: #1b2638; stroke: var(--amber); stroke-width: 2.5; }
+.x-link { fill: none; stroke: var(--amber); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+.x-pin { fill: #1b2638; stroke: #e3eaf3; stroke-width: 2; }
+.x-arrow { fill: none; stroke: #f3f6fb; stroke-width: 2.5; }
+.x-arrow.amber { stroke: var(--amber); stroke-width: 3; }
+.x-arrow.red { stroke: var(--red); stroke-width: 3; }
+.x-arrow.green { stroke: var(--green); stroke-width: 3; }
+.x-arrow.blue { stroke: var(--blue); stroke-width: 3; }
+.x-lead { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 2; }
+.x-text { fill: var(--muted); font-size: 12px; }
+.x-head { fill: var(--text); font-size: 13px; font-weight: 700; }
+.x-head.good { fill: var(--green); }
+.x-head.bad { fill: #ff8a8a; }
+.x-in { fill: #06213b; font-size: 12px; font-weight: 800; letter-spacing: 0.08em; }
 .info-where { font-size: 0.95rem; color: var(--muted); }
 .info-where strong { color: var(--text); }
 .info-empty { text-align: center; color: var(--muted); padding: 1.5rem 0.5rem; }
@@ -372,7 +412,6 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 
 /* ---------- Section 2: hydraulics ---------- */
 .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; }
-.controls.stack { flex-direction: column; align-items: stretch; }
 .legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; font-size: 0.85rem; color: var(--muted); margin-left: auto; }
 .legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
 .swatch { display: inline-block; width: 22px; height: 5px; border-radius: 3px; }
@@ -394,16 +433,37 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 .fluid { fill: var(--blue); opacity: 0.85; }
 .pump { fill: #0d1c33; stroke: #8fa1ba; stroke-width: 3; }
 .blade { stroke: #8fa1ba; stroke-width: 4; stroke-linecap: round; }
-#impeller { transform-origin: 95px 260px; transform-box: view-box; }
+#impeller { transform-origin: 95px 230px; transform-box: view-box; }
 #impeller.spin { animation: spin 0.8s linear infinite; }
 #impeller.spin .blade { stroke: var(--blue); }
 @keyframes spin { to { transform: rotate(360deg); } }
 .valve { fill: #0d1c33; stroke: #8fa1ba; stroke-width: 3; }
 .valve-tag { fill: var(--bg); stroke: var(--amber); stroke-width: 1.5; }
 .cylinder { fill: #0d1c33; stroke: #8fa1ba; stroke-width: 3; }
-.piston { fill: #c3cfdf; }
-.rod { fill: #e3eaf3; }
-.joint-lg { fill: #1b2638; stroke: #e3eaf3; stroke-width: 3; }
+.piston { fill: #c3cfdf; stroke: #6b7a90; stroke-width: 1; }
+.rod { stroke: #e3eaf3; stroke-width: 7; stroke-linecap: round; }
+.crank { stroke: #c3cfdf; stroke-width: 6; stroke-linecap: round; }
+.leg { stroke: #8fa1ba; stroke-width: 8; stroke-linecap: round; }
+.leg-wheel { fill: #151a22; stroke: #5b6b82; stroke-width: 3; }
+.chamber { fill: #24466f; }
+.chamber.blue { fill: var(--blue); fill-opacity: 0.6; }
+.chamber.red { fill: var(--red); fill-opacity: 0.5; }
+.bay { fill: none; stroke: #3a5a85; stroke-width: 1.5; stroke-dasharray: 5 4; }
+.gauge { fill: #0d1c33; stroke: #8fa1ba; stroke-width: 2.5; }
+.needle { stroke: var(--amber); stroke-width: 3; stroke-linecap: round; }
+.needle-hub { fill: var(--amber); }
+.filter { fill: #0d1c33; stroke: #8fa1ba; stroke-width: 2; }
+.filter-mesh { stroke: #8fa1ba; stroke-width: 1.5; }
+.valve-box { fill: #0d1c33; stroke: #8fa1ba; stroke-width: 2; }
+.check-mark { fill: #8fa1ba; stroke: #8fa1ba; stroke-width: 2; }
+.spring { fill: none; stroke: #8fa1ba; stroke-width: 2; }
+.pipe.thin { stroke-width: 5; }
+.pipe.relief { stroke-dasharray: 6 5; stroke-width: 5; }
+.hyd-part.focus .gauge, .hyd-part.focus .filter, .hyd-part.focus .valve-box { stroke: var(--amber); }
+.fig-note { margin: 0.5rem 0 0; }
+.key { font-weight: 700; }
+.key.blue { color: var(--blue); }
+.key.red { color: #ff8a8a; }
 .passages { transition: opacity 0.4s; }
 
 .pipe {
@@ -464,13 +524,50 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 .stage.done::before { content: "\2713"; border-color: var(--green); color: var(--green); }
 
 /* ---------- Section 3: cockpit panel ---------- */
-.cockpit-wrap {
+.ind-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
 }
 .cockpit-card { background: #050b15; }
+.fig-cap { font-size: 0.85rem; font-weight: 600; margin: 0.15rem 0 0.35rem 0.3rem; }
+.fig-cap .muted { font-weight: 400; }
+.jet-card .diagram { margin-top: 0.5rem; }
+.nozzle { fill: #1b2638; stroke: #6d88b3; stroke-width: 2; }
+.nozzle-in { fill: #050c18; }
+.jg-leg { stroke: #c3cfdf; stroke-width: 6; stroke-linecap: round; }
+.jg-tyre { fill: #151a22; stroke: #8fa1ba; stroke-width: 2.5; }
+.jg-pivot { fill: #1b2638; stroke: #c3cfdf; stroke-width: 2; }
+.jg-door { stroke: var(--amber); stroke-width: 4; stroke-linecap: round; }
+.jg-label { fill: var(--muted); font-size: 13px; font-weight: 700; letter-spacing: 0.06em; }
+.jg-label.locked-down { fill: var(--green); }
+.jg-label.not-locked { fill: var(--red); }
+
+.ind-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+.ind-controls { margin: 0; }
+.ind-controls .btn { flex: 1 1 11.5rem; white-space: nowrap; }
+.btn.warn { background: var(--red); border-color: var(--red); color: #fff; }
+
+.fault-card {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--red);
+  background: rgba(255, 75, 75, 0.08);
+}
+.fault-kicker { margin: 0 0 0.2rem; font-size: 0.85rem; color: var(--muted); }
+.fault-card h2 { color: #ff8a8a; }
+.fault-grid { display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 0.4rem 1rem; margin: 0.6rem 0; }
+.fault-grid dt { font-weight: 700; color: var(--amber); }
+.fault-grid dd { margin: 0; }
+.fault-try { margin: 0; font-weight: 700; }
 .cp-panel { fill: #1d2430; stroke: #3b4658; stroke-width: 3; }
 .screw { fill: #3b4658; stroke: #59667c; }
 .cp-title { fill: #e9edf3; font-size: 15px; font-weight: 800; letter-spacing: 0.18em; }
@@ -494,7 +591,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 #handle.down { transform: translateY(186px); }
 
 .readout {
-  margin-top: 0.9rem;
+  margin-top: 0;
   padding: 0.8rem 1rem;
   border-radius: 10px;
   background: #050b15;
@@ -539,7 +636,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 /* ---------- Small screens ---------- */
 @media (max-width: 760px) {
   h1 { font-size: 1.3rem; }
-  .cockpit-wrap, .locate-views, .gear-windows, .info-cols { grid-template-columns: minmax(0, 1fr); }
+  .ind-layout, .ind-bottom, .locate-views, .gear-windows, .info-cols, .fault-grid { grid-template-columns: minmax(0, 1fr); }
+  .fault-grid dd { margin-bottom: 0.4rem; }
   .jet-top { max-height: 380px; }
   .legend { margin-left: 0; }
   .tabs { gap: 0; }

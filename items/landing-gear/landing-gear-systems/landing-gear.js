@@ -1,8 +1,11 @@
 /*
  * Landing Gear Systems: three sections shown as tabs.
- *   1. Components: clickable labelled diagram + a 3-question check.
- *   2. Hydraulics: animated fluid flow for GEAR DOWN / GEAR UP.
- *   3. Indication: cockpit gear lights and handle.
+ *   1. Components: where the gear is on a fighter, nose and main gear close-ups with
+ *      clickable parts and cut-away pictures, and a 3-question check.
+ *   2. Hydraulics: the whole gear hydraulic system, animated for GEAR DOWN / GEAR UP,
+ *      with three actuating cylinders moving the gear legs.
+ *   3. Indication: cockpit gear lights and handle, the gear moving on the aircraft,
+ *      and six faults to practise on.
  * A section counts as complete when the trainee has done its activity.
  * When all three are complete the item is marked done in the tracker.
  */
@@ -76,54 +79,172 @@
   const PARTS = [
     {
       id: "oleo", label: "Oleo strut", name: "Shock Absorber (Oleo Strut)",
-      where: "Every gear leg has one: the nose gear and both main gears.",
-      what: "The main leg of the landing gear, with a built-in shock absorber. Inside are oil and compressed gas (usually nitrogen). On landing, the lower tube (the shiny piston) slides up into the upper tube. The oil is forced through a small hole, which slows the movement, and the gas acts like a spring.",
-      why: "Landing is a hard bump. Without the oleo strut that shock would go straight into the aircraft's structure and the pilot. It also smooths out bumps when the aircraft moves on the ground.",
-      like: "the suspension on a car or a mountain bike's front fork."
+      where: "Every gear leg has one.",
+      what: "This is the leg's shock absorber. Inside it are oil and gas. When the wheels hit the ground, the inner tube (the piston) is pushed up. The oil has to squeeze through a small hole, which slows the push down. The gas squashes like a spring, then pushes back.",
+      why: "Landings are bumpy. The oleo strut soaks up the bump, so it doesn't damage the aircraft or hurt the pilot.",
+      like: "the springs and shock absorbers on a car or a bike.",
+      caption: "Cut in half: gas on top, oil below, and a small hole between them."
     },
     {
       id: "drag", label: "Drag brace", name: "Drag Brace",
-      where: "Shown on the nose gear window, because you see it best from the side. The main gears have one too.",
-      what: "A strong diagonal bar that holds the gear leg against forces from the front and back. It usually has a hinge in the middle so it can fold when the gear retracts, and it locks straight when the gear is down.",
-      why: "When the wheels hit the runway and the brakes are used, huge forces try to push the leg backwards. The drag brace stops the leg from folding over.",
-      like: "a prop leaning against a fence to stop it falling over."
+      where: "Shown in the nose gear window, where you see it from the side. The main gears have one too.",
+      what: "A strong bar that runs at an angle from the leg up to the aircraft. It stops the leg being pushed backwards or forwards. It has a hinge in the middle so it can fold when the gear goes up. When the gear is down, a lock holds it straight.",
+      why: "When the wheels touch the runway and the brakes go on, the leg gets a big push backwards. The drag brace stops the leg folding over.",
+      like: "a stick propping up a fence.",
+      caption: "Seen from the side: the brace takes the push from braking."
     },
     {
       id: "side", label: "Side brace", name: "Side Brace",
-      where: "Shown on the main gear window, because you see it best from the front.",
-      what: "A bar that holds the gear leg against sideways forces. Like the drag brace, it often folds in the middle for retraction and has a lock that holds it straight when the gear is down.",
-      why: "Turning on the ground or landing in a crosswind pushes the wheels sideways. The side brace keeps the leg upright so it doesn't collapse to the side.",
-      like: "the diagonal bar that stops a bookshelf wobbling sideways."
+      where: "Shown in the main gear window, where you see it from the front.",
+      what: "A bar like the drag brace, but it stops the leg moving sideways. It also folds when the gear goes up, and a lock holds it straight when the gear is down.",
+      why: "Turning on the ground, or landing in a side wind, pushes the wheels sideways. The side brace keeps the leg standing straight.",
+      like: "the bar that stops a shelf wobbling from side to side.",
+      caption: "Seen from the front: the brace takes the sideways push."
     },
     {
       id: "torque", label: "Torque links", name: "Torque Links",
-      where: "On the nose gear and both main gears, joining the upper and lower parts of the strut.",
-      what: "Two short arms joined by a hinge, like a pair of scissors or a knee. They connect the upper part of the strut to the lower piston, letting the piston slide up and down but stopping it from twisting round.",
-      why: "Without them the lower part of the strut could rotate freely and the wheels would point the wrong way. On the nose gear they also pass the steering movement down to the wheels.",
-      like: "your knee: it bends forward and back but doesn't twist sideways."
+      where: "On every gear leg, joining the top part of the leg to the bottom part.",
+      what: "Two short arms joined by a hinge, like a knee. They join the top part of the leg to the bottom part (the piston). The piston can still slide up and down, but it can't turn round.",
+      why: "Without them the wheels could twist and point the wrong way. On the nose gear they also pass on the steering, so the wheel turns when the pilot steers.",
+      like: "your knee: it bends, but it doesn't twist.",
+      caption: "The links let the piston slide, but stop it twisting."
     },
     {
       id: "wheel", label: "Wheel & tyre", name: "Wheels and Tyres",
-      where: "The nose gear has a smaller wheel that steers. The main gears have bigger wheels with the brakes inside.",
-      what: "The wheels carry the aircraft's full weight on the ground. The tyres grip the runway for braking and steering. Aircraft tyres are filled with nitrogen gas instead of air.",
-      why: "Tyres take a huge load every landing. Wrong pressure, cuts or worn tread can cause a burst tyre on landing, so they are checked often. Nitrogen is used because it doesn't help a fire burn and its pressure changes less with temperature.",
-      like: "car tyres, but built to carry many tonnes and land at high speed."
+      where: "The nose gear has a smaller wheel that steers. The main gears have bigger wheels with brakes inside.",
+      what: "The wheels hold the aircraft up on the ground, and the tyres grip the runway. The main wheels have brakes inside them. The tyres are filled with nitrogen gas, not normal air.",
+      why: "Tyres take a big hit on every landing. If the pressure is wrong, or a tyre is cut or worn, it could burst. That's why they are checked often. Nitrogen is used because it doesn't help a fire burn, and its pressure stays steady when it gets hot or cold.",
+      like: "car tyres, but much stronger.",
+      caption: "Cut through the middle: tyre, wheel, brakes and axle."
     },
     {
       id: "door", label: "Wheel well door", name: "Wheel Well Door",
-      where: "Over each wheel well: one set for the nose gear and one for each main gear.",
-      what: "A panel that covers the wheel well (the space in the aircraft where the gear is stored when it is up). It opens to let the gear move and closes again afterwards.",
-      why: "A closed door makes the underside smooth, which cuts drag (air resistance) and noise. If a door doesn't open properly the gear could hit it; if it doesn't close, the aircraft uses more fuel.",
-      like: "a garage door that opens for the car and closes behind it."
+      where: "Over each gear bay: one set for the nose gear and one for each main gear.",
+      what: "A panel that covers the space where the gear is kept in flight (the wheel well). It opens to let the gear in or out, then closes again.",
+      why: "A closed door keeps the bottom of the aircraft smooth, so air flows past easily. If a door doesn't open, the gear could hit it. If it doesn't close, the aircraft burns more fuel.",
+      like: "a garage door that opens for the car and shuts behind it.",
+      caption: "Door shut in flight, door open when the gear is down."
     },
     {
       id: "actuator", label: "Actuating cylinder", name: "Actuating Cylinder",
-      where: "Each gear leg has its own, fixed between the aircraft's structure and the leg.",
-      what: "The 'muscle' that moves the gear. It is a tube with a piston and rod inside. Hydraulic fluid pushed into one end slides the rod out; fluid pushed into the other end pulls the rod back in. This swings the gear leg down or up.",
-      why: "Landing gear is very heavy, far too heavy to move by hand. The actuating cylinder uses hydraulic pressure to raise and lower it smoothly. You'll see it working in Section 2.",
-      like: "the arm of an excavator digger, which is also moved by hydraulic cylinders."
+      where: "Each gear leg has its own, fixed between the aircraft and the leg.",
+      what: "This is the 'muscle' that moves the gear. It is a tube with a piston and a rod inside. Fluid pushed in at one end pushes the rod out. Fluid pushed in at the other end pulls the rod back in. This swings the gear down or up.",
+      why: "Landing gear is very heavy, too heavy to move by hand. The actuating cylinder uses fluid pressure to move it smoothly. You'll see it working in Section 2.",
+      like: "the arm of a digger, which is moved the same way.",
+      caption: "Cut in half: fluid in on one side pushes the piston and rod."
     }
   ];
+
+  // Cross-section pictures shown in the explanation panel (fixed markup, no user content).
+  const FIG_DEFS =
+    '<defs>' +
+    '<marker id="xa-w" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#f3f6fb"/></marker>' +
+    '<marker id="xa-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#3ee06b"/></marker>' +
+    '<marker id="xa-r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#ff4b4b"/></marker>' +
+    '<marker id="xa-a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#ffb627"/></marker>' +
+    '</defs>';
+
+  const FIGURES = {
+    oleo:
+      '<rect x="120" y="20" width="90" height="10" class="x-metal"/>' +
+      '<rect x="128" y="30" width="74" height="40" class="x-gas"/>' +
+      '<rect x="128" y="70" width="74" height="72" class="x-oil"/>' +
+      '<rect x="144" y="100" width="42" height="105" class="x-oil"/>' +
+      '<rect x="128" y="88" width="30" height="6" class="x-dark"/><rect x="172" y="88" width="30" height="6" class="x-dark"/>' +
+      '<rect x="136" y="100" width="8" height="113" class="x-chrome"/><rect x="186" y="100" width="8" height="113" class="x-chrome"/>' +
+      '<rect x="136" y="205" width="58" height="8" class="x-chrome"/>' +
+      '<rect x="120" y="20" width="8" height="125" class="x-metal"/><rect x="202" y="20" width="8" height="125" class="x-metal"/>' +
+      '<line x1="165" y1="112" x2="165" y2="80" class="x-arrow" marker-end="url(#xa-w)"/>' +
+      '<text x="165" y="55" class="x-in" text-anchor="middle">GAS</text>' +
+      '<text x="165" y="135" class="x-in" text-anchor="middle">OIL</text>' +
+      '<line x1="95" y1="210" x2="95" y2="150" class="x-arrow amber" marker-end="url(#xa-a)"/>' +
+      '<text x="10" y="172" class="x-text">Bump from</text><text x="10" y="187" class="x-text">landing</text>' +
+      '<line x1="210" y1="45" x2="226" y2="45" class="x-lead"/><text x="230" y="42" class="x-head">Gas</text><text x="230" y="56" class="x-text">acts like a spring</text>' +
+      '<line x1="202" y1="91" x2="226" y2="91" class="x-lead"/><text x="230" y="88" class="x-head">Small hole</text><text x="230" y="102" class="x-text">slows the oil down</text>' +
+      '<line x1="194" y1="175" x2="226" y2="175" class="x-lead"/><text x="230" y="172" class="x-head">Piston</text><text x="230" y="186" class="x-text">slides up on landing</text>',
+    drag:
+      '<rect x="0" y="10" width="360" height="20" class="x-body"/>' +
+      '<text x="10" y="50" class="x-text">&#9664; front</text>' +
+      '<rect x="110" y="30" width="22" height="140" class="x-metal"/>' +
+      '<circle cx="121" cy="188" r="28" class="x-tyre"/><circle cx="121" cy="188" r="10" class="x-hub"/>' +
+      '<polyline points="250,30 210,88 132,122" class="x-brace hl"/>' +
+      '<rect x="201" y="80" width="18" height="16" rx="3" class="x-lock"/>' +
+      '<line x1="40" y1="200" x2="88" y2="200" class="x-arrow red" marker-end="url(#xa-r)"/>' +
+      '<text x="10" y="226" class="x-text">Braking pushes the leg back</text>' +
+      '<line x1="226" y1="88" x2="244" y2="100" class="x-lead"/><text x="248" y="104" class="x-head">Hinge + lock</text><text x="248" y="118" class="x-text">folds to go up,</text><text x="248" y="132" class="x-text">locks straight</text>' +
+      '<line x1="170" y1="104" x2="186" y2="140" class="x-lead"/><text x="160" y="154" class="x-head">Drag brace</text>',
+    side:
+      '<rect x="0" y="10" width="360" height="20" class="x-body"/>' +
+      '<rect x="169" y="30" width="22" height="140" class="x-metal"/>' +
+      '<line x1="140" y1="190" x2="220" y2="190" class="x-axle"/>' +
+      '<rect x="134" y="164" width="28" height="52" rx="9" class="x-tyre"/><rect x="198" y="164" width="28" height="52" rx="9" class="x-tyre"/>' +
+      '<polyline points="50,30 104,86 169,122" class="x-brace hl"/>' +
+      '<rect x="95" y="78" width="18" height="16" rx="3" class="x-lock"/>' +
+      '<line x1="340" y1="190" x2="236" y2="190" class="x-arrow red" marker-end="url(#xa-r)"/>' +
+      '<text x="244" y="164" class="x-text">Sideways push</text><text x="244" y="178" class="x-text">(turning or wind)</text>' +
+      '<line x1="60" y1="64" x2="76" y2="60" class="x-lead"/><text x="8" y="62" class="x-head">Side</text><text x="8" y="76" class="x-head">brace</text>' +
+      '<line x1="104" y1="96" x2="104" y2="118" class="x-lead"/><text x="70" y="132" class="x-head">Lock</text>' +
+      '<text x="8" y="208" class="x-text">The brace holds</text><text x="8" y="222" class="x-text">the leg upright</text>',
+    torque:
+      '<rect x="140" y="10" width="60" height="100" class="x-metal"/>' +
+      '<rect x="152" y="100" width="36" height="105" class="x-chrome"/>' +
+      '<polyline points="200,82 248,128 188,176" class="x-link"/>' +
+      '<circle cx="200" cy="82" r="5" class="x-pin"/><circle cx="248" cy="128" r="6" class="x-pin"/><circle cx="188" cy="176" r="5" class="x-pin"/>' +
+      '<line x1="120" y1="120" x2="120" y2="196" class="x-arrow green" marker-start="url(#xa-g)" marker-end="url(#xa-g)"/>' +
+      '<text x="8" y="150" class="x-head good">Slides up</text><text x="8" y="164" class="x-head good">and down &#10003;</text>' +
+      '<path d="M146 210 Q170 228 194 210" class="x-arrow red" marker-end="url(#xa-r)"/>' +
+      '<text x="210" y="208" class="x-head bad">Can&#8217;t twist</text><text x="210" y="222" class="x-head bad">round &#10007;</text>' +
+      '<line x1="252" y1="128" x2="270" y2="128" class="x-lead"/><text x="274" y="125" class="x-head">Torque</text><text x="274" y="139" class="x-head">links</text>' +
+      '<text x="210" y="30" class="x-text">Top of the leg</text><text x="210" y="44" class="x-text">(fixed)</text>' +
+      '<text x="8" y="40" class="x-text">Piston</text><text x="8" y="54" class="x-text">(moves)</text><line x1="58" y1="48" x2="150" y2="140" class="x-lead"/>',
+    wheel:
+      '<rect x="110" y="10" width="140" height="56" rx="20" class="x-tyre"/><rect x="122" y="22" width="116" height="44" rx="10" class="x-n2"/>' +
+      '<rect x="110" y="154" width="140" height="56" rx="20" class="x-tyre"/><rect x="122" y="154" width="116" height="44" rx="10" class="x-n2"/>' +
+      '<rect x="116" y="62" width="128" height="96" rx="4" class="x-rim"/>' +
+      '<rect x="140" y="74" width="6" height="72" class="x-brake-a"/><rect x="150" y="74" width="6" height="72" class="x-brake-b"/>' +
+      '<rect x="160" y="74" width="6" height="72" class="x-brake-a"/><rect x="170" y="74" width="6" height="72" class="x-brake-b"/>' +
+      '<rect x="180" y="74" width="6" height="72" class="x-brake-a"/><rect x="190" y="74" width="6" height="72" class="x-brake-b"/>' +
+      '<rect x="200" y="74" width="6" height="72" class="x-brake-a"/><rect x="210" y="74" width="6" height="72" class="x-brake-b"/>' +
+      '<rect x="60" y="104" width="250" height="12" rx="3" class="x-chrome"/>' +
+      '<line x1="44" y1="22" x2="112" y2="28" class="x-lead"/><text x="8" y="26" class="x-head">Tyre</text>' +
+      '<line x1="84" y1="54" x2="140" y2="46" class="x-lead"/><text x="8" y="52" class="x-head">Nitrogen</text><text x="8" y="66" class="x-text">gas inside</text>' +
+      '<line x1="244" y1="70" x2="268" y2="70" class="x-lead"/><text x="272" y="74" class="x-head">Wheel</text>' +
+      '<line x1="216" y1="140" x2="268" y2="150" class="x-lead"/><text x="272" y="148" class="x-head">Brakes</text><text x="272" y="162" class="x-text">(discs)</text>' +
+      '<line x1="40" y1="110" x2="60" y2="110" class="x-lead"/><text x="8" y="114" class="x-head">Axle</text>',
+    door:
+      '<rect x="10" y="20" width="160" height="50" class="x-body"/>' +
+      '<rect x="50" y="46" width="80" height="24" class="x-bay"/><circle cx="90" cy="58" r="10" class="x-tyre"/>' +
+      '<rect x="50" y="70" width="80" height="6" class="x-door"/>' +
+      '<line x1="20" y1="96" x2="160" y2="96" class="x-arrow" marker-end="url(#xa-w)"/>' +
+      '<line x1="20" y1="112" x2="160" y2="112" class="x-arrow" marker-end="url(#xa-w)"/>' +
+      '<text x="90" y="140" class="x-text" text-anchor="middle">air flows past smoothly</text>' +
+      '<text x="90" y="200" class="x-head" text-anchor="middle">GEAR UP:</text><text x="90" y="214" class="x-text" text-anchor="middle">door shut</text>' +
+      '<rect x="190" y="20" width="160" height="50" class="x-body"/>' +
+      '<rect x="230" y="46" width="80" height="24" class="x-bay"/>' +
+      '<rect x="306" y="70" width="6" height="64" class="x-door"/>' +
+      '<line x1="262" y1="60" x2="262" y2="140" class="x-leg"/><circle cx="262" cy="156" r="20" class="x-tyre"/>' +
+      '<text x="270" y="200" class="x-head" text-anchor="middle">GEAR DOWN:</text><text x="270" y="214" class="x-text" text-anchor="middle">door open</text>' +
+      '<text x="318" y="106" class="x-head">Door</text>',
+    actuator:
+      '<rect x="40" y="70" width="210" height="60" rx="6" class="x-metal"/>' +
+      '<rect x="46" y="76" width="94" height="48" class="x-oil"/>' +
+      '<rect x="152" y="76" width="92" height="48" class="x-out"/>' +
+      '<rect x="140" y="74" width="12" height="52" class="x-chrome"/>' +
+      '<rect x="152" y="92" width="178" height="16" rx="3" class="x-chrome"/>' +
+      '<circle cx="336" cy="100" r="9" class="x-pin"/>' +
+      '<rect x="54" y="36" width="12" height="36" class="x-metal"/><rect x="228" y="36" width="12" height="36" class="x-metal"/>' +
+      '<line x1="60" y1="16" x2="60" y2="62" class="x-arrow blue" marker-end="url(#xa-w)"/>' +
+      '<line x1="234" y1="62" x2="234" y2="16" class="x-arrow red" marker-end="url(#xa-r)"/>' +
+      '<text x="74" y="22" class="x-head">Fluid in</text>' +
+      '<text x="250" y="22" class="x-head">Fluid out</text>' +
+      '<line x1="70" y1="100" x2="128" y2="100" class="x-arrow" marker-end="url(#xa-w)"/>' +
+      '<line x1="146" y1="130" x2="146" y2="150" class="x-lead"/><text x="146" y="164" class="x-head" text-anchor="middle">Piston</text>' +
+      '<line x1="290" y1="110" x2="290" y2="132" class="x-lead"/><text x="290" y="146" class="x-head" text-anchor="middle">Rod</text>' +
+      '<line x1="270" y1="176" x2="340" y2="176" class="x-arrow amber" marker-end="url(#xa-a)"/>' +
+      '<text x="8" y="182" class="x-text">The rod pushes out: the gear swings down.</text>' +
+      '<text x="8" y="206" class="x-text">Send the fluid to the other end and the</text>' +
+      '<text x="8" y="220" class="x-text">rod pulls back in: the gear swings up.</text>'
+  };
 
   // Labels on each close-up window. x, y: top-left of the label; ax, ay: the point it points at.
   const WINDOW_LABELS = {
@@ -273,6 +394,9 @@
     $("info-what").textContent = part.what;
     $("info-why").textContent = part.why;
     $("info-like").textContent = part.like;
+    $("info-fig").innerHTML = '<svg class="xsec-svg" viewBox="0 0 360 230" role="img" aria-label="' +
+      part.name + ' cut-away picture">' + FIG_DEFS + FIGURES[part.id] + '</svg>';
+    $("info-fig-cap").textContent = part.caption;
     $("explored-count").textContent = String(seen.size);
     $("explored-count-2").textContent = String(seen.size);
 
@@ -296,7 +420,7 @@
       topic: "Oleo strut",
       options: ["Torque links", "Oleo strut", "Wheel well door", "Side brace"],
       answer: 1,
-      explain: "The oleo strut uses oil and compressed gas to cushion the landing, like a car's suspension."
+      explain: "The oleo strut uses oil and gas to soak up the bump of landing, like the shock absorbers on a car."
     },
     {
       q: "What do the torque links do?",
@@ -308,14 +432,14 @@
         "Keep the tyres inflated"
       ],
       answer: 1,
-      explain: "The torque links let the piston slide up and down but stop it rotating, so the wheels keep pointing the right way."
+      explain: "The torque links let the piston slide up and down but stop it turning round, so the wheels keep pointing the right way."
     },
     {
       q: "Which part uses hydraulic pressure to move the landing gear up and down?",
       topic: "Actuating cylinder",
       options: ["Drag brace", "Oleo strut", "Actuating cylinder", "Wheel well door"],
       answer: 2,
-      explain: "Hydraulic fluid pushes the piston inside the actuating cylinder, and its rod moves the gear leg."
+      explain: "Fluid pushes the piston inside the actuating cylinder, and its rod swings the gear leg."
     }
   ];
 
@@ -390,38 +514,172 @@
 
   /* ================= Section 2: hydraulics ================= */
 
-  const PISTON_TRAVEL = 100; // SVG units the piston moves between gear UP and gear DOWN
-  const STAGE_MS = 2300;
-  const hyd = { pos: "up", running: false, done: { down: false, up: false }, offset: 0 };
-  const pipes = ["pipe-supply", "pipe-pressure", "pipe-a", "pipe-b", "pipe-return",
-    "pass-down-p", "pass-down-r", "pass-up-p", "pass-up-r"].map($);
+  const STAGE_MS = 2200;
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+  // Runs fn(eased progress 0..1) every frame for ms milliseconds.
+  function animate(ms, fn) {
+    return new Promise((resolve) => {
+      if (reduceMotion || ms <= 0) { fn(1); resolve(); return; }
+      const start = performance.now();
+      function frame(now) {
+        const t = Math.min(1, (now - start) / ms);
+        fn(ease(t));
+        if (t < 1) requestAnimationFrame(frame); else resolve();
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  /* ----- Flow patterns: moving stripes used inside the cylinders ----- */
+  (function makePatterns() {
+    const defs = $("hyd-defs");
+    [["blue", "#3ea6ff", "#9fd2ff"], ["red", "#ff4b4b", "#ffa3a3"]].forEach(([name, base, stripe]) => {
+      [["r", 16], ["l", -16]].forEach(([dir, dx]) => {
+        const pat = svgEl("pattern", { id: "flow-" + name + "-" + dir, width: 16, height: 40, patternUnits: "userSpaceOnUse" }, defs);
+        svgEl("rect", { width: 16, height: 40, fill: base }, pat);
+        svgEl("rect", { x: 0, width: 5, height: 40, fill: stripe, opacity: 0.8 }, pat);
+        if (!reduceMotion) {
+          svgEl("animateTransform", {
+            attributeName: "patternTransform", type: "translate",
+            from: "0 0", to: dx + " 0", dur: "0.5s", repeatCount: "indefinite"
+          }, pat);
+        }
+      });
+    });
+  })();
+
+  /* ----- Three actuating cylinders, each joined to a gear leg ----- */
+  // The rod pushes a short crank on the leg. Crank angle psi goes from -135deg (gear up,
+  // leg lying flat in its bay) to -45deg (gear down, leg hanging straight down).
+  const ACT_ROWS = [
+    { id: "nose", name: "NOSE GEAR", cy: 100 },
+    { id: "left", name: "LEFT MAIN", cy: 260 },
+    { id: "right", name: "RIGHT MAIN", cy: 420 }
+  ];
+  const PIVOT_X = 780, CRANK = 30, LEG = 90, PISTON_W = 12;
+  const ROD_LEN = Math.hypot(PIVOT_X + CRANK * Math.cos(-0.75 * Math.PI) - 618, CRANK + CRANK * Math.sin(-0.75 * Math.PI));
+
+  const actuators = ACT_ROWS.map((row) => {
+    const layer = $("actuators");
+    const cy = row.cy;
+    const g = svgEl("g", { class: "act-row" }, layer);
+    svgEl("rect", { x: 768, y: cy + 12, width: 124, height: 36, rx: 8, class: "bay" }, g);
+    svgEl("rect", { x: 600, y: cy - 18, width: 100, height: 36, rx: 6, class: "cylinder" }, g);
+    const cap = svgEl("rect", { x: 602, y: cy - 15, width: 4, height: 30, class: "chamber" }, g);
+    const rodc = svgEl("rect", { x: 618, y: cy - 15, width: 80, height: 30, class: "chamber" }, g);
+    const piston = svgEl("rect", { x: 606, y: cy - 16, width: PISTON_W, height: 32, rx: 2, class: "piston" }, g);
+    const rod = svgEl("line", { class: "rod" }, g);
+    const crank = svgEl("line", { class: "crank" }, g);
+    const leg = svgEl("line", { class: "leg" }, g);
+    const wheel = svgEl("circle", { r: 13, class: "leg-wheel" }, g);
+    svgEl("circle", { cx: PIVOT_X, cy: cy + 30, r: 5, class: "joint" }, g);
+    const t1 = svgEl("text", { x: 625, y: cy - 25, class: "svg-tiny", "text-anchor": "middle" }, g);
+    t1.textContent = "down side";
+    const t2 = svgEl("text", { x: 680, y: cy - 25, class: "svg-tiny", "text-anchor": "middle" }, g);
+    t2.textContent = "up side";
+    const name = svgEl("text", { x: 905, y: cy - 12, class: "svg-label", "text-anchor": "middle" }, g);
+    name.textContent = row.name;
+    const status = svgEl("text", { x: 905, y: cy + 4, class: "svg-small mono", "text-anchor": "middle" }, g);
+    return { row, cy, cap, rodc, piston, rod, crank, leg, wheel, status, p: 0 };
+  });
+
+  // p: 0 = gear up, 1 = gear down.
+  function setActuator(a, p) {
+    a.p = p;
+    const psi = (-135 + 90 * p) * Math.PI / 180;
+    const px = PIVOT_X, py = a.cy + 30;
+    const cx = px + CRANK * Math.cos(psi), cyy = py + CRANK * Math.sin(psi);
+    const pistonRight = cx - Math.sqrt(ROD_LEN * ROD_LEN - (cyy - a.cy) * (cyy - a.cy));
+    const pistonX = pistonRight - PISTON_W;
+    a.piston.setAttribute("x", pistonX.toFixed(1));
+    a.cap.setAttribute("width", Math.max(0, pistonX - 602).toFixed(1));
+    a.rodc.setAttribute("x", pistonRight.toFixed(1));
+    a.rodc.setAttribute("width", Math.max(0, 698 - pistonRight).toFixed(1));
+    setLine(a.rod, pistonRight, a.cy, cx, cyy);
+    setLine(a.crank, px, py, cx, cyy);
+    const alpha = psi + 0.75 * Math.PI;
+    const ex = px + LEG * Math.cos(alpha), ey = py + LEG * Math.sin(alpha);
+    setLine(a.leg, px, py, ex, ey);
+    a.wheel.setAttribute("cx", ex.toFixed(1));
+    a.wheel.setAttribute("cy", ey.toFixed(1));
+  }
+
+  function setLine(line, x1, y1, x2, y2) {
+    line.setAttribute("x1", x1.toFixed(1)); line.setAttribute("y1", y1.toFixed(1));
+    line.setAttribute("x2", x2.toFixed(1)); line.setAttribute("y2", y2.toFixed(1));
+  }
+
+  // kind: null (idle fluid), "blue" or "red"; dir "r" or "l"; still: solid colour, no movement.
+  function setChamber(rect, kind, dir, still) {
+    rect.classList.remove("blue", "red");
+    rect.style.fill = "";
+    if (!kind) return;
+    if (still) { rect.classList.add(kind); return; }
+    // Inline style, so it beats the stylesheet's idle colour.
+    rect.style.fill = "url(#flow-" + kind + "-" + dir + ")";
+  }
+
+  /* ----- Pipes, gauge, valve ----- */
+  const downLines = Array.from(document.querySelectorAll("#down-lines .pipe"));
+  const upLines = Array.from(document.querySelectorAll("#up-lines .pipe"));
+  const hydPipes = ["pipe-supply", "pipe-pressure", "pipe-return", "pipe-gauge",
+    "pass-down-p", "pass-down-r", "pass-up-p", "pass-up-r"].map($).concat(downLines, upLines);
+  const hyd = { pos: "up", running: false, done: { down: false, up: false }, psi: 0 };
+
+  function setPipe(pipe, kind, reverse) {
+    pipe.classList.remove("pressure", "return", "rev");
+    if (kind) pipe.classList.add(kind);
+    if (reverse) pipe.classList.add("rev");
+  }
+
+  function setGauge(psi) {
+    hyd.psi = psi;
+    $("gauge-needle").setAttribute("transform", "rotate(" + (-120 + 240 * psi / 3000).toFixed(1) + " 300 180)");
+    $("gauge-value").textContent = Math.round(psi / 10) * 10 + " psi";
+  }
+
+  function resetFlow() {
+    hydPipes.forEach((p) => setPipe(p, null));
+    $("valve-down").setAttribute("opacity", "0");
+    $("valve-up").setAttribute("opacity", "0");
+    $("impeller").classList.remove("spin");
+    $("hyd-svg").classList.remove("still");
+    actuators.forEach((a) => { setChamber(a.cap, null); setChamber(a.rodc, null); });
+    document.querySelectorAll("#hyd-svg .focus").forEach((n) => n.classList.remove("focus"));
+  }
 
   function stageText(dir) {
     const down = dir === "down";
     return [
       {
-        title: "The reservoir supplies the fluid",
-        text: "The reservoir is a storage tank for hydraulic fluid. It keeps the pump supplied so it never runs dry, and has room for the fluid that comes back."
+        title: "The reservoir stores the fluid",
+        text: "The reservoir is a tank that holds the hydraulic fluid (a special oil). It feeds fluid to the pump, and the used fluid comes back to it."
       },
       {
-        title: "The pump puts the fluid under pressure",
-        text: "The pump (driven by an engine or an electric motor) pushes the fluid out at high pressure, often around 3,000 psi: roughly 100 times the pressure in a car tyre. That pressure does the heavy lifting."
+        title: "The pump pushes the fluid hard",
+        text: "The engine turns the pump. The pump pushes the fluid out very hard: about 3,000 psi, roughly 100 times the pressure in a car tyre. Watch the gauge go up."
       },
       {
-        title: "The selector valve chooses the direction: GEAR " + (down ? "DOWN" : "UP"),
+        title: "The filter and valves keep it clean and safe",
+        text: "The filter cleans the fluid, because dirt can jam the valves. The check valve lets fluid go one way only, so it can't run back into the pump. The relief valve is a safety valve: if the pressure gets too high, it opens and lets some fluid go back."
+      },
+      {
+        title: "The selector valve picks the way: GEAR " + (down ? "DOWN" : "UP"),
         text: down
-          ? "The gear handle was moved to DOWN. The selector valve works like a railway points switch: it sends the pressure (blue) to the \"down\" side of the actuating cylinder, and connects the other side to the return line."
-          : "The gear handle was moved to UP. The selector valve switches its paths over: pressure (blue) now goes to the \"up\" side of the actuating cylinder, and the \"down\" side is connected to the return line."
+          ? "The pilot moved the gear handle to DOWN. The selector valve works like a railway switch. It sends the fluid (blue) to the \"down\" side of all three actuating cylinders, and lets the other side drain back."
+          : "The pilot moved the gear handle to UP. The selector valve switches over. Now the fluid (blue) goes to the \"up\" side of all three actuating cylinders, and the \"down\" side drains back."
       },
       {
-        title: down ? "The actuating cylinder extends" : "The actuating cylinder retracts",
+        title: down ? "The cylinders push the gear down" : "The cylinders pull the gear up",
         text: down
-          ? "Fluid under pressure pushes the piston. The rod slides out and pushes the gear leg down until it locks in place. At the same time, fluid on the other side of the piston is squeezed out (red)."
-          : "Fluid under pressure pushes the piston the other way. The rod slides in and pulls the gear leg up into the wheel well, where it locks. Fluid on the \"down\" side is squeezed out (red)."
+          ? "Look inside each cylinder. Blue fluid flows in behind the piston and pushes it along. The rod pushes the gear leg, which swings down and locks. The fluid in front of the piston (red) is pushed out."
+          : "Look inside each cylinder. Blue fluid flows in on the rod side and pushes the piston back. The rod pulls the gear leg up into its bay, where it locks. The fluid behind the piston (red) is pushed out."
       },
       {
-        title: "Fluid returns to the reservoir",
-        text: "The squeezed-out fluid flows back along the return line (red) into the reservoir, ready to be used again. The fluid goes round and round in a closed loop and is never used up."
+        title: "The fluid goes back to the reservoir",
+        text: "The pushed-out fluid flows back along the return line to the reservoir, ready to use again. The fluid goes round in a loop: it is never used up."
       }
     ];
   }
@@ -441,21 +699,6 @@
     });
   }
 
-  function setPipe(pipe, kind, reverse) {
-    pipe.classList.remove("pressure", "return", "rev");
-    if (kind) pipe.classList.add(kind);
-    if (reverse) pipe.classList.add("rev");
-  }
-
-  function resetFlow() {
-    pipes.forEach((p) => setPipe(p, null));
-    $("valve-down").setAttribute("opacity", "0");
-    $("valve-up").setAttribute("opacity", "0");
-    $("impeller").classList.remove("spin");
-    $("hyd-svg").classList.remove("still");
-    document.querySelectorAll("#hyd-svg .focus").forEach((n) => n.classList.remove("focus"));
-  }
-
   function focusStage(n) {
     document.querySelectorAll("#hyd-svg .focus").forEach((node) => node.classList.remove("focus"));
     const target = document.querySelector('#hyd-svg [data-stage="' + n + '"]') ||
@@ -465,29 +708,12 @@
       li.classList.toggle("current", i === n - 1);
       li.classList.toggle("done", i < n - 1);
     });
+    $("hyd-status").textContent = "Stage " + n + " of 6: " + stageText(hyd.dir)[n - 1].title + ".";
   }
 
-  function setPiston(offset) {
-    hyd.offset = offset;
-    $("piston-group").setAttribute("transform", "translate(" + offset.toFixed(1) + " 0)");
+  function setActStatus(text) {
+    actuators.forEach((a) => { a.status.textContent = text; });
   }
-
-  function movePiston(to, ms) {
-    return new Promise((resolve) => {
-      const from = hyd.offset;
-      if (reduceMotion) { setPiston(to); resolve(); return; }
-      const start = performance.now();
-      function frame(now) {
-        const t = Math.min(1, (now - start) / ms);
-        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        setPiston(from + (to - from) * eased);
-        if (t < 1) requestAnimationFrame(frame); else resolve();
-      }
-      requestAnimationFrame(frame);
-    });
-  }
-
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
   async function runHydraulics(dir) {
     if (hyd.running) return;
@@ -498,46 +724,51 @@
     }
     const down = dir === "down";
     hyd.running = true;
+    hyd.dir = dir;
     $("hyd-down").disabled = true;
     $("hyd-up").disabled = true;
     resetFlow();
     renderStages(dir);
     $("valve-text").textContent = "NEUTRAL";
-    $("mini-gear-text").textContent = "GEAR MOVING";
 
-    // 1. Reservoir feeds the pump
     focusStage(1);
-    $("hyd-status").textContent = "Stage 1 of 5: fluid leaves the reservoir.";
     setPipe($("pipe-supply"), "pressure");
     await wait(STAGE_MS);
 
-    // 2. Pump pressurises
     focusStage(2);
-    $("hyd-status").textContent = "Stage 2 of 5: the pump pressurises the fluid.";
     $("impeller").classList.add("spin");
     setPipe($("pipe-pressure"), "pressure");
+    setPipe($("pipe-gauge"), "pressure");
+    const from = hyd.psi;
+    await animate(STAGE_MS * 0.8, (t) => setGauge(from + (3000 - from) * t));
+    await wait(STAGE_MS * 0.2);
+
+    focusStage(3);
     await wait(STAGE_MS);
 
-    // 3. Selector valve routes pressure
-    focusStage(3);
-    $("hyd-status").textContent = "Stage 3 of 5: selector valve set to GEAR " + dir.toUpperCase() + ".";
+    focusStage(4);
     $("valve-text").textContent = down ? "DOWN" : "UP";
     $(down ? "valve-down" : "valve-up").setAttribute("opacity", "1");
     setPipe($(down ? "pass-down-p" : "pass-up-p"), "pressure");
-    setPipe($(down ? "pipe-a" : "pipe-b"), "pressure");
+    (down ? downLines : upLines).forEach((p) => setPipe(p, "pressure"));
     await wait(STAGE_MS);
 
-    // 4. Actuator moves; the other side is pushed out at the same time
-    focusStage(4);
-    $("hyd-status").textContent = "Stage 4 of 5: the actuating cylinder " + (down ? "extends" : "retracts") + ".";
-    setPipe($(down ? "pipe-b" : "pipe-a"), "return", true);
+    // 5. Inside the cylinders: blue fills the working side, red is pushed out the other.
+    focusStage(5);
+    (down ? upLines : downLines).forEach((p) => setPipe(p, "return", true));
     setPipe($(down ? "pass-down-r" : "pass-up-r"), "return");
     setPipe($("pipe-return"), "return");
-    await movePiston(down ? PISTON_TRAVEL : 0, STAGE_MS);
+    setActStatus("MOVING");
+    actuators.forEach((a) => {
+      setChamber(down ? a.cap : a.rodc, "blue", down ? "r" : "l");
+      setChamber(down ? a.rodc : a.cap, "red", down ? "r" : "l");
+    });
+    await Promise.all(actuators.map((a, i) =>
+      wait(i * 200).then(() => animate(STAGE_MS * 1.3, (t) => setActuator(a, down ? t : 1 - t)))
+    ));
+    setActStatus(down ? "DOWN & LOCKED" : "UP & LOCKED");
 
-    // 5. Return to reservoir
-    focusStage(5);
-    $("hyd-status").textContent = "Stage 5 of 5: fluid returns to the reservoir.";
+    focusStage(6);
     await wait(STAGE_MS);
 
     document.querySelectorAll("#stages .stage").forEach((li) => {
@@ -547,11 +778,14 @@
     document.querySelectorAll("#hyd-svg .focus").forEach((n) => n.classList.remove("focus"));
     $("hyd-svg").classList.add("still");
     $("impeller").classList.remove("spin");
+    actuators.forEach((a) => {
+      setChamber(down ? a.cap : a.rodc, "blue", null, true);
+      setChamber(down ? a.rodc : a.cap, null);
+    });
     hyd.pos = dir;
     hyd.done[dir] = true;
-    $("mini-gear-text").textContent = down ? "GEAR DOWN" : "GEAR UP";
-    $("hyd-status").textContent = "Done: gear " + (down ? "DOWN" : "UP") +
-      " and locked. The piston has reached the end of its travel, so the fluid stops moving.";
+    $("hyd-status").textContent = "Done: all three gears are " + (down ? "DOWN" : "UP") +
+      " and locked. The pistons can't go any further, so the fluid stops moving. The pressure stays on to hold them.";
     hyd.running = false;
     $("hyd-down").disabled = false;
     $("hyd-up").disabled = false;
@@ -565,165 +799,375 @@
 
   $("hyd-down").addEventListener("click", () => runHydraulics("down"));
   $("hyd-up").addEventListener("click", () => runHydraulics("up"));
+  hyd.dir = "down";
   renderStages("down");
-  setPiston(0);
+  actuators.forEach((a) => setActuator(a, 0));
+  setActStatus("UP & LOCKED");
+  setGauge(0);
 
   /* ================= Section 3: indication ================= */
 
-  const ind = { pos: "up", busy: false, done: { down: false, up: false }, timers: [] };
+  const GEARS = ["nose", "left", "right"];
+  const GEAR_NAMES = { nose: "nose gear", left: "left main gear", right: "right main gear" };
+  // Each gear: p (0 = up, 1 = down) and lock ("up", "down" or null while moving / not locked).
+  const sim = {
+    handle: "up",
+    gear: { nose: { p: 0, lock: "up" }, left: { p: 0, lock: "up" }, right: { p: 0, lock: "up" } },
+    doors: 0,              // 0 = shut, 1 = open
+    moving: 0,             // animations running
+    busy: false,
+    lampTest: false,
+    // Fault flags
+    hydraulics: true,
+    jammed: {},            // gear stuck in its bay (until emergency extension)
+    stall: {},             // gear stops short of locking down (next extension only)
+    stuckDown: {},         // gear won't come up
+    bulb: {},              // blown green bulb
+    doorStuck: false,      // doors stay open on the next retraction
+    fault: null,
+    done: { down: false, up: false }
+  };
   const lamps = { red: $("lamp-red"), nose: $("lamp-nose"), left: $("lamp-left"), right: $("lamp-right") };
 
-  const IND_STATES = {
-    up: { label: "UP AND LOCKED", cls: "", row: "up",
-      text: "All lights off with the handle UP: the gear is tucked away and locked. Normal for flight." },
-    transitDown: { label: "IN TRANSIT", cls: "bad", row: "transit",
-      text: "Red light on: the gear is moving down. Each green comes on as its leg locks. Wait for all three." },
-    transitUp: { label: "IN TRANSIT", cls: "bad", row: "transit",
-      text: "Red light on: the gear is moving up into the wheel wells. Wait for the light to go out." },
-    down: { label: "DOWN AND LOCKED", cls: "ok", row: "down",
-      text: "Three greens and no red: all three legs are down and locked. Safe to land." },
-    fault: { label: "UNSAFE: LEFT MAIN", cls: "bad", row: "unsafe",
-      text: "Only two greens and the red stays on: the left main gear has not locked. Do NOT land. Try GEAR UP then GEAR DOWN again (recycle), and follow the checklist." },
-    test: { label: "LAMP TEST", cls: "", row: null,
-      text: "Every light is switched on to prove no bulb has failed. A blown bulb could hide a warning." }
-  };
-
-  function setLamps(state) {
-    Object.keys(lamps).forEach((k) => lamps[k].classList.toggle("on", !!state[k]));
+  /* ----- Drawing the aircraft ----- */
+  function renderJet() {
+    const g = sim.gear;
+    const n = g.nose.p;
+    $("jg-nose").setAttribute("transform", "translate(260 188) scale(1 " + (0.06 + 0.94 * n).toFixed(3) + ") translate(-260 -188)");
+    $("jg-left").setAttribute("transform", "rotate(" + (90 * g.left.p - 90).toFixed(1) + " 176 166)");
+    $("jg-right").setAttribute("transform", "rotate(" + (90 - 90 * g.right.p).toFixed(1) + " 344 166)");
+    GEARS.forEach((k) => {
+      $("jg-" + k).style.opacity = (0.35 + 0.65 * g[k].p).toFixed(2);
+      const label = $("jl-" + k);
+      label.classList.toggle("locked-down", g[k].lock === "down");
+      label.classList.toggle("not-locked", g[k].lock === null && sim.moving === 0);
+    });
+    $("jd-left").setAttribute("transform", "rotate(" + (100 * sim.doors).toFixed(1) + " 246 189)");
+    $("jd-right").setAttribute("transform", "rotate(" + (-100 * sim.doors).toFixed(1) + " 274 189)");
   }
 
-  function showIndState(key) {
-    const s = IND_STATES[key];
+  /* ----- What the lights show (worked out from the gear, like real sensors) ----- */
+  function lightsShow() {
+    if (sim.lampTest) {
+      return { red: true, nose: !sim.bulb.nose, left: !sim.bulb.left, right: !sim.bulb.right };
+    }
+    const out = { red: false };
+    GEARS.forEach((k) => {
+      out[k] = sim.gear[k].lock === "down" && !sim.bulb[k];
+      if (sim.gear[k].lock !== sim.handle) out.red = true;
+    });
+    if (sim.handle === "up" && sim.doors > 0.02) out.red = true;
+    return out;
+  }
+
+  const IND_STATES = {
+    test: { label: "LAMP TEST", cls: "", row: null,
+      text: "Every bulb should light up now. A bulb that stays dark has failed, and could hide a warning." },
+    transit: { label: "IN TRANSIT", cls: "bad", row: "transit",
+      text: "Red light on: the gear is moving. Wait for it to finish." },
+    unsafe: { label: "UNSAFE", cls: "bad", row: "unsafe",
+      text: "The red light is staying on: a gear is not where the handle says it should be. Do NOT land like this." },
+    down: { label: "DOWN AND LOCKED", cls: "ok", row: "down",
+      text: "Three greens and no red: all three legs are down and locked. Safe to land." },
+    up: { label: "UP AND LOCKED", cls: "", row: "up",
+      text: "All lights off with the handle UP: the gear is tucked away and locked. Normal for flight." },
+    check: { label: "CHECK THE LIGHTS", cls: "bad", row: "none",
+      text: "No red light, but a green is missing. A bulb may have failed. Do a lamp test before you trust it." }
+  };
+
+  function indicationKey(L) {
+    if (sim.lampTest) return "test";
+    if (sim.moving > 0 && L.red) return "transit";
+    if (L.red) return "unsafe";
+    const greens = GEARS.filter((k) => L[k]).length;
+    if (sim.handle === "down") return greens === 3 ? "down" : "check";
+    return "up";
+  }
+
+  function renderInd() {
+    const L = lightsShow();
+    Object.keys(lamps).forEach((k) => lamps[k].classList.toggle("on", !!L[k]));
+    $("handle").classList.toggle("down", sim.handle === "down");
+    $("handle-btn").setAttribute("aria-label", "Gear handle, now " + sim.handle.toUpperCase() + ": click to move it");
+    renderJet();
+
+    const s = IND_STATES[indicationKey(L)];
     const value = $("ind-state");
     value.textContent = s.label;
     value.className = "readout-value " + s.cls;
-    $("ind-explain").textContent = s.text;
+    if (!sim.message) $("ind-explain").textContent = s.text;
     document.querySelectorAll(".lights-table tbody tr").forEach((tr) => {
       tr.classList.toggle("match", tr.dataset.row === s.row);
     });
+
+    // The backup way down: offered when the handle is DOWN but a gear isn't locked down.
+    const needsEmergency = sim.handle === "down" && sim.moving === 0 &&
+      GEARS.some((k) => sim.gear[k].lock !== "down");
+    $("ind-emergency").hidden = !(needsEmergency && !sim.busy);
+    $("ind-reset").hidden = !sim.fault;
+    ["ind-down", "ind-up", "ind-fault", "ind-test", "ind-emergency", "ind-reset"].forEach((id) => { $(id).disabled = sim.busy; });
   }
 
-  function setHandle(down) {
-    $("handle").classList.toggle("down", down);
-    $("handle-btn").setAttribute("aria-label", "Gear handle, now " + (down ? "DOWN" : "UP") + ": click to move it");
+  // Shows a one-off note in the readout until the next state change.
+  function note(text) {
+    sim.message = true;
+    $("ind-explain").textContent = text;
   }
 
-  function setIndButtons(disabled) {
-    ["ind-down", "ind-up", "ind-fault", "ind-test"].forEach((id) => { $(id).disabled = disabled; });
+  // Moves a gear (or the doors) to a new position over ms milliseconds.
+  function move(target, key, to, ms) {
+    const from = target[key];
+    sim.moving++;
+    return animate(ms, (t) => { target[key] = from + (to - from) * t; renderInd(); })
+      .then(() => { sim.moving--; renderInd(); });
   }
 
-  function later(ms, fn) { ind.timers.push(setTimeout(fn, ms)); }
+  const MOVE_MS = { nose: 1700, right: 2000, left: 2300 };
 
-  function startSequence() {
-    ind.busy = true;
-    setIndButtons(true);
+  async function extend(emergency) {
+    sim.handle = "down";
+    renderInd();
+    if (!sim.hydraulics && !emergency) return;            // nothing to push the gear
+    if (sim.doors < 1) await move(sim, "doors", 1, emergency ? 1200 : 500);
+    await Promise.all(GEARS.map((k) => {
+      const g = sim.gear[k];
+      if (g.lock === "down") return null;
+      if (sim.jammed[k] && !emergency) return null;        // uplock won't let go
+      g.lock = null;
+      const stop = emergency ? 1 : (sim.stall[k] !== undefined ? sim.stall[k] : 1);
+      return move(g, "p", stop, (emergency ? 1.6 : 1) * MOVE_MS[k]).then(() => {
+        if (stop === 1) g.lock = "down";
+      });
+    }));
+    if (emergency) { sim.jammed = {}; sim.stall = {}; }
+    renderInd();
   }
 
-  function endSequence() {
-    ind.busy = false;
-    ind.timers = [];
-    setIndButtons(false);
-    updateIndProgress();
+  async function retract() {
+    sim.handle = "up";
+    renderInd();
+    if (!sim.hydraulics) return;
+    await Promise.all(GEARS.map((k) => {
+      const g = sim.gear[k];
+      if (g.lock === "up" || sim.stuckDown[k]) return null;
+      g.lock = null;
+      return move(g, "p", 0, MOVE_MS[k]).then(() => { g.lock = "up"; });
+    }));
+    const allUp = GEARS.every((k) => sim.gear[k].lock === "up");
+    if (allUp && !sim.doorStuck) await move(sim, "doors", 0, 600);
+    sim.doorStuck = false;
+    renderInd();
   }
 
-  function gearDown(withFault) {
-    if (ind.busy) return;
-    if (ind.pos === "down" && !withFault) {
-      $("ind-explain").textContent = "The gear is already down and locked (three greens). Press GEAR UP to raise it.";
+  async function run(action) {
+    if (sim.busy) return;
+    sim.busy = true;
+    sim.message = false;
+    renderInd();
+    await action();
+    sim.busy = false;
+    renderInd();
+  }
+
+  function gearDown() {
+    if (sim.handle === "down" && GEARS.every((k) => sim.gear[k].lock === "down") && !sim.busy) {
+      note("The gear is already down and locked. Press GEAR UP to raise it.");
       return;
     }
-    startSequence();
-    setHandle(true);
-    setLamps({ red: true });
-    showIndState("transitDown");
-    later(1600, () => setLamps({ red: true, nose: true }));
-    later(2300, () => setLamps({ red: true, nose: true, right: true }));
-    if (withFault) {
-      later(3600, () => {
-        ind.pos = "fault";
-        showIndState("fault");
-        endSequence();
-      });
-    } else {
-      later(2900, () => {
-        setLamps({ nose: true, left: true, right: true });
-        ind.pos = "down";
-        ind.done.down = true;
-        showIndState("down");
-        endSequence();
-      });
-    }
+    run(async () => { await extend(false); checkNormal("down"); });
   }
 
   function gearUp() {
-    if (ind.busy) return;
-    if (ind.pos === "up") {
-      $("ind-explain").textContent = "The gear is already up and locked (all lights off). Press GEAR DOWN to lower it.";
+    if (sim.handle === "up" && GEARS.every((k) => sim.gear[k].lock === "up") && sim.doors === 0 && !sim.busy) {
+      note("The gear is already up and locked. Press GEAR DOWN to lower it.");
       return;
     }
-    startSequence();
-    setHandle(false);
-    setLamps({ red: true });
-    showIndState("transitUp");
-    later(3000, () => {
-      setLamps({});
-      ind.pos = "up";
-      ind.done.up = true;
-      showIndState("up");
-      endSequence();
-    });
+    run(async () => { await retract(); checkNormal("up"); });
+  }
+
+  function checkNormal(dir) {
+    const key = indicationKey(lightsShow());
+    if (sim.fault && (key === "down" || key === "up")) {
+      note("Problem solved: the lights now show " + IND_STATES[key].label + ". In real life, still report the fault after landing.");
+    }
+    if (key === dir) sim.done[dir] = true;
+    updateIndProgress();
   }
 
   function lampTest() {
-    if (ind.busy) return;
-    startSequence();
-    const before = ind.pos;
-    setLamps({ red: true, nose: true, left: true, right: true });
-    showIndState("test");
-    later(1800, () => {
-      if (before === "down") { setLamps({ nose: true, left: true, right: true }); showIndState("down"); }
-      else if (before === "fault") { setLamps({ red: true, nose: true, right: true }); showIndState("fault"); }
-      else { setLamps({}); showIndState("up"); }
-      endSequence();
+    run(async () => {
+      sim.lampTest = true;
+      renderInd();
+      await wait(1800);
+      sim.lampTest = false;
+      const blown = GEARS.filter((k) => sim.bulb[k]);
+      note(blown.length
+        ? "The " + blown.map((k) => k.toUpperCase()).join(" and ") + " light didn't come on in the lamp test: that bulb has failed. The gear itself may be fine."
+        : "All the bulbs work.");
     });
   }
 
   function updateIndProgress() {
-    const d = ind.done;
+    const d = sim.done;
     const msg = $("ind-progress");
     if (d.down && d.up) {
-      msg.textContent = "Section 3 complete. Try \"Simulate a fault\" to see an unsafe indication.";
+      msg.textContent = "Section 3 complete. Press \"Simulate a fault\" to practise spotting problems.";
       completeSection(3);
-    } else if (d.down) {
-      msg.textContent = "Good. Now run GEAR UP to finish this section.";
-    } else if (d.up) {
-      msg.textContent = "Good. Now run GEAR DOWN to finish this section.";
-    }
-  }
-
-  $("ind-down").addEventListener("click", () => gearDown(false));
-  $("ind-up").addEventListener("click", gearUp);
-  $("ind-fault").addEventListener("click", () => {
-    if (ind.busy) return;
-    if (ind.pos !== "up") {
-      $("ind-explain").textContent = "Raise the gear first (GEAR UP), then simulate the fault on the way down.";
       return;
     }
-    gearDown(true);
-  });
+    let text = "To complete this section: run a normal GEAR DOWN and a normal GEAR UP.";
+    if (d.down) text = "Good. Now run GEAR UP to finish this section.";
+    if (d.up) text = "Good. Now run GEAR DOWN to finish this section.";
+    if (sim.fault) text += " (If the fault stops you, press Reset to clear it.)";
+    msg.textContent = text;
+  }
+
+  /* ----- Faults ----- */
+  function snap(state) {
+    sim.handle = state;
+    const p = state === "down" ? 1 : 0;
+    GEARS.forEach((k) => { sim.gear[k].p = p; sim.gear[k].lock = state; });
+    sim.doors = p;
+  }
+
+  function clearFaults() {
+    sim.hydraulics = true;
+    sim.jammed = {}; sim.stall = {}; sim.stuckDown = {}; sim.bulb = {};
+    sim.doorStuck = false;
+    sim.fault = null;
+  }
+
+  const FAULTS = [
+    {
+      title: "Left main gear not locked",
+      start: "up",
+      setup() { sim.stall.left = 0.85; },
+      // Happens once: recycling the gear (UP, then DOWN) clears it.
+      action: async () => { await extend(false); sim.stall = {}; },
+      see: "Red light stays on. NOSE and RIGHT are green, LEFT is dark.",
+      means: "The left main gear came down, but it hasn't locked. Look at the aircraft: the left leg is not quite straight.",
+      todo: "Don't land. Put the handle UP, then DOWN again (this is called \"recycling\" the gear). If it still won't lock, use the emergency extension. Report it after landing.",
+      tryit: "Try it: press GEAR UP, then GEAR DOWN."
+    },
+    {
+      title: "Nose gear stuck up",
+      start: "up",
+      setup() { sim.jammed.nose = true; },
+      action: () => extend(false),
+      see: "Red light stays on. LEFT and RIGHT are green, NOSE is dark.",
+      means: "The nose gear is stuck in its bay: the lock holding it up didn't let go.",
+      todo: "Don't land. Try recycling the gear once. If it's still stuck, use the emergency extension: it releases the locks and lets the gear drop by its own weight.",
+      tryit: "Try it: press Emergency extension."
+    },
+    {
+      title: "Hydraulic failure",
+      start: "up",
+      setup() { sim.hydraulics = false; },
+      action: () => extend(false),
+      see: "Red light on, no greens, and nothing changes. On the aircraft, nothing moves.",
+      means: "The hydraulic system has lost its pressure (for example, a pump has failed or fluid has leaked out). Nothing is pushing the gear.",
+      todo: "Use the emergency extension to get the gear down. Without hydraulics it can't come up again, so plan to land. Report the failure.",
+      tryit: "Try it: press Emergency extension."
+    },
+    {
+      title: "Blown bulb",
+      start: "up",
+      setup() { sim.bulb.right = true; },
+      action: () => extend(false),
+      see: "Red light is off. NOSE and LEFT are green, but RIGHT is dark.",
+      means: "Look at the aircraft: all three gears are really down and locked. The RIGHT green bulb has failed.",
+      todo: "Press Lamp test. If the RIGHT light still won't come on, the bulb is blown. Check the gear another way (for example, ask the control tower to look) and report the bulb.",
+      tryit: "Try it: press Lamp test."
+    },
+    {
+      title: "Right main gear won't come up",
+      start: "down",
+      setup() { sim.stuckDown.right = true; },
+      action: () => retract(),
+      see: "The handle is UP, the red light is on, and the RIGHT green stays on.",
+      means: "The right main gear is still down and locked. It didn't come up after take-off.",
+      todo: "Don't fly fast with a gear down: it can be damaged. Put the handle back DOWN, check for three greens, and come back to land. Report it.",
+      tryit: "Try it: press GEAR DOWN."
+    },
+    {
+      title: "Gear door stuck open",
+      start: "down",
+      setup() { sim.doorStuck = true; },
+      action: () => retract(),
+      see: "The handle is UP, all greens are off, but the red light stays on.",
+      means: "The gear is up, but a gear door hasn't closed. Look at the aircraft: the nose gear doors are still open.",
+      todo: "Fly slowly, because fast air can tear an open door off. Try recycling the gear (DOWN, then UP). Report it after landing.",
+      tryit: "Try it: press GEAR DOWN, then GEAR UP."
+    }
+  ];
+  let faultOrder = [];
+  let faultCount = 0;
+
+  function nextFault() {
+    if (!faultOrder.length) {
+      faultOrder = FAULTS.map((_, i) => i);
+      for (let i = faultOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [faultOrder[i], faultOrder[j]] = [faultOrder[j], faultOrder[i]];
+      }
+      // Don't repeat the fault just shown.
+      if (sim.lastFault !== undefined && faultOrder[0] === sim.lastFault) faultOrder.push(faultOrder.shift());
+    }
+    return faultOrder.shift();
+  }
+
+  function simulateFault() {
+    if (sim.busy) return;
+    const index = nextFault();
+    const f = FAULTS[index];
+    sim.lastFault = index;
+    faultCount++;
+    clearFaults();
+    snap(f.start);
+    f.setup();
+    sim.fault = f;
+
+    $("fault-kicker").textContent = "Fault " + faultCount + " (" + FAULTS.length + " different faults to find). " +
+      (f.start === "up" ? "You are flying in to land and select GEAR DOWN." : "You have just taken off and select GEAR UP.");
+    $("fault-title").textContent = f.title;
+    $("fault-see").textContent = f.see;
+    $("fault-means").textContent = f.means;
+    $("fault-do").textContent = f.todo;
+    $("fault-try").textContent = f.tryit;
+    $("fault-card").hidden = false;
+    $("ind-fault").textContent = "Simulate another fault";
+    updateIndProgress();
+    run(f.action);
+  }
+
+  function resetSim() {
+    if (sim.busy) return;
+    clearFaults();
+    snap("up");
+    $("fault-card").hidden = true;
+    sim.message = false;
+    updateIndProgress();
+    renderInd();
+  }
+
+  $("ind-down").addEventListener("click", gearDown);
+  $("ind-up").addEventListener("click", gearUp);
   $("ind-test").addEventListener("click", lampTest);
+  $("ind-fault").addEventListener("click", simulateFault);
+  $("ind-emergency").addEventListener("click", () => run(async () => {
+    note("Emergency extension: the locks are released and the gear falls by its own weight. It's slower than normal.");
+    await extend(true);
+    checkNormal("down");
+  }));
+  $("ind-reset").addEventListener("click", resetSim);
 
   const handleBtn = $("handle-btn");
   function toggleHandle() {
-    if (ind.pos === "up") gearDown(false); else gearUp();
+    if (sim.handle === "up") gearDown(); else gearUp();
   }
-  handleBtn.addEventListener("click", toggleHandle);
-  handleBtn.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleHandle(); }
-  });
+  onActivate(handleBtn, toggleHandle);
 
-  setHandle(false);
-  showIndState("up");
+  renderInd();
 
   /* ================= Start ================= */
   renderProgress();

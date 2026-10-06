@@ -41,6 +41,11 @@ window.CATALOGUE = {
       id: "aircraft",
       title: "Aircraft Familiarisation",
       description: "Learn the main parts of a fighter jet, how its fuselage and wings are built, and its engine and empennage (tail), in plain English."
+    },
+    {
+      id: "landing-gear",
+      title: "Landing Gear Systems",
+      description: "What the parts of the landing gear do, how hydraulics raise and lower it, and how to read the gear lights in the cockpit."
     }
   ],
 
@@ -79,6 +84,13 @@ window.CATALOGUE = {
       type: "lesson",
       title: "Aircraft Familiarisation Training",
       summary: "Three short modules on a fighter jet, in any order: aircraft parts, fuselage and wing structure, and engine and empennage."
+    },
+    {
+      id: "landing-gear-systems",
+      module: "landing-gear",
+      type: "lesson",
+      title: "Landing Gear Systems",
+      summary: "Explore a labelled landing gear, watch hydraulic fluid raise and lower it, and practise reading the cockpit gear lights. Includes a short parts check."
     }
   ]
 };

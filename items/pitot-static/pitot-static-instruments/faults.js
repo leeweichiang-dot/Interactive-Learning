@@ -74,7 +74,7 @@
       explanation: [
         "The airspeed indicator needs total pressure from the pitot tube. With the inlet blocked, fresh total pressure cannot get in.",
         "Pressure already inside the pitot line may leak out through the small drain opening. The airspeed indication may then fall toward zero. Or it may stop responding to changes in speed. What happens depends on the design.",
-        "The altimeter and vertical speed indicator use only static pressure, so a pitot fault does not directly affect them."
+        "The altimeter and vertical speed indicator use only static pressure. So a pitot fault does not directly affect them."
       ]
     },
     {
@@ -164,7 +164,7 @@
   svg.setAttribute("aria-describedby", "fReadings");
   svg.removeAttribute("id");
   Array.from(svg.querySelectorAll("text")).forEach(function (t) {
-    if (t.textContent.indexOf("Generic training aircraft") === 0) t.textContent = "Generic training representation. Illustrative only.";
+    if (t.textContent.indexOf("Generic training aircraft") === 0) t.textContent = "Simulated values. Generic training aircraft.";
   });
   airGroup.setAttribute("opacity", "1");
   airLabel.textContent = "Airflow";
@@ -261,7 +261,7 @@
   function describe() {   // the instrument values in words
     const vs = Math.round(cur.vs / 10) * 10;
     const trend = vs > 0 ? "climbing at " + C.fmt(vs) + " feet per minute" : vs < 0 ? "descending at " + C.fmt(-vs) + " feet per minute" : "zero (not climbing or descending)";
-    return (revealed ? "Instrument readings after your prediction (illustrative values, not real aircraft data). " : "Instrument readings for a normal system. ") +
+    return (revealed ? "Simulated instrument readings after your prediction (illustrative values, not real aircraft data). " : "Simulated instrument readings for a normal system. ") +
       "Airspeed indicator: " + C.fmt(cur.ias) + " knots. Altimeter: " + C.fmt(Math.round(cur.alt / 10) * 10) + " feet. Vertical speed indicator: " + trend + ".";
   }
 

@@ -277,7 +277,7 @@
   function describe(s) {   // the instrument values in words
     const vs = Math.round(s.vs / 10) * 10;
     const trend = vs > 0 ? "climbing at " + fmt(vs) + " feet per minute" : vs < 0 ? "descending at " + fmt(-vs) + " feet per minute" : "zero (not climbing or descending)";
-    return "Instrument readings. Airspeed indicator: " + fmt(s.ias) + " knots. Altimeter: " + fmt(Math.round(s.alt / 10) * 10) + " feet. Vertical speed indicator: " + trend + ".";
+    return "Simulated instrument readings. Airspeed indicator: " + fmt(s.ias) + " knots. Altimeter: " + fmt(Math.round(s.alt / 10) * 10) + " feet. Vertical speed indicator: " + trend + ".";
   }
 
   function showState() {

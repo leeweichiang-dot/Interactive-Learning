@@ -46,6 +46,11 @@ window.CATALOGUE = {
       id: "landing-gear",
       title: "Landing Gear Systems",
       description: "What the parts of the landing gear do, how hydraulics raise and lower it, and how to read the gear lights in the cockpit."
+    },
+    {
+      id: "pitot-static",
+      title: "Pitot-Static Flight Instruments",
+      description: "How pitot and static air pressure produce the airspeed, altitude and climb-rate readings in a generic fighter-style cockpit, in plain English."
     }
   ],
 
@@ -91,6 +96,13 @@ window.CATALOGUE = {
       type: "lesson",
       title: "Landing Gear Systems",
       summary: "Explore a labelled landing gear, watch hydraulic fluid raise and lower it, and practise reading the cockpit gear lights. Includes a short parts check."
+    },
+    {
+      id: "pitot-static-instruments",
+      module: "pitot-static",
+      type: "lesson",
+      title: "Pitot-Static Flight Instruments",
+      summary: "Learn how pitot and static pressure move three cockpit instruments. Includes an interactive diagram, five guided flight scenarios, a fault investigation and a 12-question competency check."
     }
   ]
 };

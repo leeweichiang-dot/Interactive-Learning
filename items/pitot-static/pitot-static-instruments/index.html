@@ -192,6 +192,39 @@
     .schematic .route { fill: none; stroke: none; pointer-events: none; }
     .schematic .dimmed { opacity: 0.4; }
 
+    /* Guided Learning (section 3) */
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .g-card { margin: 12px 0; padding: 14px 16px; background: var(--accent-soft); border-radius: 8px; }
+    .g-title { margin: 0 0 4px; font-size: 1.1rem; }
+    .g-count { margin: 0 0 6px; color: var(--muted); font-size: 0.9rem; }
+    .g-instruction { margin: 0 0 8px; font-size: 1.1rem; font-weight: 600; }
+    .g-now { margin: 0 0 8px; color: var(--muted); font-size: 0.92rem; min-height: 1.4em; }
+    .g-question { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+    .q-label { margin: 0 0 4px; font-weight: 700; color: var(--accent); }
+    .g-prompt { margin: 0 0 8px; }
+    .g-options { display: grid; gap: 8px; }
+    .g-options button { text-align: left; padding: 10px 14px; }
+    .g-options button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .g-feedback { margin: 10px 0 0; padding: 0; }
+    .g-feedback.good, .g-feedback.try { padding: 10px 12px; background: var(--surface); border-radius: 8px; border-left: 5px solid var(--success); }
+    .g-feedback.try { border-left-color: #b26a00; }
+    .g-done { margin: 12px 0 0; font-weight: 600; color: var(--success); }
+    .g-airfield { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0; }
+    .g-airfield select { padding: 8px 10px; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+    .sim .air { marker-end: url(#g-grey); }
+    .sim .line[data-c="red"] { marker-end: url(#g-red); }
+    .sim .line[data-c="blue"] { marker-end: url(#g-blue); }
+    .sim.has-sel .line:not(.rel) { marker-end: url(#g-grey); }
+    .sim.has-sel .line.nomark:not(.rel) { marker-end: none; }
+    .sim .dimmed { opacity: 0.55; }
+    .sim .tick { stroke: var(--muted); stroke-width: 1.5; }
+    .sim .tick.major { stroke: var(--text); stroke-width: 2; }
+    .sim text.num { font-size: 11px; text-anchor: middle; dominant-baseline: central; }
+    .sim text.unit { font-size: 8px; text-anchor: middle; dominant-baseline: central; fill: var(--muted); }
+    .sim .needle { stroke: var(--text); stroke-width: 3.5; stroke-linecap: round; }
+    .sim .hub { fill: var(--text); }
+    .sim text.val { font-size: 15px; font-weight: 700; }
+
     @media (max-width: 600px) {
       .steps .label { display: none; }
       .nav button, .nav .btn { padding: 10px 12px; }
@@ -401,8 +434,130 @@
 
     <section class="step" data-title="Flight Simulation" aria-labelledby="s3" hidden>
       <h2 id="s3">3. Flight Simulation</h2>
-      <p>Change speed and height in a simple simulated flight and watch how the three instruments respond.</p>
-      <div class="soon"><strong>Coming soon:</strong> an interactive flight simulation with live pressure and instrument readings.</div>
+      <p>Follow five short flights and watch how pitot and static pressure move the three instruments.</p>
+
+      <div class="guided" id="guided">
+        <h3>Guided Learning</h3>
+        <p>Pick a scenario and press <strong>Start</strong>. Read one instruction at a time, predict what happens, then watch. Nothing is scored.</p>
+        <div class="picker" id="gTabs" role="group" aria-label="Scenarios">
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+        </div>
+
+        <div class="g-card">
+          <h4 class="g-title" id="gTitle"></h4>
+          <p class="g-count" id="gCount"></p>
+          <p class="g-instruction" id="gInstruction" aria-live="polite"></p>
+          <p class="g-now" id="gNow"></p>
+          <div class="g-question" id="gQuestion" hidden>
+            <p class="q-label">What should happen next?</p>
+            <p class="g-prompt" id="gPrompt"></p>
+            <div class="g-options" id="gOptions" role="group" aria-label="Choose your prediction"></div>
+            <p class="g-feedback" id="gFeedback" aria-live="polite"></p>
+          </div>
+          <p class="g-done" id="gDone" hidden>Scenario complete. Choose another scenario above, or press Restart to watch this one again.</p>
+        </div>
+
+        <div class="controls" id="gControls" role="group" aria-label="Scenario controls">
+          <button type="button" class="primary" id="gStart">Start</button>
+          <button type="button" id="gPause">Pause</button>
+          <button type="button" id="gResume">Resume</button>
+          <button type="button" id="gRestart">Restart</button>
+          <button type="button" id="gNext">Next Step</button>
+          <span class="flow-state" id="gState" role="status"></span>
+        </div>
+
+        <svg class="schematic sim" id="simSvg" viewBox="0 0 800 440" role="img" aria-labelledby="simTitle simDesc">
+          <title id="simTitle">Simulation: pitot-static system and three instruments</title>
+          <desc id="simDesc">A generic fighter-style aircraft seen from above with the pitot tube, two static ports, a pressure line to the airspeed indicator, and a static pressure line to the airspeed indicator, altimeter and vertical speed indicator. The needles move as the scenario runs. The current readings are announced below the diagram.</desc>
+          <defs>
+            <marker id="g-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--red)"/></marker>
+            <marker id="g-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--blue)"/></marker>
+            <marker id="g-grey" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--grey)"/></marker>
+          </defs>
+
+          <path class="body" d="M78 230 L130 216 L200 204 L268 204 L402 64 L448 64 L466 204 L478 204 L490 166 L506 166 L504 204 L504 256 L506 294 L490 294 L478 256 L466 256 L448 396 L402 396 L268 256 L200 256 L130 244 Z"/>
+
+          <g id="simAir" opacity="0">
+            <path class="air" d="M4 206 H30"/>
+            <path class="air" d="M4 230 H30"/>
+            <path class="air" d="M4 254 H30"/>
+          </g>
+          <text class="muted" id="simAirLabel" x="4" y="192">No airflow</text>
+
+          <path class="line" data-c="red" data-el="linePitot" d="M90 230 H464 a6 6 0 0 1 12 0 H515 V75 H564"/>
+          <path class="line dash" data-c="blue" data-el="lineSR" d="M200 204 V216 H458"/>
+          <path class="line dash nomark" data-c="blue" data-el="lineSR" d="M470 216 V244"/>
+          <path class="line dash" data-c="blue" data-el="lineSL" d="M200 256 V244 H458"/>
+          <path class="line dash" data-c="blue" data-el="lineTrunk" d="M470 244 H534"/>
+          <path class="line dash nomark" data-c="blue" data-el="bus" d="M534 115 V365"/>
+          <path class="line dash" data-c="blue" data-el="brAsi" d="M534 115 H564"/>
+          <path class="line dash" data-c="blue" data-el="brAlt" d="M534 230 H564"/>
+          <path class="line dash" data-c="blue" data-el="brVsi" d="M534 365 H564"/>
+
+          <g data-dim="all">
+            <path class="part tube" data-c="red" data-el="tube" d="M38 230 H90"/>
+            <text x="14" y="276">Pitot tube</text>
+          </g>
+          <g data-dim="all">
+            <circle class="part" data-c="blue" data-el="portR" cx="200" cy="204" r="8"/>
+            <text x="200" y="186" text-anchor="middle">Right static port</text>
+          </g>
+          <g data-dim="all">
+            <circle class="part" data-c="blue" data-el="portL" cx="200" cy="256" r="8"/>
+            <text x="200" y="288" text-anchor="middle">Left static port</text>
+          </g>
+
+          <g data-dim="all">
+            <circle class="part" data-c="purple" data-el="asi" cx="620" cy="95" r="56"/>
+            <g id="marksAsi"></g>
+            <g id="needleAsi"><line class="needle" x1="620" y1="95" x2="620" y2="55"/></g>
+            <circle class="hub" cx="620" cy="95" r="5"/>
+            <text x="686" y="78">Airspeed</text>
+            <text x="686" y="95">indicator</text>
+            <text class="val" id="valAsi" x="686" y="119">0 kt</text>
+          </g>
+          <g data-dim="all">
+            <circle class="part" data-c="blue" data-el="alt" cx="620" cy="230" r="56"/>
+            <g id="marksAlt"></g>
+            <g id="needleAlt"><line class="needle" x1="620" y1="230" x2="620" y2="190"/></g>
+            <circle class="hub" cx="620" cy="230" r="5"/>
+            <text x="686" y="226">Altimeter</text>
+            <text class="val" id="valAlt" x="686" y="250">0 ft</text>
+          </g>
+          <g data-dim="all">
+            <circle class="part" data-c="blue" data-el="vsi" cx="620" cy="365" r="56"/>
+            <g id="marksVsi"></g>
+            <g id="needleVsi"><line class="needle" x1="620" y1="365" x2="620" y2="325"/></g>
+            <circle class="hub" cx="620" cy="365" r="5"/>
+            <text x="686" y="348">Vertical speed</text>
+            <text x="686" y="365">indicator</text>
+            <text class="val" id="valVsi" x="686" y="389">0 ft/min</text>
+          </g>
+
+          <g id="simDots" aria-hidden="true"></g>
+          <text class="muted" x="14" y="28">Visual representation of pressure transmission</text>
+          <text class="muted" x="300" y="424" text-anchor="middle">Generic training aircraft. Teaching values only; flight time is sped up.</text>
+        </svg>
+        <p class="sr-only" id="gSummary" aria-live="polite"></p>
+
+        <div class="g-airfield">
+          <label for="gGround"><strong>Airfield height</strong></label>
+          <select id="gGround">
+            <option value="0">Sea level (0 ft)</option>
+            <option value="1000" selected>1,000 ft</option>
+            <option value="2500">2,500 ft</option>
+            <option value="5000">5,000 ft</option>
+          </select>
+          <span class="flow-state">Changing it restarts the scenario.</span>
+        </div>
+        <p class="flow-note"><strong>Visual representation of pressure transmission.</strong> Moving dots show a pressure change being passed along a line. They do not show liquid or air flowing through it.</p>
+      </div>
+
+      <div class="soon"><strong>Coming soon:</strong> free-play controls so you can fly the simulation yourself.</div>
     </section>
 
     <section class="step" data-title="Fault Investigation" aria-labelledby="s4" hidden>
@@ -477,6 +632,7 @@
     next.addEventListener("click", function () { show(current + 1); });
     show(0);
   </script>
+  <script src="pulses.js"></script>
   <script>
     "use strict";
 
@@ -582,31 +738,7 @@
 
       // Animation settings (pixels of the diagram per second). Deliberately slow.
       const SPEED = 65, SLOW_SPEED = 26, SPACING = 150, FADE = 16;
-      const NS = "http://www.w3.org/2000/svg";
-      const dotLayer = document.getElementById("dots");
-      let maxLen = 0;
-      ROUTES.forEach(function (route) {
-        route.path = document.createElementNS(NS, "path");
-        route.path.setAttribute("d", route.d);
-        route.path.setAttribute("class", "route");
-        dotLayer.appendChild(route.path);
-        route.len = route.path.getTotalLength();
-        maxLen = Math.max(maxLen, route.len);
-      });
-      const DOTS_PER_ROUTE = Math.ceil(maxLen / SPACING);
-      const PERIOD = DOTS_PER_ROUTE * SPACING;
-      ROUTES.forEach(function (route) {
-        route.dots = [];
-        for (let k = 0; k < DOTS_PER_ROUTE; k++) {
-          const dot = document.createElementNS(NS, "circle");
-          dot.setAttribute("class", "dot");
-          dot.setAttribute("data-c", route.color);
-          dot.setAttribute("r", "6");
-          dot.setAttribute("visibility", "hidden");
-          dotLayer.appendChild(dot);
-          route.dots.push(dot);
-        }
-      });
+      const pulses = PressurePulses(document.getElementById("dots"), ROUTES, { spacing: SPACING, fade: FADE });
 
       const els = Array.from(svg.querySelectorAll("[data-el]"));
       const dimGroups = Array.from(svg.querySelectorAll("[data-dim]"));
@@ -630,21 +762,8 @@
       }
 
       function drawDots() {
-        const active = activeRoutes();
         // Reduced motion: show the pulses as a still picture instead of moving them.
-        const travelled = reduced() ? SPACING * 0.45 : dist;
-        ROUTES.forEach(function (route) {
-          const on = active.indexOf(route) !== -1 && route.len > 0;
-          route.dots.forEach(function (dot, k) {
-            const d = (travelled + k * SPACING) % PERIOD;
-            if (!on || d > route.len) { dot.setAttribute("visibility", "hidden"); return; }
-            const pt = route.path.getPointAtLength(d);
-            dot.setAttribute("cx", pt.x.toFixed(1));
-            dot.setAttribute("cy", pt.y.toFixed(1));
-            dot.setAttribute("opacity", Math.max(0, Math.min(1, d / FADE, (route.len - d) / FADE)).toFixed(2));
-            dot.setAttribute("visibility", "visible");
-          });
-        });
+        pulses.draw(activeRoutes().map(function (route) { return route.id; }), reduced() ? SPACING * 0.45 : dist);
       }
 
       function tick(now) {
@@ -775,5 +894,6 @@
       render();
     })();
   </script>
+  <script src="guided.js"></script>
 </body>
 </html>

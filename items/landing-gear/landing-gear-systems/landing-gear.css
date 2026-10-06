@@ -180,12 +180,85 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 .next-row .btn:only-child { margin-left: auto; }
 
 /* ---------- Section 1: diagram, labels, info panel ---------- */
-.explore {
+.svg-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* Where the gear is on a fighter */
+.locate-card { margin-top: 0; }
+.locate-card p { max-width: 75ch; }
+.locate-views {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
   gap: 1rem;
   align-items: start;
 }
+.locate-fig {
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 10px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+}
+.locate-fig figcaption { font-size: 0.85rem; font-weight: 600; margin: 0 0 0.3rem 0.25rem; }
+.locate-fig figcaption .muted { font-weight: 400; }
+.jet-top { max-height: 420px; margin: 0 auto; }
+.jet-shape { fill: #2c4266; stroke: #6d88b3; stroke-width: 2; stroke-linejoin: round; }
+.jet-canopy { fill: #5fb6e8; fill-opacity: 0.55; stroke: #9fd6f5; stroke-width: 2; }
+.jet-dark { fill: #050c18; }
+.jet-ground { stroke: #5b6f8e; stroke-width: 3; stroke-dasharray: 10 6; }
+.jet-gear { cursor: pointer; fill: var(--amber); }
+.jet-gear .jet-tyre { fill: #151a22; stroke: var(--amber); stroke-width: 4; }
+.hidden-gear rect { fill: rgba(255, 182, 39, 0.25); stroke: var(--amber); stroke-width: 3; stroke-dasharray: 6 4; }
+.locate-ring {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 2.5;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ring 1.8s ease-out infinite;
+}
+@keyframes ring {
+  0% { transform: scale(0.6); opacity: 1; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+.locate-pill .pill-text { font-size: 16px; }
+.gear-svg .label-pill .pill-text { font-size: 14px; }
+.front-mark { fill: var(--amber); font-size: 18px; font-weight: 700; letter-spacing: 0.1em; }
+.jet-top .locate-pill .pill-text { font-size: 18px; }
+
+.jump-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.8rem; }
+
+/* The two close-up windows */
+.gear-windows {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+.gear-window {
+  margin: 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  overflow: hidden;
+  scroll-margin-top: 9rem;
+}
+.gear-window .diagram { padding: 0.5rem; }
+.gear-window.flash { animation: flash 1s ease-out; }
+.window-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.window-dots { display: inline-flex; gap: 0.3rem; }
+.window-dots i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--idle); }
+.window-dots i:first-child { background: var(--amber); }
+.window-title { font-weight: 700; color: var(--amber); letter-spacing: 0.03em; }
+.window-sub { margin-left: auto; font-size: 0.8rem; color: var(--muted); }
+
 .fuselage { fill: #2c4266; stroke: #4c6a96; stroke-width: 2; }
 .well { fill: #050c18; }
 .ground { stroke: #5b6f8e; stroke-width: 3; stroke-dasharray: 10 6; }
@@ -226,10 +299,14 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 .label-pill:hover .num-text, .label-pill.active .num-text { fill: var(--amber); }
 .label-pill.seen .num { fill: var(--green); }
 .leader { stroke: var(--amber); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.leader-dot { fill: var(--amber); }
 .label-pill:focus { outline: none; }
 .label-pill:focus-visible rect { stroke: var(--blue); stroke-width: 4; }
 
-.info-panel { padding: 1rem 1.1rem; min-height: 100%; }
+.info-panel { padding: 1rem 1.1rem; margin-top: 1rem; scroll-margin-top: 9rem; }
+.info-cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1.5rem; }
+.info-where { font-size: 0.95rem; color: var(--muted); }
+.info-where strong { color: var(--text); }
 .info-empty { text-align: center; color: var(--muted); padding: 1.5rem 0.5rem; }
 .info-icon { font-size: 2.2rem; color: var(--amber); }
 .info-kicker { margin: 0; font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
@@ -462,7 +539,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 /* ---------- Small screens ---------- */
 @media (max-width: 760px) {
   h1 { font-size: 1.3rem; }
-  .explore, .cockpit-wrap { grid-template-columns: minmax(0, 1fr); }
+  .cockpit-wrap, .locate-views, .gear-windows, .info-cols { grid-template-columns: minmax(0, 1fr); }
+  .jet-top { max-height: 380px; }
   .legend { margin-left: 0; }
   .tabs { gap: 0; }
   .tab { flex: 1 1 auto; font-size: 0.72rem; padding: 0.5rem 0.15rem; gap: 0.1rem; }
@@ -482,6 +560,6 @@ main { max-width: 1100px; margin: 0 auto; padding: 1rem 1rem 3rem; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .pipe.pressure, .pipe.return, #impeller.spin { animation: none; }
+  .pipe.pressure, .pipe.return, #impeller.spin, .locate-ring { animation: none; }
   #handle { transition: none; }
 }

@@ -2,7 +2,7 @@
  * Pressure pulses: small beads that travel along SVG paths.
  *
  *   const pulses = PressurePulses(layerElement, routes, { spacing, fade, radius });
- *   pulses.draw(activeRouteIds, distanceTravelled);
+ *   pulses.draw(activeRouteIds, distanceTravelled, strengthById);   // strength is optional, 0 to 1
  *
  * routes: [{ id, color: "red" | "blue", d: "<svg path data>" }]. Each route gets a
  * train of dots spaced `spacing` apart. All routes share one period, so pulses on
@@ -60,17 +60,18 @@
     }
 
     return {
-      draw: function (activeIds, travelled) {
+      draw: function (activeIds, travelled, strength) {
         if (!ready && !measure()) return;
         routes.forEach(function (route) {
-          const on = activeIds.indexOf(route.id) !== -1;
+          const level = strength && strength[route.id] !== undefined ? strength[route.id] : 1;
+          const on = activeIds.indexOf(route.id) !== -1 && level > 0.05;
           route.dots.forEach(function (dot, k) {
             const d = (travelled + k * spacing) % period;
             if (!on || d > route.len) { dot.setAttribute("visibility", "hidden"); return; }
             const pt = route.path.getPointAtLength(d);
             dot.setAttribute("cx", pt.x.toFixed(1));
             dot.setAttribute("cy", pt.y.toFixed(1));
-            dot.setAttribute("opacity", Math.max(0, Math.min(1, d / fade, (route.len - d) / fade)).toFixed(2));
+            dot.setAttribute("opacity", (level * Math.max(0, Math.min(1, d / fade, (route.len - d) / fade))).toFixed(2));
             dot.setAttribute("visibility", "visible");
           });
         });

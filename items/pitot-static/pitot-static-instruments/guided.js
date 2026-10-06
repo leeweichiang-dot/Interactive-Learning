@@ -10,7 +10,7 @@
   "use strict";
 
   const root = document.getElementById("guided");
-  if (!root || !window.PressurePulses) return;
+  if (!root || !window.PressurePulses || !window.SimCommon) return;
   const $ = function (id) { return document.getElementById(id); };
 
   const svg = $("simSvg");
@@ -173,12 +173,9 @@
   /* ---------- Gauges ---------- */
 
   const NS = "http://www.w3.org/2000/svg";
-  const GAUGES = {
-    asi: { cx: 620, cy: 95 },
-    alt: { cx: 620, cy: 230 },
-    vsi: { cx: 620, cy: 365 }
-  };
-  const R = 56;
+  const GAUGES = window.SimCommon.GAUGES;
+  const ASI_DEG = window.SimCommon.asiDeg, ALT_DEG = window.SimCommon.altDeg, VSI_DEG = window.SimCommon.vsiDeg;
+  const fmt = window.SimCommon.fmt, signed = window.SimCommon.signed;
 
   function polar(g, radius, deg) {   // deg is clockwise from 12 o'clock
     const a = (deg - 90) * Math.PI / 180;
@@ -200,13 +197,6 @@
     t.textContent = text;
     group.appendChild(t);
   }
-
-  const ASI_DEG = function (v) { return -150 + 300 * Math.max(0, Math.min(400, v)) / 400; };
-  const ALT_DEG = function (v) { return 360 * (Math.max(0, Math.min(10000, v)) / 10000); };
-  const VSI_DEG = function (v) {
-    const c = Math.max(-3000, Math.min(3000, v));
-    return -90 + c / 3000 * 165;   // zero is at 9 o'clock; climb swings up, descent swings down
-  };
 
   function buildDials() {
     const asi = $("marksAsi"), alt = $("marksAlt"), vsi = $("marksVsi");
@@ -235,9 +225,6 @@
   function turn(id, g, deg) {
     $(id).setAttribute("transform", "rotate(" + deg.toFixed(1) + " " + g.cx + " " + g.cy + ")");
   }
-  function fmt(n) { return Math.round(n).toLocaleString("en-US"); }
-  function signed(n) { const r = Math.round(n / 10) * 10 || 0; return (r > 0 ? "+" : "") + fmt(r); }   // "|| 0" avoids "-0"
-
   /* ---------- Highlighting ---------- */
 
   const els = Array.from(svg.querySelectorAll("[data-el]"));
@@ -265,12 +252,7 @@
 
   /* ---------- Pressure pulses ---------- */
 
-  const TAILS = { asi: "H534 V115 H564", alt: "H534 V230 H564", vsi: "H534 V365 H564" };
-  const ROUTES = [{ id: "pitot", color: "red", d: "M40 230 H464 a6 6 0 0 1 12 0 H515 V75 H564" }];
-  Object.keys(TAILS).forEach(function (inst) {
-    ROUTES.push({ id: "sr-" + inst, color: "blue", d: "M200 204 V216 H470 V244 " + TAILS[inst] });
-    ROUTES.push({ id: "sl-" + inst, color: "blue", d: "M200 256 V244 " + TAILS[inst] });
-  });
+  const ROUTES = window.SimCommon.routes();
   const pulses = window.PressurePulses($("simDots"), ROUTES, { spacing: SPACING, fade: FADE });
 
   /* ---------- Scenario engine ---------- */

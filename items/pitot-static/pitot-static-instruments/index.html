@@ -23,6 +23,8 @@
       --purple: #7b3fc4;
       --grey: #868b94;
       --sil: #e9e9e6;
+      --warn: #a84d00;
+      --warn-soft: #fdf0dc;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -40,6 +42,8 @@
         --purple: #c8a2ff;
         --grey: #7b8089;
         --sil: #2a2d33;
+        --warn: #f2b24c;
+        --warn-soft: #3a2e14;
       }
     }
     *, *::before, *::after { box-sizing: border-box; }
@@ -225,6 +229,49 @@
     .sim .hub { fill: var(--text); }
     .sim text.val { font-size: 15px; font-weight: 700; }
 
+    /* Fault Investigation (section 4) */
+    .fault-note {
+      margin: 12px 0; padding: 14px 16px;
+      background: var(--warn-soft);
+      border: 2px solid var(--warn);
+      border-radius: 8px;
+      font-size: 1.02rem; font-weight: 600;
+    }
+    .fault-note strong { color: var(--warn); }
+    .f-form { margin: 14px 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+    .f-form h4 { margin: 0 0 4px; font-size: 1.1rem; }
+    .f-q { margin: 0 0 14px; padding: 0; border: 0; min-width: 0; }
+    .f-q legend { padding: 0; margin-bottom: 4px; font-weight: 600; }
+    .f-q label { display: block; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+    .f-q label:hover { background: var(--accent-soft); }
+    .f-q input { margin-right: 6px; }
+    .f-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .f-reveal { margin: 14px 0; padding: 14px 16px; background: var(--accent-soft); border-radius: 8px; }
+    .f-reveal h4 { margin: 0 0 8px; font-size: 1.1rem; }
+    .f-reveal h5 { margin: 14px 0 6px; font-size: 1rem; }
+    .f-reveal h4:focus { outline: none; }
+    .f-review { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+    .f-review li { padding: 8px 10px; background: var(--surface); border-radius: 6px; border-left: 5px solid var(--success); }
+    .f-review li.diff { border-left-color: var(--warn); }
+    .f-review li strong, .f-review li span { display: block; }
+    .f-icing { display: inline-flex; align-items: center; gap: 6px; padding: 6px 8px; }
+    .f-icing[hidden] { display: none; }
+    .sim .heater { fill: none; stroke: var(--grey); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+    .sim .heater.off { stroke-dasharray: 3 3; }
+    .sim .heater.drain { stroke-dasharray: none; stroke-width: 3; }
+    .sim .heater.faulty { stroke: var(--warn); stroke-width: 3.5; }
+    .sim .drain-hole { fill: var(--surface); stroke: var(--grey); stroke-width: 1.5; }
+    .sim .part.faulty { stroke: var(--warn); stroke-width: 5; }
+    .sim .part.tube.faulty { stroke-width: 7; }
+    .sim .fmark circle { fill: var(--surface); stroke: var(--warn); stroke-width: 2.5; }
+    .sim .fmark line { stroke: var(--warn); stroke-width: 2.5; stroke-linecap: round; }
+    .sim .ice { fill: var(--blue); fill-opacity: 0.35; stroke: var(--blue); stroke-width: 1.5; stroke-dasharray: 2 2; }
+    .sim .water { fill: var(--blue); fill-opacity: 0.5; }
+    .sim text.tiny { font-size: 11px; fill: var(--muted); }
+    .sim text.faulty-text { fill: var(--warn); font-weight: 700; }
+    .sim text.flag { font-size: 12px; font-weight: 700; fill: var(--warn); }
+    .sim .part.affected { stroke: var(--warn); stroke-width: 5; }
+
     @media (max-width: 600px) {
       .steps .label { display: none; }
       .nav button, .nav .btn { padding: 10px 12px; }
@@ -232,6 +279,14 @@
   </style>
 </head>
 <body>
+  <!-- Arrowheads shared by the simulation-style diagrams. Kept outside any section so they still draw when another section is hidden. -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <marker id="g-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--red)"/></marker>
+      <marker id="g-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--blue)"/></marker>
+      <marker id="g-grey" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--grey)"/></marker>
+    </defs>
+  </svg>
   <main>
     <a class="back" href="../../../module.html?m=pitot-static">&larr; Pitot-Static Flight Instruments</a>
     <h1>Pitot-Static Flight Instruments</h1>
@@ -473,11 +528,6 @@
         <svg class="schematic sim" id="simSvg" viewBox="0 0 800 440" role="img" aria-labelledby="simTitle simDesc">
           <title id="simTitle">Simulation: pitot-static system and three instruments</title>
           <desc id="simDesc">A generic fighter-style aircraft seen from above with the pitot tube, two static ports, a pressure line to the airspeed indicator, and a static pressure line to the airspeed indicator, altimeter and vertical speed indicator. The needles move as the scenario runs. The current readings are announced below the diagram.</desc>
-          <defs>
-            <marker id="g-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--red)"/></marker>
-            <marker id="g-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--blue)"/></marker>
-            <marker id="g-grey" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--grey)"/></marker>
-          </defs>
 
           <path class="body" d="M78 230 L130 216 L200 204 L268 204 L402 64 L448 64 L466 204 L478 204 L490 166 L506 166 L504 204 L504 256 L506 294 L490 294 L478 256 L466 256 L448 396 L402 396 L268 256 L200 256 L130 244 Z"/>
 
@@ -562,8 +612,57 @@
 
     <section class="step" data-title="Fault Investigation" aria-labelledby="s4" hidden>
       <h2 id="s4">4. Fault Investigation</h2>
-      <p>Something is wrong with the system. Use the instrument readings to work out what, for example a blocked pitot tube, a blocked static port or a leak in a pipe.</p>
-      <div class="soon"><strong>Coming soon:</strong> fault scenarios to investigate, with hints.</div>
+      <p>See how a problem in one pressure path can change what the instruments show. Choose a condition, study the diagram, make your prediction, then reveal the explanation.</p>
+
+      <div class="fault-note" role="note">
+        <strong>Important:</strong> Actual indications depend on aircraft design, system configuration and approved technical documentation. This activity uses simplified, generic examples to build understanding. It is not a maintenance or operating guide.
+      </div>
+
+      <div id="faults">
+        <p class="row-label" id="fTabsLabel">Choose a training condition</p>
+        <div class="picker" id="fTabs" role="group" aria-labelledby="fTabsLabel">
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+          <button type="button" aria-pressed="false"></button>
+        </div>
+
+        <div class="g-card">
+          <h4 class="g-title" id="fTitle"></h4>
+          <p class="g-instruction" id="fSummary"></p>
+          <p class="g-now">Reference situation: the aircraft has climbed at a steady speed to about 8,000 ft. The gauges start with the readings a normal system would show. The affected part is marked in amber.</p>
+        </div>
+
+        <div id="fSvgHolder"></div>
+        <p class="sr-only" id="fDiagramText" aria-live="polite"></p>
+
+        <div class="controls" role="group" aria-label="Diagram controls">
+          <button type="button" id="fPause">Pause animation</button>
+          <button type="button" id="fReset">Reset to Normal</button>
+          <label class="f-icing" id="fIcingRow" hidden><input type="checkbox" id="fIcing" checked> Flight in icing conditions</label>
+          <span class="flow-state" id="fMotionNote"></span>
+        </div>
+        <p class="flow-note"><strong>Visual representation of pressure transmission.</strong> Moving dots show a pressure change being passed along a line. They do not show liquid or air flowing through it.</p>
+
+        <form class="f-form" id="fForm" novalidate>
+          <h4>Predict first</h4>
+          <p>Look at the diagram, then answer all four questions. The explanation appears after you submit your prediction.</p>
+          <div class="f-actions">
+            <button type="submit" class="primary" id="fSubmit" disabled>Submit prediction</button>
+          </div>
+        </form>
+
+        <div class="f-reveal" id="fReveal" hidden>
+          <h4 id="fExplainTitle" tabindex="-1"></h4>
+          <div id="fExplainBody"></div>
+          <p class="g-instruction" id="fAffected"></p>
+          <p class="g-count" id="fRevealNeedles"></p>
+          <h5>Review of your prediction</h5>
+          <ul class="f-review" id="fReview"></ul>
+          <p class="g-now">Remember: actual indications depend on aircraft design, system configuration and approved technical documentation. To try another condition, choose it above or press Reset to Normal.</p>
+        </div>
+      </div>
     </section>
 
     <section class="step" data-title="Competency Check" aria-labelledby="s5" hidden>
@@ -894,6 +993,8 @@
       render();
     })();
   </script>
+  <script src="simcommon.js"></script>
   <script src="guided.js"></script>
+  <script src="faults.js"></script>
 </body>
 </html>

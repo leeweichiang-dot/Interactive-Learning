@@ -74,7 +74,7 @@
     }
     .steps .num { display: block; font-weight: 700; font-size: 1rem; }
     .steps li.visited button { border-color: var(--success); }
-    .steps li.visited .num::after { content: " \2713"; color: var(--success); }
+    .steps li.visited .num::after { content: " \2713"; content: " \2713" / ""; color: var(--success); }
     .steps li.current button { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
     .steps li.current .num::after { color: var(--on-accent); }
     .bar { height: 6px; margin: 0 0 4px; background: var(--border); border-radius: 3px; overflow: hidden; }
@@ -169,7 +169,7 @@
     .schematic .line.rel { stroke-width: 5; }
     .schematic .line.dyn.rel { stroke-width: 3; }
     /* When something is selected, lines that are not involved turn grey */
-    .schematic.has-sel .line:not(.rel) { stroke: var(--grey); opacity: 0.45; marker-end: url(#a-grey); }
+    .schematic.has-sel .line:not(.rel) { stroke: var(--grey); opacity: 0.55; marker-end: url(#a-grey); }
     .schematic.has-sel .line.dyn:not(.rel) { marker-start: url(#a-grey); }
     .schematic.has-sel .line.nomark:not(.rel) { marker-end: none; }
 
@@ -195,7 +195,7 @@
     .flow-state { color: var(--muted); font-size: 0.9rem; }
     .schematic .dot { fill: var(--surface); stroke: var(--c); stroke-width: 2.5; pointer-events: none; }
     .schematic .route { fill: none; stroke: none; pointer-events: none; }
-    .schematic .dimmed { opacity: 0.4; }
+    .schematic .dimmed { opacity: 0.7; }   /* faded, but labels keep a readable contrast */
 
     /* Guided Learning (section 3) */
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
@@ -221,7 +221,8 @@
     .sim .line[data-c="blue"] { marker-end: url(#g-blue); }
     .sim.has-sel .line:not(.rel) { marker-end: url(#g-grey); }
     .sim.has-sel .line.nomark:not(.rel) { marker-end: none; }
-    .sim .dimmed { opacity: 0.55; }
+    .sim .dimmed { opacity: 0.7; }
+    .schematic text.dimmed { opacity: 0.9; }
     .sim .tick { stroke: var(--muted); stroke-width: 1.5; }
     .sim .tick.major { stroke: var(--text); stroke-width: 2; }
     .sim text.num { font-size: 11px; text-anchor: middle; dominant-baseline: central; }
@@ -240,7 +241,7 @@
     }
     .fault-note strong, .notice strong { color: var(--warn); }
     .f-form { margin: 14px 0; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
-    .f-form h4 { margin: 0 0 4px; font-size: 1.1rem; }
+    .f-form h3 { margin: 0 0 4px; font-size: 1.1rem; }
     .f-q { margin: 0 0 14px; padding: 0; border: 0; min-width: 0; }
     .f-q legend { padding: 0; margin-bottom: 4px; font-weight: 600; }
     .f-q label { display: block; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
@@ -248,9 +249,9 @@
     .f-q input { margin-right: 6px; }
     .f-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
     .f-reveal { margin: 14px 0; padding: 14px 16px; background: var(--accent-soft); border-radius: 8px; }
-    .f-reveal h4 { margin: 0 0 8px; font-size: 1.1rem; }
-    .f-reveal h5 { margin: 14px 0 6px; font-size: 1rem; }
-    .f-reveal h4:focus { outline: none; }
+    .f-reveal h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .f-reveal h4 { margin: 14px 0 6px; font-size: 1rem; }
+    .f-reveal h3:focus { outline: none; }
     .f-review { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
     .f-review li { padding: 8px 10px; background: var(--surface); border-radius: 6px; border-left: 5px solid var(--success); }
     .f-review li.diff { border-left-color: var(--warn); }
@@ -320,9 +321,28 @@
     .sim [data-sel] { cursor: pointer; }
     .a-diagram-note { margin: 0 0 8px; color: var(--muted); font-size: 0.92rem; }
 
+    /* Usability and accessibility */
+    .skip-link { position: absolute; left: 8px; top: -80px; z-index: 100; padding: 8px 14px; background: var(--surface); color: var(--text); border: 2px solid var(--accent); border-radius: 8px; }
+    .skip-link:focus { top: 8px; }
+    .steps li.current button { font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+    .picker button[aria-pressed="true"]::before, .controls button[aria-pressed="true"]::before { content: "\2713\00a0"; content: "\2713\00a0" / ""; }
+    .glossary { margin: 0 0 12px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+    .glossary summary { cursor: pointer; font-weight: 600; }
+    .glossary dl { margin: 10px 0 0; display: grid; gap: 2px 0; }
+    .glossary dt { margin-top: 8px; font-weight: 700; }
+    .glossary dd { margin: 0; }
+    .term { text-decoration: underline dotted var(--accent); text-decoration-thickness: 2px; text-underline-offset: 3px; cursor: help; }
+    .term:hover { background: var(--accent-soft); }
+    .term-tip { position: absolute; z-index: 60; max-width: min(340px, calc(100vw - 16px)); padding: 10px 12px; background: var(--text); color: var(--bg); border-radius: 8px; font-size: 0.95rem; line-height: 1.45; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); }
+    .readings { margin: 8px 0; padding: 8px 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
+    .schematic .dot[data-c="blue"] { stroke-dasharray: 5 3; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+    }
+
     @media (max-width: 600px) {
       .a-row { grid-template-columns: 1fr; }
-      .steps .label { display: none; }
+      .steps .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
       .nav button, .nav .btn { padding: 10px 12px; }
     }
   </style>
@@ -336,6 +356,7 @@
       <marker id="g-grey" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--grey)"/></marker>
     </defs>
   </svg>
+  <a class="skip-link" id="skipLink" href="#s1">Skip to the lesson section</a>
   <main>
     <a class="back" href="../../../module.html?m=pitot-static">&larr; Pitot-Static Flight Instruments</a>
     <h1>Pitot-Static Flight Instruments</h1>
@@ -345,35 +366,65 @@
     <div class="bar" aria-hidden="true"><span id="bar"></span></div>
     <p class="progress" id="progress" aria-live="polite"></p>
 
+    <details class="glossary" id="glossary">
+      <summary>Glossary of key terms</summary>
+      <p class="g-now">Words with a dotted underline show a short meaning. Hover over them, move to them with the Tab key, or tap them.</p>
+      <dl>
+        <dt id="gl-pitot-tube" data-aliases="pitot tube|pitot tubes">Pitot tube</dt>
+        <dd>A small tube at the front of the aircraft. It faces the oncoming air and senses total pressure.</dd>
+        <dt id="gl-static-port" data-aliases="static port|static ports">Static port</dt>
+        <dd>A small hole on the side of the aircraft. Air slides past it, so it senses static pressure.</dd>
+        <dt id="gl-total-pressure" data-aliases="total pressure">Total pressure</dt>
+        <dd>The pressure measured at the open front of the pitot tube. Moving air is pushed in, so it is higher than static pressure. It is also called pitot pressure.</dd>
+        <dt id="gl-static-pressure" data-aliases="static pressure">Static pressure</dt>
+        <dd>The pressure of the air around the aircraft. It gets lower as the aircraft goes higher.</dd>
+        <dt id="gl-dynamic-pressure" data-aliases="dynamic pressure">Dynamic pressure</dt>
+        <dd>The extra push from moving through the air. Dynamic pressure = total pressure &minus; static pressure. It gets bigger as the aircraft goes faster.</dd>
+        <dt id="gl-airspeed-indicator" data-aliases="airspeed indicator">Airspeed indicator</dt>
+        <dd>A cockpit dial that shows how fast the aircraft moves through the air. It compares total pressure with static pressure.</dd>
+        <dt id="gl-altimeter" data-aliases="altimeter">Altimeter</dt>
+        <dd>A cockpit dial that shows height. It reads static pressure.</dd>
+        <dt id="gl-vertical-speed-indicator" data-aliases="vertical speed indicator">Vertical speed indicator</dt>
+        <dd>A cockpit dial that shows how fast the aircraft goes up or down. It reads how quickly static pressure is changing.</dd>
+        <dt id="gl-climb" data-aliases="climb|climbs|climbing|climbed">Climb</dt>
+        <dd>To go up to a greater height. In a climb, static pressure falls.</dd>
+        <dt id="gl-descent" data-aliases="descent|descend|descends|descending|descended">Descent</dt>
+        <dd>Going down to a lower height. In a descent, static pressure rises.</dd>
+        <dt id="gl-blockage" data-aliases="blockage|blockages|blocked">Blockage</dt>
+        <dd>Something that stops air or pressure from getting through, such as ice, dirt or water. &ldquo;Blocked&rdquo; means there is a blockage.</dd>
+      </dl>
+    </details>
+
     <section class="step" data-title="System Overview" aria-labelledby="s1">
       <h2 id="s1">1. System Overview</h2>
-      <p>An aircraft cannot feel how fast or how high it is. Instead, it <strong>measures air pressure</strong> and turns it into readings on three cockpit instruments.</p>
+      <p>An aircraft cannot feel how fast or how high it is. Instead, it <strong>measures air pressure</strong>. It turns the pressure into readings on three cockpit instruments (dials in front of the pilot).</p>
 
       <h3>Three pressures to know</h3>
       <div class="cards">
         <div class="card red">
           <h3>Total pressure</h3>
-          <p>The <strong>pitot tube</strong> faces the airflow. Air is pushed into it, so it senses <strong>total pressure</strong> (also called pitot pressure).</p>
+          <p>The <strong>pitot tube</strong> is a small tube at the front of the aircraft. It faces the air. Air is pushed into it, so it senses <strong>total pressure</strong> (also called pitot pressure).</p>
         </div>
         <div class="card blue">
           <h3>Static pressure</h3>
-          <p>A <strong>static port</strong> is a small hole on the side of the aircraft. Air slides past it, so it senses the <strong>static pressure</strong> of the air around the aircraft.</p>
+          <p>A <strong>static port</strong> is a small hole on the side of the aircraft. Air slides past it. It senses <strong>static pressure</strong>: the pressure of the air around the aircraft.</p>
         </div>
         <div class="card purple">
           <h3>Dynamic pressure</h3>
           <p class="formula">Dynamic = Total &minus; Static</p>
-          <p>This is the extra push caused by moving through the air. Faster flight gives a bigger difference.</p>
+          <p>This is the extra push from moving through the air. Faster flight gives a bigger difference.</p>
         </div>
       </div>
 
       <h3>Three instruments use them</h3>
+      <p>Each instrument is a dial in the cockpit.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th scope="col">Instrument</th><th scope="col">What it uses</th><th scope="col">What it shows</th></tr></thead>
           <tbody>
             <tr><th scope="row">Airspeed indicator</th><td>Pitot (total) pressure and static pressure</td><td>Speed, from the difference between the two</td></tr>
             <tr><th scope="row">Altimeter</th><td>Static pressure</td><td>Height. Static pressure falls as height increases.</td></tr>
-            <tr><th scope="row">Vertical speed indicator</th><td>Changes in static pressure over time</td><td>How fast the aircraft climbs or descends</td></tr>
+            <tr><th scope="row">Vertical speed indicator</th><td>Changes in static pressure over time</td><td>How fast the aircraft goes up (climbs) or down (descends)</td></tr>
           </tbody>
         </table>
       </div>
@@ -472,7 +523,7 @@
         <text class="muted" x="300" y="424" text-anchor="middle">Generic fighter-style aircraft, top view, nose to the left</text>
       </svg>
 
-      <p class="flow-note"><strong>Visual representation of pressure transmission.</strong> The dots show a pressure change being passed along each line. They do not show liquid or air flowing through it. Real pressure changes travel much faster than this, so the animation is slowed down to help you follow it.</p>
+      <p class="flow-note"><strong>Visual representation of pressure transmission.</strong> The dots show a pressure change being passed along each line. They do not show liquid or air flowing through it. Real pressure changes travel much faster. The animation is slowed down to help you follow it.</p>
 
       <p class="row-label" id="flowLabel">Show pressure flow</p>
       <div class="picker" id="flowPicker" role="group" aria-labelledby="flowLabel">
@@ -512,7 +563,8 @@
         <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--blue)" stroke-dasharray="9 5"/></svg>Static pressure</li>
         <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--purple)" stroke-dasharray="2 5"/></svg>Dynamic pressure (total &minus; static)</li>
         <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--grey)"/></svg>Inactive part</li>
-        <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--red)"/><circle cx="22" cy="6" r="5" fill="var(--surface)" stroke="var(--red)" stroke-width="2.5"/></svg>Moving dot = pressure pulse (red: total, blue: static)</li>
+        <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--red)"/><circle cx="22" cy="6" r="5" fill="var(--surface)" stroke="var(--red)" stroke-width="2.5"/></svg>Red pulse, solid ring: total pressure</li>
+        <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--blue)" stroke-dasharray="9 5"/><circle cx="22" cy="6" r="5" fill="var(--surface)" stroke="var(--blue)" stroke-width="2.5" stroke-dasharray="5 3"/></svg>Blue pulse, dashed ring: static pressure</li>
       </ul>
       <div class="tools"><button type="button" id="resetDiagram">Reset Diagram</button></div>
 
@@ -538,7 +590,7 @@
 
     <section class="step" data-title="Flight Simulation" aria-labelledby="s3" hidden>
       <h2 id="s3">3. Flight Simulation</h2>
-      <p>Follow five short flights and watch how pitot and static pressure move the three instruments.</p>
+      <p>Follow five short flights and watch how pitot and static pressure move the three instruments. Speed is in knots (kt). Height is in feet (ft). Vertical speed is in feet per minute (ft/min).</p>
 
       <div class="guided" id="guided">
         <h3>Guided Learning</h3>
@@ -574,7 +626,7 @@
           <span class="flow-state" id="gState" role="status"></span>
         </div>
 
-        <svg class="schematic sim" id="simSvg" viewBox="0 0 800 440" role="img" aria-labelledby="simTitle simDesc">
+        <svg class="schematic sim" id="simSvg" viewBox="0 0 800 440" role="img" aria-labelledby="simTitle simDesc" aria-describedby="gReadings">
           <title id="simTitle">Simulation: pitot-static system and three instruments</title>
           <desc id="simDesc">A generic fighter-style aircraft seen from above with the pitot tube, two static ports, a pressure line to the airspeed indicator, and a static pressure line to the airspeed indicator, altimeter and vertical speed indicator. The needles move as the scenario runs. The current readings are announced below the diagram.</desc>
 
@@ -613,7 +665,7 @@
           <g data-dim="all">
             <circle class="part" data-c="purple" data-el="asi" cx="620" cy="95" r="56"/>
             <g id="marksAsi"></g>
-            <g id="needleAsi"><line class="needle" x1="620" y1="95" x2="620" y2="55"/></g>
+            <g id="needleAsi"><line class="needle" x1="620" y1="95" x2="620" y2="71"/></g>
             <circle class="hub" cx="620" cy="95" r="5"/>
             <text x="686" y="78">Airspeed</text>
             <text x="686" y="95">indicator</text>
@@ -622,7 +674,7 @@
           <g data-dim="all">
             <circle class="part" data-c="blue" data-el="alt" cx="620" cy="230" r="56"/>
             <g id="marksAlt"></g>
-            <g id="needleAlt"><line class="needle" x1="620" y1="230" x2="620" y2="190"/></g>
+            <g id="needleAlt"><line class="needle" x1="620" y1="230" x2="620" y2="206"/></g>
             <circle class="hub" cx="620" cy="230" r="5"/>
             <text x="686" y="226">Altimeter</text>
             <text class="val" id="valAlt" x="686" y="250">0 ft</text>
@@ -630,7 +682,7 @@
           <g data-dim="all">
             <circle class="part" data-c="blue" data-el="vsi" cx="620" cy="365" r="56"/>
             <g id="marksVsi"></g>
-            <g id="needleVsi"><line class="needle" x1="620" y1="365" x2="620" y2="325"/></g>
+            <g id="needleVsi"><line class="needle" x1="620" y1="365" x2="620" y2="341"/></g>
             <circle class="hub" cx="620" cy="365" r="5"/>
             <text x="686" y="348">Vertical speed</text>
             <text x="686" y="365">indicator</text>
@@ -641,6 +693,7 @@
           <text class="muted" x="14" y="28">Visual representation of pressure transmission</text>
           <text class="muted" x="300" y="424" text-anchor="middle">Generic training aircraft. Teaching values only; flight time is sped up.</text>
         </svg>
+        <p class="readings" id="gReadings"></p>
         <p class="sr-only" id="gSummary" aria-live="polite"></p>
 
         <div class="g-airfield">
@@ -661,7 +714,7 @@
 
     <section class="step" data-title="Fault Investigation" aria-labelledby="s4" hidden>
       <h2 id="s4">4. Fault Investigation</h2>
-      <p>See how a problem in one pressure path can change what the instruments show. Choose a condition, study the diagram, make your prediction, then reveal the explanation.</p>
+      <p>A blockage is something that stops air from getting through, such as ice, dirt or water. See how a blockage or a fault in one pressure path can change the instruments. Choose a condition. Study the diagram. Make your prediction. Then read the explanation.</p>
 
       <div class="fault-note" role="note">
         <strong>Important:</strong> Actual indications depend on aircraft design, system configuration and approved technical documentation. This activity uses simplified, generic examples to build understanding. It is not a maintenance or operating guide.
@@ -678,12 +731,13 @@
         </div>
 
         <div class="g-card">
-          <h4 class="g-title" id="fTitle"></h4>
+          <h3 class="g-title" id="fTitle"></h3>
           <p class="g-instruction" id="fSummary"></p>
-          <p class="g-now">Reference situation: the aircraft has climbed at a steady speed to about 8,000 ft. The gauges start with the readings a normal system would show. The affected part is marked in amber.</p>
+          <p class="g-now">Example: the aircraft has climbed to about 8,000 ft at a steady speed. The gauges start with normal readings. The affected part has an amber outline, and a cross if it is blocked.</p>
         </div>
 
         <div id="fSvgHolder"></div>
+        <p class="readings" id="fReadings"></p>
         <p class="sr-only" id="fDiagramText" aria-live="polite"></p>
 
         <div class="controls" role="group" aria-label="Diagram controls">
@@ -695,7 +749,7 @@
         <p class="flow-note"><strong>Visual representation of pressure transmission.</strong> Moving dots show a pressure change being passed along a line. They do not show liquid or air flowing through it.</p>
 
         <form class="f-form" id="fForm" novalidate>
-          <h4>Predict first</h4>
+          <h3>Predict first</h3>
           <p>Look at the diagram, then answer all four questions. The explanation appears after you submit your prediction.</p>
           <div class="f-actions">
             <button type="submit" class="primary" id="fSubmit" disabled>Submit prediction</button>
@@ -703,11 +757,11 @@
         </form>
 
         <div class="f-reveal" id="fReveal" hidden>
-          <h4 id="fExplainTitle" tabindex="-1"></h4>
+          <h3 id="fExplainTitle" tabindex="-1"></h3>
           <div id="fExplainBody"></div>
           <p class="g-instruction" id="fAffected"></p>
           <p class="g-count" id="fRevealNeedles"></p>
-          <h5>Review of your prediction</h5>
+          <h4>Review of your prediction</h4>
           <ul class="f-review" id="fReview"></ul>
           <p class="g-now">Remember: actual indications depend on aircraft design, system configuration and approved technical documentation. To try another condition, choose it above or press Reset to Normal.</p>
         </div>
@@ -791,6 +845,7 @@
     let current = 0;
 
     sections.forEach(function (section, i) {
+      section.querySelector("h2").tabIndex = -1;   // lets the skip link and section changes move focus here
       const li = document.createElement("li");
       const button = document.createElement("button");
       button.type = "button";
@@ -800,15 +855,16 @@
       const label = document.createElement("span");
       label.className = "label";
       label.textContent = section.dataset.title;
-      button.append(num, label);
-      button.setAttribute("aria-label", "Section " + (i + 1) + ": " + section.dataset.title);
-      button.addEventListener("click", function () { show(i); });
+      const state = document.createElement("span");
+      state.className = "sr-only state";
+      button.append(num, document.createTextNode(" "), label, state);
+      button.addEventListener("click", function () { show(i, true); });
       li.append(button);
       stepList.append(li);
       tabs.push(li);
     });
 
-    function show(index) {
+    function show(index, moveFocus) {
       current = index;
       visited.add(index);
       sections.forEach(function (s, i) { s.hidden = i !== current; });
@@ -816,19 +872,25 @@
         li.classList.toggle("current", i === current);
         li.classList.toggle("visited", visited.has(i));
         li.firstChild.setAttribute("aria-current", i === current ? "step" : "false");
+        li.querySelector(".state").textContent = i === current ? " (current section)" : visited.has(i) ? " (seen)" : "";
       });
+      document.getElementById("skipLink").setAttribute("href", "#s" + (current + 1));
       progress.textContent = "Section " + (current + 1) + " of " + sections.length + ": " +
         sections[current].dataset.title + " (" + visited.size + " of " + sections.length + " seen)";
       bar.style.width = (visited.size / sections.length * 100) + "%";
       prev.disabled = current === 0;
       next.disabled = current === sections.length - 1;
       if (visited.size === sections.length && window.Tracker) window.Tracker.complete();
+      if (moveFocus) {   // so keyboard and screen reader users land at the top of the new section
+        sections[current].querySelector("h2").focus();
+      }
     }
 
-    prev.addEventListener("click", function () { show(current - 1); });
-    next.addEventListener("click", function () { show(current + 1); });
+    prev.addEventListener("click", function () { show(current - 1, true); });
+    next.addEventListener("click", function () { show(current + 1, true); });
     show(0);
   </script>
+  <script src="terms.js"></script>
   <script src="pulses.js"></script>
   <script>
     "use strict";
@@ -850,7 +912,7 @@
       const PARTS = {
         "pitot": {
           title: "Pitot tube",
-          text: "The pitot tube faces the airflow. Air is pushed into its open front end, so it senses total pressure (also called pitot pressure).",
+          text: "The pitot tube faces the airflow. Air is pushed into its open front end. So it senses total pressure (also called pitot pressure).",
           label: "Instruments that depend on it", list: [ASI],
           own: ["tube"], rel: ["tube", "linePitot", "asi"]
         },
@@ -862,13 +924,13 @@
         },
         "static-l": {
           title: "Left static port",
-          text: "A static port is a small hole on the side of the aircraft. Air slides past it, so it senses static pressure: the pressure of the air around the aircraft. The left and right ports share one line.",
+          text: "A static port is a small hole on the side of the aircraft. Air slides past it. It senses static pressure: the pressure of the air around the aircraft. The left and right ports share one line.",
           label: "Instruments that depend on it", list: [ASI, ALT, VSI],
           own: ["portL"], rel: ["portL", "lineSL", "lineTrunk", "bus", "brAsi", "brAlt", "brVsi", "asi", "alt", "vsi"]
         },
         "static-r": {
           title: "Right static port",
-          text: "The right port does the same job as the left one. Having a port on each side helps keep the reading steady if the aircraft is not flying straight into the wind.",
+          text: "The right port does the same job as the left port. A port on each side helps keep the reading steady. This matters when the aircraft is not flying straight into the wind.",
           label: "Instruments that depend on it", list: [ASI, ALT, VSI],
           own: ["portR"], rel: ["portR", "lineSR", "lineTrunk", "bus", "brAsi", "brAlt", "brVsi", "asi", "alt", "vsi"]
         },
@@ -898,26 +960,26 @@
         },
         "vsi": {
           title: VSI,
-          text: "It watches how quickly static pressure changes. In a climb the pressure falls, in a descent it rises. A faster change means a faster climb or descent. In level flight it shows zero.",
+          text: "It watches how quickly static pressure changes. In a climb the pressure falls. In a descent it rises. A faster change means a faster climb or descent. In level flight (no climb or descent) it shows zero.",
           label: "It depends on", list: ["Static ports (static pressure changing over time)"],
           own: ["vsi"], rel: ["portL", "portR", "lineSR", "lineSL", "lineTrunk", "bus", "brVsi", "vsi"]
         },
         // The three pressure-flow views
         "flow-pitot": {
           title: "Pitot flow",
-          text: "Total pressure from the pitot tube is passed along the red line to the airspeed indicator.",
+          text: "Total pressure from the pitot tube travels along the red line to the airspeed indicator.",
           label: "Destination instrument", list: [ASI],
           own: [], rel: ["tube", "linePitot", "asi"]
         },
         "flow-static": {
           title: "Static flow",
-          text: "Static pressure from the left and right static ports is passed along the blue lines to all three instruments.",
+          text: "Static pressure from both static ports travels along the blue lines to all three instruments.",
           label: "Destination instruments", list: [ASI, ALT, VSI],
           own: [], rel: ["portL", "portR", "asi", "alt", "vsi"].concat(SIX)
         },
         "flow-all": {
           title: "Complete system",
-          text: "Both pressures are passed along their lines at the same time, so the airspeed indicator can compare them while the other two instruments use static pressure only.",
+          text: "Both pressures travel at the same time. The airspeed indicator compares them. The other two instruments use static pressure only.",
           label: "Destination instruments", list: [ASI + " (pitot and static)", ALT + " (static only)", VSI + " (static only)"],
           own: [], rel: ["tube", "linePitot", "portL", "portR", "dyn", "asi", "alt", "vsi"].concat(SIX)
         }

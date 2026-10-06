@@ -102,7 +102,7 @@ window.CATALOGUE = {
       module: "pitot-static",
       type: "lesson",
       title: "Pitot-Static Flight Instruments",
-      summary: "Five sections: system overview, explore the system, flight simulation, fault investigation and a competency check. Animations and activities are coming soon."
+      summary: "Learn how pitot and static pressure move three cockpit instruments. Includes an interactive diagram, five guided flight scenarios, a fault investigation and a 12-question competency check."
     }
   ]
 };

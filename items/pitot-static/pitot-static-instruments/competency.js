@@ -71,8 +71,8 @@
       id: "c3", category: "component", type: "select",
       prompt: "Select the altimeter. It shows height.",
       target: "alt",
-      hint: "Look for the dial with the scale marked x1000 ft.",
-      explain: "The altimeter shows height. Its dial is marked in thousands of feet. It reads static pressure and turns it into a height."
+      hint: "Look for the dial with the numbers 0 to 9 all the way round.",
+      explain: "The altimeter shows height. Its dial has the numbers 0 to 9 for thousands of feet. It reads static pressure and turns it into a height."
     },
     {
       id: "c4", category: "component", type: "match",
@@ -107,7 +107,7 @@
       prompt: "How is dynamic pressure found?",
       options: ["Total pressure minus static pressure", "Total pressure plus static pressure", "Static pressure on its own"], answer: 0,
       hint: "Dynamic pressure is the extra push from moving through the air.",
-      explain: "Dynamic pressure = total pressure − static pressure. It is the extra pressure caused by moving through the air, and it gets bigger as the aircraft goes faster."
+      explain: "Dynamic pressure = total pressure − static pressure. It is the extra pressure from moving through the air. It gets bigger as the aircraft goes faster."
     },
     {
       id: "p3", category: "pressure", type: "select",
@@ -125,7 +125,7 @@
         { label: "Vertical speed indicator", answer: "climb", choices: [{ value: "climb", label: "Shows a climb" }, { value: "zero", label: "Shows zero" }, { value: "descent", label: "Shows a descent" }] }
       ],
       hint: "Think about static pressure as the aircraft goes higher. Does the airflow past the pitot tube change?",
-      explain: "Static pressure falls as the aircraft climbs, so the altimeter reading rises and the vertical speed indicator shows a climb. The airflow past the pitot tube stays the same, so the airspeed stays about the same."
+      explain: "Static pressure falls as the aircraft climbs. So the altimeter reading rises and the vertical speed indicator shows a climb. The airflow past the pitot tube stays the same. So the airspeed stays about the same."
     },
     {
       id: "i2", category: "instrument", type: "predict",
@@ -153,7 +153,7 @@
         { label: "Vertical speed indicator", answer: "may", choices: MAY_NOT }
       ],
       hint: "Count how many instruments use static pressure.",
-      explain: "All three instruments use static pressure. With the ports blocked, the static line holds old pressure. The altimeter may stay at the earlier height, the vertical speed indicator may read near zero, and the airspeed indicator may read wrongly. Real behaviour depends on the aircraft design and approved technical documents."
+      explain: "All three instruments use static pressure. With the ports blocked, the static line holds old pressure. The altimeter may stay at the earlier height. The vertical speed indicator may read near zero. The airspeed indicator may read wrongly. Real behaviour depends on the aircraft design and approved technical documents."
     },
     {
       id: "f2", category: "fault", type: "mc",
@@ -252,7 +252,7 @@
   function showStorageNote() {
     $("aStorageNote").textContent = storageOk
       ? "Your progress is saved only in this browser, on this device. No name or personal information is collected."
-      : "This browser is not letting the page save progress, so your answers will not be remembered if you leave. No name or personal information is collected.";
+      : "This browser will not let the page save progress. Your answers will not be remembered if you leave. No name or personal information is collected.";
   }
 
   function scoringRules() {
@@ -296,8 +296,9 @@
       if (!t.classList.contains("num") && !t.classList.contains("unit")) t.remove();
     });
     svg.querySelector("title").textContent = "Diagram for the question";
-    svg.querySelector("desc").textContent = "A generic training aircraft seen from above with a nose tube, two small side ports, a red line, blue lines and three dials. Select a part by clicking it, or use the list below the diagram.";
+    svg.querySelector("desc").textContent = "A generic training aircraft seen from above. It has a nose tube, two small side ports, a red line, blue lines and three dials. Click a part to select it, or use the list below the diagram.";
     svg.removeAttribute("aria-labelledby");
+    svg.removeAttribute("aria-describedby");
     svg.setAttribute("aria-label", "Diagram for the question. Select a part by clicking it, or use the list below.");
     [["asi", 140], ["alt", 3000], ["vsi", 0]].forEach(function (p) {
       const g = C.GAUGES[p[0]];

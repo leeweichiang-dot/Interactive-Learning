@@ -53,14 +53,14 @@
       result: function () { return { ias: BASE.ias, alt: BASE.alt, vs: BASE.vs, affected: [] }; },
       explanation: [
         "With both pressure paths open, each instrument gets the pressure it needs. The airspeed indicator compares pitot pressure with static pressure. The altimeter and vertical speed indicator use static pressure only.",
-        "In this reference situation the instruments show a steady speed, a height of about 8,000 ft and a climb. Keep this normal picture in mind when you look at the faults."
+        "In this example the instruments show a steady speed, a height of about 8,000 ft and a climb. Keep this normal picture in mind when you look at the faults."
       ]
     },
     {
       id: "pitot-inlet",
       tab: "2. Pitot inlet blocked",
       title: "Pitot inlet blocked",
-      summary: "The front opening of the pitot tube is blocked, so total pressure cannot enter.",
+      summary: "The front opening (inlet) of the pitot tube is blocked. Total pressure cannot get in.",
       faulty: ["tube"], marks: ["inlet"],
       diagram: "A blocked marker sits on the pitot inlet. No red pulses leave the pitot tube. Blue pulses still reach all three instruments.",
       routes: function () { return ALL_STATIC; },
@@ -73,7 +73,7 @@
       result: function () { return { ias: 0, alt: BASE.alt, vs: BASE.vs, affected: ["asi"] }; },
       explanation: [
         "The airspeed indicator needs total pressure from the pitot tube. With the inlet blocked, fresh total pressure cannot get in.",
-        "Pressure already inside the pitot line may leak out through the small drain opening. Depending on the design, the airspeed indication may then fall toward zero or stop responding to changes in speed.",
+        "Pressure already inside the pitot line may leak out through the small drain opening. The airspeed indication may then fall toward zero. Or it may stop responding to changes in speed. What happens depends on the design.",
         "The altimeter and vertical speed indicator use only static pressure, so a pitot fault does not directly affect them."
       ]
     },
@@ -83,7 +83,7 @@
       title: "Pitot drain opening blocked",
       summary: "The small drain opening of the pitot tube is blocked. The main inlet is still open.",
       faulty: ["tube", "drain"], marks: ["drain"],
-      diagram: "A blocked marker sits on the drain opening and moisture slowly collects there. Red pulses still travel to the airspeed indicator, and blue pulses still reach all three instruments.",
+      diagram: "A blocked marker sits on the drain opening. Water slowly collects there. Red pulses still travel to the airspeed indicator. Blue pulses still reach all three instruments.",
       routes: function () { return ALL_ROUTES; },
       answer: { source: "pitot", instruments: ["asi"], unaffected: ["alt", "vsi"], evidence: "e1" },
       evidence: [
@@ -93,8 +93,8 @@
       ],
       result: function () { return { ias: BASE.ias, alt: BASE.alt, vs: BASE.vs, affected: ["asi"] }; },
       explanation: [
-        "The drain opening lets moisture leave the pitot tube. With the inlet still open, total pressure still reaches the airspeed indicator, so the indication may look normal at first.",
-        "If moisture collects, it may later disturb the pressure in the pitot line and make the airspeed indication unsteady or wrong. The needles above stay normal because the effect may not show straight away.",
+        "The drain opening lets water leave the pitot tube. The inlet is still open. So total pressure still reaches the airspeed indicator. The indication may look normal at first.",
+        "If water collects, it may later disturb the pressure in the pitot line. The airspeed indication may become unsteady or wrong. The needles stay normal now because the effect may not show straight away.",
         "The altimeter and vertical speed indicator use static pressure, so they are not directly affected."
       ]
     },
@@ -114,9 +114,9 @@
       ],
       result: function () { return { ias: 210, alt: 5000, vs: 0, affected: ["asi", "alt", "vsi"] }; },
       explanation: [
-        "All three instruments use static pressure. With the ports blocked, the static line holds the pressure from the moment it was blocked instead of following the real outside pressure.",
-        "In this climb the altimeter may stay at the earlier height and the vertical speed indicator may read near zero. The airspeed indicator compares pitot pressure with the trapped static pressure, so it may read lower than the real speed.",
-        "Because even the airspeed indicator depends on static pressure, none of the three instruments is fully independent of this fault."
+        "All three instruments use static pressure. If the ports are blocked, the static line holds the old pressure. It no longer follows the real outside pressure.",
+        "In a climb, the altimeter may stay at the earlier height. The vertical speed indicator may read near zero. The airspeed indicator compares pitot pressure with the trapped static pressure. So it may read lower than the real speed.",
+        "All three instruments depend on static pressure. None of them is fully free of this fault."
       ]
     },
     {
@@ -135,8 +135,8 @@
       ],
       result: function (s) { return s.icing ? { ias: 0, alt: BASE.alt, vs: BASE.vs, affected: ["asi"] } : { ias: BASE.ias, alt: BASE.alt, vs: BASE.vs, affected: [] }; },
       explanation: [
-        "A pitot heater keeps the inlet warm so ice cannot build up. In dry air with no ice, the airspeed indication may not be affected at all.",
-        "In icing conditions, ice may partly or fully block the inlet. The pitot tube then behaves like a blocked inlet, and the airspeed indication may become wrong or stop responding.",
+        "A pitot heater keeps the inlet warm so ice cannot build up. In dry air with no ice, the airspeed indication may not be affected.",
+        "In icing conditions (cold, wet air), ice may block the inlet. The pitot tube then acts like a blocked inlet. The airspeed indication may become wrong or stop responding.",
         "The altimeter and vertical speed indicator use static pressure, so they are not directly affected."
       ]
     }
@@ -159,8 +159,9 @@
   titleEl.id = "fdTitle";
   descEl.id = "fdDesc";
   titleEl.textContent = "Fault investigation: pitot-static system and three instruments";
-  descEl.textContent = "A generic training aircraft with a pitot tube, a heater, a drain opening, two static ports, pressure lines and three instruments. Fault markers and moving pulses change with the chosen condition. A text description of the diagram is announced when you choose a condition.";
+  descEl.textContent = "A generic training aircraft. It shows a pitot tube, a heater, a drain opening, two static ports, pressure lines and three instruments. Fault markers and moving pulses change with the chosen condition. A text description of the diagram is announced when you choose a condition.";
   svg.setAttribute("aria-labelledby", "fdTitle fdDesc");
+  svg.setAttribute("aria-describedby", "fReadings");
   svg.removeAttribute("id");
   Array.from(svg.querySelectorAll("text")).forEach(function (t) {
     if (t.textContent.indexOf("Generic training aircraft") === 0) t.textContent = "Generic training representation. Illustrative only.";
@@ -253,6 +254,15 @@
     value.asi.textContent = C.fmt(cur.ias) + " kt";
     value.alt.textContent = C.fmt(Math.round(cur.alt / 10) * 10) + " ft";
     value.vsi.textContent = C.signed(cur.vs) + " ft/min";
+    const readings = describe();
+    if (readings !== lastReadings) { $("fReadings").textContent = readings; lastReadings = readings; }
+  }
+  let lastReadings = "";
+  function describe() {   // the instrument values in words
+    const vs = Math.round(cur.vs / 10) * 10;
+    const trend = vs > 0 ? "climbing at " + C.fmt(vs) + " feet per minute" : vs < 0 ? "descending at " + C.fmt(-vs) + " feet per minute" : "zero (not climbing or descending)";
+    return (revealed ? "Instrument readings after your prediction (illustrative values, not real aircraft data). " : "Instrument readings for a normal system. ") +
+      "Airspeed indicator: " + C.fmt(cur.ias) + " knots. Altimeter: " + C.fmt(Math.round(cur.alt / 10) * 10) + " feet. Vertical speed indicator: " + trend + ".";
   }
 
   function buildLevel() {   // 0 to 1: how far ice or moisture has built up
@@ -422,6 +432,7 @@
     const body = $("fExplainBody");
     body.textContent = "";
     c.explanation.forEach(function (t) { const p = document.createElement("p"); p.textContent = t; body.appendChild(p); });
+    if (window.Terms) window.Terms.markElement(body);
 
     let affected = res.affected.length ? names(res.affected, INSTRUMENT) : "None directly";
     if (c.heater && !icing) affected = "None in dry air. The airspeed indicator may be affected if ice forms.";

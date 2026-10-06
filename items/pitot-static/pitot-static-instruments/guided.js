@@ -82,14 +82,14 @@
       goal: "See how the airspeed indicator responds as the aircraft speeds up.",
       state: function (p, g) { const s = p * p * (3 - 2 * p); return { ias: 160 * s, alt: g, vs: 0 }; },
       steps: [
-        { text: "The aircraft is at the start of its take-off run. Airspeed is zero.", hl: ["asi"] },
+        { text: "The aircraft is at the start of the runway. Airspeed is zero.", hl: ["asi"] },
         {
           text: "The pilot adds power. The aircraft will speed up along the runway.",
           hl: PITOT_PART.concat(["asi"]),
           q: {
             prompt: "The aircraft speeds up. Which instruments should change?",
             options: [
-              { label: "Airspeed, altitude and vertical speed all change.", feedback: "Not quite. Speeding up along the ground does not change static pressure, so the altimeter and vertical speed stay the same." },
+              { label: "Airspeed, altitude and vertical speed all change.", feedback: "Not quite. Speeding up on the ground does not change static pressure. So the altimeter and vertical speed stay the same." },
               { label: "Only the airspeed indicator changes.", correct: true, feedback: "Correct. Faster air pushes harder into the pitot tube, so total pressure rises above static pressure. Only the airspeed indicator uses that difference." },
               { label: "Only the altimeter changes.", feedback: "Not quite. The altimeter reads static pressure, and that stays the same while the aircraft stays at one height." }
             ]
@@ -159,7 +159,7 @@
             prompt: "Choose the best prediction.",
             options: [
               { label: "Vertical speed stays at zero, because airspeed is the same.", feedback: "Not quite. Vertical speed does not depend on airspeed. It shows static pressure changing, and that changes in a descent." },
-              { label: "The altimeter reading falls and vertical speed shows a descent.", correct: true, feedback: "Correct. Static pressure rises as the aircraft goes lower. The altimeter turns higher pressure into a lower height, and the vertical speed indicator shows the rising pressure as a negative reading." },
+              { label: "The altimeter reading falls and vertical speed shows a descent.", correct: true, feedback: "Correct. Static pressure rises as the aircraft goes lower. The altimeter turns higher pressure into a lower height. The vertical speed indicator shows rising pressure as a negative reading." },
               { label: "The altimeter reading rises, because static pressure rises.", feedback: "Not quite. Static pressure does rise in a descent, but higher pressure means lower height, so the altimeter reading falls." }
             ]
           }
@@ -200,26 +200,24 @@
 
   function buildDials() {
     const asi = $("marksAsi"), alt = $("marksAlt"), vsi = $("marksVsi");
-    const NUM = 34;   // radius of the scale numbers
+    const NUM = 37;   // radius of the scale numbers: outside the needle's reach, inside the tick marks
+    const tick = function (group, g, deg, major) { mark(group, g, major ? 48 : 50, 53, deg, major); };
     for (let v = 0; v <= 400; v += 25) {
       const major = v % 100 === 0;
-      mark(asi, GAUGES.asi, major ? 44 : 48, 52, ASI_DEG(v), major);
+      tick(asi, GAUGES.asi, ASI_DEG(v), major);
       if (major) label(asi, GAUGES.asi, NUM, ASI_DEG(v), String(v));
     }
-    label(asi, GAUGES.asi, 16, 180, "kt", "unit");
     for (let v = 0; v < 10000; v += 500) {
       const major = v % 1000 === 0;
-      mark(alt, GAUGES.alt, major ? 44 : 48, 52, ALT_DEG(v), major);
+      tick(alt, GAUGES.alt, ALT_DEG(v), major);
       if (major) label(alt, GAUGES.alt, NUM, ALT_DEG(v), String(v / 1000));
     }
-    label(alt, GAUGES.alt, 14, 180, "x1000 ft", "unit");
     for (let v = -3000; v <= 3000; v += 500) {
       const major = v % 1000 === 0;
-      mark(vsi, GAUGES.vsi, major ? 44 : 48, 52, VSI_DEG(v), major);
-      if (major) label(vsi, GAUGES.vsi, NUM + 2, VSI_DEG(v), String(Math.abs(v) / 1000));
+      tick(vsi, GAUGES.vsi, VSI_DEG(v), major);
+      // Signed numbers say which way is a climb and which is a descent: +1 is a climb, \u22121 is a descent
+      if (major) label(vsi, GAUGES.vsi, NUM, VSI_DEG(v), v === 0 ? "0" : (v > 0 ? "+" : "\u2212") + Math.abs(v) / 1000);
     }
-    label(vsi, GAUGES.vsi, 15, 0, "CLIMB", "unit");
-    label(vsi, GAUGES.vsi, 15, 180, "DESCENT", "unit");
   }
 
   function turn(id, g, deg) {
@@ -275,6 +273,13 @@
   function flowIds() { const s = step(); return s && s.flow ? s.flow : []; }
   function animating() { return !reduced() && (motion !== null || flowIds().length > 0); }
 
+  let lastReadings = "";
+  function describe(s) {   // the instrument values in words
+    const vs = Math.round(s.vs / 10) * 10;
+    const trend = vs > 0 ? "climbing at " + fmt(vs) + " feet per minute" : vs < 0 ? "descending at " + fmt(-vs) + " feet per minute" : "zero (not climbing or descending)";
+    return "Instrument readings. Airspeed indicator: " + fmt(s.ias) + " knots. Altimeter: " + fmt(Math.round(s.alt / 10) * 10) + " feet. Vertical speed indicator: " + trend + ".";
+  }
+
   function showState() {
     const s = current().state(p, ground());
     turn("needleAsi", GAUGES.asi, ASI_DEG(s.ias));
@@ -283,6 +288,8 @@
     $("valAsi").textContent = fmt(s.ias) + " kt";
     $("valAlt").textContent = fmt(Math.round(s.alt / 10) * 10) + " ft";
     $("valVsi").textContent = signed(s.vs) + " ft/min";
+    const readings = describe(s);
+    if (readings !== lastReadings) { $("gReadings").textContent = readings; lastReadings = readings; }
     // Air only moves past the pitot tube when the aircraft is moving
     const airflow = s.ias > 1 ? Math.min(1, 0.3 + s.ias / 250) : 0;
     $("simAir").setAttribute("opacity", airflow.toFixed(2));

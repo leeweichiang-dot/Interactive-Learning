@@ -181,6 +181,17 @@
     .legend line { stroke-width: 3; stroke-linecap: round; }
     .tools { display: flex; justify-content: flex-end; }
 
+    /* Pressure-flow animation */
+    .row-label { margin: 14px 0 0; font-weight: 600; font-size: 0.95rem; }
+    .flow-note { margin: 8px 0 0; padding: 8px 12px; border-left: 4px solid var(--purple); background: var(--accent-soft); border-radius: 0 8px 8px 0; font-size: 0.92rem; }
+    .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 10px 0; }
+    .controls button { padding: 8px 14px; font-size: 0.92rem; }
+    .controls button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+    .flow-state { color: var(--muted); font-size: 0.9rem; }
+    .schematic .dot { fill: var(--surface); stroke: var(--c); stroke-width: 2.5; pointer-events: none; }
+    .schematic .route { fill: none; stroke: none; pointer-events: none; }
+    .schematic .dimmed { opacity: 0.4; }
+
     @media (max-width: 600px) {
       .steps .label { display: none; }
       .nav button, .nav .btn { padding: 10px 12px; }
@@ -235,7 +246,7 @@
 
       <svg class="schematic" id="schematic" viewBox="0 0 800 440" role="img" aria-labelledby="dgTitle dgDesc">
         <title id="dgTitle">Pitot-static system schematic</title>
-        <desc id="dgDesc">A generic fighter-style aircraft seen from above, nose to the left. The pitot tube at the nose sends total pressure along a red line to the airspeed indicator. Left and right static ports send static pressure along blue lines to the airspeed indicator, the altimeter and the vertical speed indicator. Use the buttons below the diagram to select each part.</desc>
+        <desc id="dgDesc">A generic fighter-style aircraft seen from above, nose to the left. Small moving dots show pressure being passed along the lines; this is a visual representation of pressure transmission, not liquid flowing. The pitot tube at the nose sends total pressure along a red line to the airspeed indicator. Left and right static ports send static pressure along blue lines to the airspeed indicator, the altimeter and the vertical speed indicator. Use the buttons below the diagram to select each part.</desc>
         <defs>
           <marker id="a-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--red)"/></marker>
           <marker id="a-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--blue)"/></marker>
@@ -270,24 +281,24 @@
         </g>
 
         <!-- Pitot tube and static ports -->
-        <g data-pick="pitot">
+        <g data-pick="pitot" data-dim="all">
           <path class="hit" d="M38 230 H90"/>
           <path class="part tube" data-c="red" data-el="tube" d="M38 230 H90"/>
+          <text x="14" y="276">Pitot tube</text>
         </g>
-        <text x="14" y="276">Pitot tube</text>
-        <g data-pick="static-r">
+        <g data-pick="static-r" data-dim="all">
           <circle class="hit" cx="200" cy="204" r="14" style="fill:transparent;stroke:none;pointer-events:all"/>
           <circle class="part" data-c="blue" data-el="portR" cx="200" cy="204" r="8"/>
+          <text x="200" y="186" text-anchor="middle">Right static port</text>
         </g>
-        <text x="200" y="186" text-anchor="middle">Right static port</text>
-        <g data-pick="static-l">
+        <g data-pick="static-l" data-dim="all">
           <circle class="hit" cx="200" cy="256" r="14" style="fill:transparent;stroke:none;pointer-events:all"/>
           <circle class="part" data-c="blue" data-el="portL" cx="200" cy="256" r="8"/>
+          <text x="200" y="288" text-anchor="middle">Left static port</text>
         </g>
-        <text x="200" y="288" text-anchor="middle">Left static port</text>
 
         <!-- Dynamic pressure: the difference between total and static at the airspeed indicator -->
-        <g data-pick="dynamic">
+        <g data-pick="dynamic" data-dim="text">
           <path class="hit" d="M556 80 V110"/>
           <path class="line dyn dot" data-c="purple" data-el="dyn" d="M556 82 V108"/>
           <text class="purple" x="672" y="126">Dynamic =</text>
@@ -296,20 +307,20 @@
 
         <!-- Instruments -->
         <text class="muted" x="700" y="28" text-anchor="middle">Cockpit instruments</text>
-        <g data-pick="asi">
+        <g data-pick="asi" data-dim="all">
           <circle class="part" data-c="purple" data-el="asi" cx="620" cy="95" r="42"/>
           <circle class="dial" cx="620" cy="95" r="32"/>
           <line class="needle" x1="620" y1="95" x2="640" y2="77"/>
           <text x="672" y="88">Airspeed</text>
           <text x="672" y="105">indicator</text>
         </g>
-        <g data-pick="alt">
+        <g data-pick="alt" data-dim="all">
           <circle class="part" data-c="blue" data-el="alt" cx="620" cy="230" r="42"/>
           <circle class="dial" cx="620" cy="230" r="32"/>
           <line class="needle" x1="620" y1="230" x2="604" y2="212"/>
           <text x="672" y="236">Altimeter</text>
         </g>
-        <g data-pick="vsi">
+        <g data-pick="vsi" data-dim="all">
           <circle class="part" data-c="blue" data-el="vsi" cx="620" cy="365" r="42"/>
           <circle class="dial" cx="620" cy="365" r="32"/>
           <line class="needle" x1="620" y1="365" x2="642" y2="355"/>
@@ -317,10 +328,31 @@
           <text x="672" y="379">indicator</text>
         </g>
 
+        <!-- Moving pulses are drawn here by the script -->
+        <g id="dots" aria-hidden="true"></g>
+
+        <text class="muted" x="14" y="28">Visual representation of pressure transmission</text>
         <text class="muted" x="300" y="424" text-anchor="middle">Generic fighter-style aircraft, top view, nose to the left</text>
       </svg>
 
-      <div class="picker" id="picker" role="group" aria-label="Choose a part of the system to explore">
+      <p class="flow-note"><strong>Visual representation of pressure transmission.</strong> The dots show a pressure change being passed along each line. They do not show liquid or air flowing through it. Real pressure changes travel much faster than this, so the animation is slowed down to help you follow it.</p>
+
+      <p class="row-label" id="flowLabel">Show pressure flow</p>
+      <div class="picker" id="flowPicker" role="group" aria-labelledby="flowLabel">
+        <button type="button" data-pick="flow-pitot" aria-pressed="false">Show Pitot Flow</button>
+        <button type="button" data-pick="flow-static" aria-pressed="false">Show Static Flow</button>
+        <button type="button" data-pick="flow-all" aria-pressed="false">Show Complete System</button>
+      </div>
+      <div class="controls" id="flowControls" role="group" aria-label="Animation controls">
+        <button type="button" id="flowPlay">Play</button>
+        <button type="button" id="flowPause">Pause</button>
+        <button type="button" id="flowRestart">Restart</button>
+        <button type="button" id="flowSlow" aria-pressed="false">Slow Motion</button>
+        <span class="flow-state" id="flowState" role="status"></span>
+      </div>
+
+      <p class="row-label" id="partLabel">Or explore one part</p>
+      <div class="picker" id="picker" role="group" aria-labelledby="partLabel">
         <button type="button" data-pick="pitot" aria-pressed="false">Pitot tube</button>
         <button type="button" data-pick="static-l" aria-pressed="false">Left static port</button>
         <button type="button" data-pick="static-r" aria-pressed="false">Right static port</button>
@@ -343,6 +375,7 @@
         <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--blue)" stroke-dasharray="9 5"/></svg>Static pressure</li>
         <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--purple)" stroke-dasharray="2 5"/></svg>Dynamic pressure (total &minus; static)</li>
         <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--grey)"/></svg>Inactive part</li>
+        <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--red)"/><circle cx="22" cy="6" r="5" fill="var(--surface)" stroke="var(--red)" stroke-width="2.5"/></svg>Moving dot = pressure pulse (red: total, blue: static)</li>
       </ul>
       <div class="tools"><button type="button" id="resetDiagram">Reset Diagram</button></div>
 
@@ -447,10 +480,12 @@
   <script>
     "use strict";
 
-    // System Overview diagram: select a part, highlight its pressure path, explain it.
+    // System Overview diagram: select a part or a pressure flow, highlight its path,
+    // explain it, and (optionally) animate pulses along it.
     (function () {
       const svg = document.getElementById("schematic");
       const picker = document.getElementById("picker");
+      const flowPicker = document.getElementById("flowPicker");
       const titleEl = document.getElementById("explainTitle");
       const textEl = document.getElementById("explainText");
       const dependsEl = document.getElementById("explainDepends");
@@ -492,7 +527,7 @@
         },
         "dynamic": {
           title: "Dynamic pressure",
-          text: "Dynamic pressure = total pressure \u2212 static pressure. It is the extra push from moving through the air. The faster the aircraft flies, the bigger the difference.",
+          text: "Dynamic pressure = total pressure − static pressure. It is the extra push from moving through the air. The faster the aircraft flies, the bigger the difference.",
           label: "Instruments that depend on it", list: [ASI],
           own: ["dyn"], rel: ["tube", "linePitot", "portL", "portR", "dyn", "asi"].concat(ASI_STATIC)
         },
@@ -513,12 +548,142 @@
           text: "It watches how quickly static pressure changes. In a climb the pressure falls, in a descent it rises. A faster change means a faster climb or descent. In level flight it shows zero.",
           label: "It depends on", list: ["Static ports (static pressure changing over time)"],
           own: ["vsi"], rel: ["portL", "portR", "lineSR", "lineSL", "lineTrunk", "bus", "brVsi", "vsi"]
+        },
+        // The three pressure-flow views
+        "flow-pitot": {
+          title: "Pitot flow",
+          text: "Total pressure from the pitot tube is passed along the red line to the airspeed indicator.",
+          label: "Destination instrument", list: [ASI],
+          own: [], rel: ["tube", "linePitot", "asi"]
+        },
+        "flow-static": {
+          title: "Static flow",
+          text: "Static pressure from the left and right static ports is passed along the blue lines to all three instruments.",
+          label: "Destination instruments", list: [ASI, ALT, VSI],
+          own: [], rel: ["portL", "portR", "asi", "alt", "vsi"].concat(SIX)
+        },
+        "flow-all": {
+          title: "Complete system",
+          text: "Both pressures are passed along their lines at the same time, so the airspeed indicator can compare them while the other two instruments use static pressure only.",
+          label: "Destination instruments", list: [ASI + " (pitot and static)", ALT + " (static only)", VSI + " (static only)"],
+          own: [], rel: ["tube", "linePitot", "portL", "portR", "dyn", "asi", "alt", "vsi"].concat(SIX)
         }
       };
 
+      // Pulse routes follow the drawn lines. A route is animated when all the
+      // line segments it needs are highlighted.
+      const STATIC_TAIL = { asi: ["brAsi", "H550 V115 H578"], alt: ["brAlt", "H550 V230 H578"], vsi: ["brVsi", "H550 V365 H578"] };
+      const ROUTES = [{ id: "pitot", color: "red", d: "M40 230 H464 a6 6 0 0 1 12 0 H515 V75 H578", need: ["linePitot"] }];
+      Object.keys(STATIC_TAIL).forEach(function (inst) {
+        const tail = STATIC_TAIL[inst];
+        ROUTES.push({ id: "sr-" + inst, color: "blue", d: "M200 204 V216 H470 V244 " + tail[1], need: ["lineSR", "lineTrunk", "bus", tail[0]] });
+        ROUTES.push({ id: "sl-" + inst, color: "blue", d: "M200 256 V244 " + tail[1], need: ["lineSL", "lineTrunk", "bus", tail[0]] });
+      });
+
+      // Animation settings (pixels of the diagram per second). Deliberately slow.
+      const SPEED = 65, SLOW_SPEED = 26, SPACING = 150, FADE = 16;
+      const NS = "http://www.w3.org/2000/svg";
+      const dotLayer = document.getElementById("dots");
+      let maxLen = 0;
+      ROUTES.forEach(function (route) {
+        route.path = document.createElementNS(NS, "path");
+        route.path.setAttribute("d", route.d);
+        route.path.setAttribute("class", "route");
+        dotLayer.appendChild(route.path);
+        route.len = route.path.getTotalLength();
+        maxLen = Math.max(maxLen, route.len);
+      });
+      const DOTS_PER_ROUTE = Math.ceil(maxLen / SPACING);
+      const PERIOD = DOTS_PER_ROUTE * SPACING;
+      ROUTES.forEach(function (route) {
+        route.dots = [];
+        for (let k = 0; k < DOTS_PER_ROUTE; k++) {
+          const dot = document.createElementNS(NS, "circle");
+          dot.setAttribute("class", "dot");
+          dot.setAttribute("data-c", route.color);
+          dot.setAttribute("r", "6");
+          dot.setAttribute("visibility", "hidden");
+          dotLayer.appendChild(dot);
+          route.dots.push(dot);
+        }
+      });
+
       const els = Array.from(svg.querySelectorAll("[data-el]"));
-      const buttons = Array.from(picker.querySelectorAll("button"));
-      let selected = null;
+      const dimGroups = Array.from(svg.querySelectorAll("[data-dim]"));
+      const buttons = Array.from(document.querySelectorAll("#picker button, #flowPicker button"));
+      const playBtn = document.getElementById("flowPlay");
+      const pauseBtn = document.getElementById("flowPause");
+      const restartBtn = document.getElementById("flowRestart");
+      const slowBtn = document.getElementById("flowSlow");
+      const stateEl = document.getElementById("flowState");
+      const reduceQuery = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+      let selected = null, playing = false, slow = false, dist = 0, last = 0, frame = 0;
+
+      function reduced() { return Boolean(reduceQuery && reduceQuery.matches); }
+
+      function activeRoutes() {
+        const info = selected && PARTS[selected];
+        if (!info) return [];
+        return ROUTES.filter(function (route) {
+          return route.need.every(function (n) { return info.rel.indexOf(n) !== -1; });
+        });
+      }
+
+      function drawDots() {
+        const active = activeRoutes();
+        // Reduced motion: show the pulses as a still picture instead of moving them.
+        const travelled = reduced() ? SPACING * 0.45 : dist;
+        ROUTES.forEach(function (route) {
+          const on = active.indexOf(route) !== -1 && route.len > 0;
+          route.dots.forEach(function (dot, k) {
+            const d = (travelled + k * SPACING) % PERIOD;
+            if (!on || d > route.len) { dot.setAttribute("visibility", "hidden"); return; }
+            const pt = route.path.getPointAtLength(d);
+            dot.setAttribute("cx", pt.x.toFixed(1));
+            dot.setAttribute("cy", pt.y.toFixed(1));
+            dot.setAttribute("opacity", Math.max(0, Math.min(1, d / FADE, (route.len - d) / FADE)).toFixed(2));
+            dot.setAttribute("visibility", "visible");
+          });
+        });
+      }
+
+      function tick(now) {
+        if (!playing) return;
+        const dt = Math.min(0.1, (now - last) / 1000);
+        last = now;
+        dist += (slow ? SLOW_SPEED : SPEED) * dt;
+        drawDots();
+        frame = requestAnimationFrame(tick);
+      }
+
+      function setPlaying(on) {
+        if (on && reduced()) on = false;
+        if (on === playing) return;
+        playing = on;
+        cancelAnimationFrame(frame);
+        if (on) {
+          last = performance.now();
+          frame = requestAnimationFrame(tick);
+        }
+      }
+
+      function updateControls() {
+        const noMotion = reduced();
+        playBtn.disabled = noMotion || playing;
+        pauseBtn.disabled = noMotion || !playing;
+        restartBtn.disabled = noMotion;
+        slowBtn.disabled = noMotion;
+        slowBtn.setAttribute("aria-pressed", String(slow));
+        if (noMotion) {
+          stateEl.textContent = "Motion is off because your device asks for reduced motion. Pulses are shown still.";
+        } else if (playing) {
+          stateEl.textContent = slow ? "Playing in slow motion" : "Playing";
+        } else if (selected) {
+          stateEl.textContent = "Paused";
+        } else {
+          stateEl.textContent = "Choose a flow or press Play";
+        }
+      }
 
       function render() {
         const info = selected && PARTS[selected];
@@ -527,6 +692,13 @@
           const name = el.dataset.el;
           el.classList.toggle("rel", Boolean(info) && info.rel.indexOf(name) !== -1);
           el.classList.toggle("sel", Boolean(info) && info.own.indexOf(name) !== -1);
+        });
+        // Dim parts (and their labels) that are not part of the selected path
+        dimGroups.forEach(function (group) {
+          const main = group.querySelector("[data-el]");
+          const dim = Boolean(info) && !main.classList.contains("rel");
+          const targets = group.dataset.dim === "text" ? group.querySelectorAll("text") : [group];
+          Array.prototype.forEach.call(targets, function (t) { t.classList.toggle("dimmed", dim); });
         });
         buttons.forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.pick === selected)); });
         if (info) {
@@ -538,25 +710,68 @@
           textEl.textContent = "Select a part of the diagram to see what it does.";
           dependsEl.textContent = "";
         }
+        drawDots();
+        updateControls();
       }
 
       function pick(id) {
         selected = selected === id ? null : id;
+        if (selected) {
+          setPlaying(true);
+        } else {
+          setPlaying(false);
+          dist = 0;
+        }
         render();
       }
 
-      svg.addEventListener("click", function (e) {
+      function onPick(e) {
         const target = e.target.closest("[data-pick]");
         if (target) pick(target.dataset.pick);
+      }
+      svg.addEventListener("click", onPick);
+      picker.addEventListener("click", onPick);
+      flowPicker.addEventListener("click", onPick);
+
+      playBtn.addEventListener("click", function () {
+        if (!selected) selected = "flow-all";
+        setPlaying(true);
+        render();
       });
-      picker.addEventListener("click", function (e) {
-        const button = e.target.closest("button");
-        if (button) pick(button.dataset.pick);
+      pauseBtn.addEventListener("click", function () {
+        setPlaying(false);
+        render();
+      });
+      restartBtn.addEventListener("click", function () {
+        if (!selected) selected = "flow-all";
+        dist = 0;
+        setPlaying(true);
+        render();
+      });
+      slowBtn.addEventListener("click", function () {
+        slow = !slow;
+        updateControls();
       });
       document.getElementById("resetDiagram").addEventListener("click", function () {
         selected = null;
+        slow = false;
+        dist = 0;
+        setPlaying(false);
         render();
       });
+
+      // Stop animating when the section is hidden, or the device asks for reduced motion
+      const section = svg.closest(".step");
+      if (section && window.MutationObserver) {
+        new MutationObserver(function () {
+          if (section.hidden) { setPlaying(false); render(); }
+        }).observe(section, { attributes: true, attributeFilter: ["hidden"] });
+      }
+      if (reduceQuery) {
+        const onChange = function () { setPlaying(false); render(); };
+        if (reduceQuery.addEventListener) reduceQuery.addEventListener("change", onChange);
+        else if (reduceQuery.addListener) reduceQuery.addListener(onChange);
+      }
       render();
     })();
   </script>

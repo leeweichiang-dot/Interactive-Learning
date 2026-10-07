@@ -148,12 +148,12 @@
     .schematic .line { fill: none; stroke: var(--c); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
     .schematic .line.dash { stroke-dasharray: 9 5; }
     .schematic .line.dot { stroke-dasharray: 2 5; }
-    .schematic .line[data-c="red"] { marker-end: url(#a-red); }
-    .schematic .line[data-c="blue"] { marker-end: url(#a-blue); }
-    .schematic .line[data-c="purple"] { marker-end: url(#a-purple); }
-    .schematic .line.dyn { marker-start: url(#a-purple); }
+    .schematic .line[data-c="red"] { marker-end: url(#g-red); }
+    .schematic .line[data-c="blue"] { marker-end: url(#g-blue); }
+    .schematic .line[data-c="purple"] { marker-end: url(#g-purple); }
+    .schematic .line.dyn { marker-start: url(#g-purple); }
     .schematic .line.nomark { marker-end: none !important; }
-    .schematic .air { fill: none; stroke: var(--grey); stroke-width: 2; marker-end: url(#a-grey); }
+    .schematic .air { fill: none; stroke: var(--grey); stroke-width: 2; marker-end: url(#g-grey); }
     .schematic .hit { fill: none; stroke: transparent; stroke-width: 18; pointer-events: stroke; }
     .schematic .part { fill: var(--sil); stroke: var(--grey); stroke-width: 2; }
     .schematic .part.tube { fill: none; stroke-width: 6; stroke-linecap: round; }
@@ -169,8 +169,8 @@
     .schematic .line.rel { stroke-width: 5; }
     .schematic .line.dyn.rel { stroke-width: 3; }
     /* When something is selected, lines that are not involved turn grey */
-    .schematic.has-sel .line:not(.rel) { stroke: var(--grey); opacity: 0.55; marker-end: url(#a-grey); }
-    .schematic.has-sel .line.dyn:not(.rel) { marker-start: url(#a-grey); }
+    .schematic.has-sel .line:not(.rel) { stroke: var(--grey); opacity: 0.55; marker-end: url(#g-grey); }
+    .schematic.has-sel .line.dyn:not(.rel) { marker-start: url(#g-grey); }
     .schematic.has-sel .line.nomark:not(.rel) { marker-end: none; }
 
     .picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
@@ -354,6 +354,7 @@
       <marker id="g-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--red)"/></marker>
       <marker id="g-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--blue)"/></marker>
       <marker id="g-grey" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--grey)"/></marker>
+      <marker id="g-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--purple)"/></marker>
     </defs>
   </svg>
   <a class="skip-link" id="skipLink" href="#s1">Skip to the lesson section</a>
@@ -429,18 +430,104 @@
         </table>
       </div>
 
-      <h3>Explore the system diagram</h3>
+      <h3>System diagram</h3>
+      <p>This picture shows how the parts connect. Pressure travels along the lines to the instruments. You can explore it in section 2.</p>
+      <svg class="schematic" viewBox="0 0 800 440" role="img" aria-labelledby="sdTitle sdDesc">
+        <title id="sdTitle">Pitot-static system diagram</title>
+        <desc id="sdDesc">A generic training aircraft seen from above, nose to the left. A red line carries total pressure from the pitot tube to the airspeed indicator. Blue dashed lines carry static pressure from the left and right static ports to the airspeed indicator, the altimeter and the vertical speed indicator. The airspeed indicator compares the two pressures.</desc>
+
+        <!-- Aircraft silhouette (generic, nose left) -->
+        <path class="body" d="M78 230 L130 216 L200 204 L268 204 L402 64 L448 64 L466 204 L478 204 L490 166 L506 166 L504 204 L504 256 L506 294 L490 294 L478 256 L466 256 L448 396 L402 396 L268 256 L200 256 L130 244 Z"/>
+
+        <!-- Airflow into the pitot tube -->
+        <path class="air" d="M4 206 H30"/>
+        <path class="air" d="M4 230 H30"/>
+        <path class="air" d="M4 254 H30"/>
+        <text class="muted" x="4" y="192">Airflow</text>
+
+        <!-- Pressure lines -->
+        <g>
+          <path class="line" data-c="red" d="M90 230 H464 a6 6 0 0 1 12 0 H515 V75 H578"/>
+        </g>
+        <g>
+          <path class="line dash" data-c="blue" d="M200 204 V216 H458"/>
+          <path class="line dash nomark" data-c="blue" d="M470 216 V244"/>
+          <path class="line dash" data-c="blue" d="M200 256 V244 H458"/>
+          <path class="line dash" data-c="blue" d="M470 244 H550"/>
+          <path class="line dash nomark" data-c="blue" d="M550 115 V365"/>
+          <path class="line dash" data-c="blue" d="M550 115 H578"/>
+          <path class="line dash" data-c="blue" d="M550 230 H578"/>
+          <path class="line dash" data-c="blue" d="M550 365 H578"/>
+        </g>
+
+        <!-- Pitot tube and static ports -->
+        <g>
+          <path class="part tube" data-c="red" d="M38 230 H90"/>
+          <text x="14" y="276">Pitot tube</text>
+        </g>
+        <g>
+          <circle class="part" data-c="blue" cx="200" cy="204" r="8"/>
+          <text x="200" y="186" text-anchor="middle">Right static port</text>
+        </g>
+        <g>
+          <circle class="part" data-c="blue" cx="200" cy="256" r="8"/>
+          <text x="200" y="288" text-anchor="middle">Left static port</text>
+        </g>
+
+        <!-- Dynamic pressure: the difference between total and static at the airspeed indicator -->
+        <g>
+          <path class="line dyn dot" data-c="purple" d="M556 82 V108"/>
+          <text class="purple" x="672" y="126">Dynamic =</text>
+          <text class="purple" x="672" y="143">Total &#8722; Static</text>
+        </g>
+
+        <!-- Instruments -->
+        <text class="muted" x="700" y="28" text-anchor="middle">Cockpit instruments</text>
+        <g>
+          <circle class="part" data-c="purple" cx="620" cy="95" r="42"/>
+          <circle class="dial" cx="620" cy="95" r="32"/>
+          <line class="needle" x1="620" y1="95" x2="640" y2="77"/>
+          <text x="672" y="88">Airspeed</text>
+          <text x="672" y="105">indicator</text>
+        </g>
+        <g>
+          <circle class="part" data-c="blue" cx="620" cy="230" r="42"/>
+          <circle class="dial" cx="620" cy="230" r="32"/>
+          <line class="needle" x1="620" y1="230" x2="604" y2="212"/>
+          <text x="672" y="236">Altimeter</text>
+        </g>
+        <g>
+          <circle class="part" data-c="blue" cx="620" cy="365" r="42"/>
+          <circle class="dial" cx="620" cy="365" r="32"/>
+          <line class="needle" x1="620" y1="365" x2="642" y2="355"/>
+          <text x="672" y="362">Vertical speed</text>
+          <text x="672" y="379">indicator</text>
+        </g>
+
+        <text class="muted" x="14" y="28">Pressure travels along the lines</text>
+        <text class="muted" x="300" y="424" text-anchor="middle">Generic fighter-style aircraft, top view, nose to the left</text>
+      </svg>
+      <ul class="legend" aria-label="Diagram legend">
+        <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--red)"/></svg>Red solid line: total pressure</li>
+        <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--blue)" stroke-dasharray="9 5"/></svg>Blue dashed line: static pressure</li>
+        <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--purple)" stroke-dasharray="2 5"/></svg>Purple dotted arrow: dynamic pressure (total &minus; static)</li>
+      </ul>
+
+      <h3>Key points</h3>
+      <ul>
+        <li>Pitot tube: total pressure. Static ports: static pressure.</li>
+        <li>Dynamic pressure is total pressure minus static pressure.</li>
+        <li>Airspeed indicator: pitot and static. Altimeter: static. Vertical speed indicator: static pressure changing over time.</li>
+      </ul>
+    </section>
+
+    <section class="step" data-title="Explore the System" aria-labelledby="s2" hidden>
+      <h2 id="s2">2. Explore the System</h2>
       <p>Select a part in the diagram, or use the buttons under it. The diagram highlights the connected pressure line and explains the part. This is a simple generic training schematic, not a real aircraft.</p>
 
       <svg class="schematic" id="schematic" viewBox="0 0 800 440" role="img" aria-labelledby="dgTitle dgDesc">
         <title id="dgTitle">Pitot-static system schematic</title>
         <desc id="dgDesc">A generic fighter-style aircraft seen from above, nose to the left. Small moving dots show pressure being passed along the lines; this is a visual representation of pressure transmission, not liquid flowing. The pitot tube at the nose sends total pressure along a red line to the airspeed indicator. Left and right static ports send static pressure along blue lines to the airspeed indicator, the altimeter and the vertical speed indicator. Use the buttons below the diagram to select each part.</desc>
-        <defs>
-          <marker id="a-red" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--red)"/></marker>
-          <marker id="a-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--blue)"/></marker>
-          <marker id="a-purple" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--purple)"/></marker>
-          <marker id="a-grey" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--grey)"/></marker>
-        </defs>
 
         <!-- Aircraft silhouette (generic, nose left) -->
         <path class="body" d="M78 230 L130 216 L200 204 L268 204 L402 64 L448 64 L466 204 L478 204 L490 166 L506 166 L504 204 L504 256 L506 294 L490 294 L478 256 L466 256 L448 396 L402 396 L268 256 L200 256 L130 244 Z"/>
@@ -567,25 +654,6 @@
         <li><svg viewBox="0 0 44 12" aria-hidden="true"><line x1="2" y1="6" x2="42" y2="6" stroke="var(--blue)" stroke-dasharray="9 5"/><circle cx="22" cy="6" r="5" fill="var(--surface)" stroke="var(--blue)" stroke-width="2.5" stroke-dasharray="5 3"/></svg>Blue pulse, dashed ring: static pressure</li>
       </ul>
       <div class="tools"><button type="button" id="resetDiagram">Reset Diagram</button></div>
-
-      <h3>Key points</h3>
-      <ul>
-        <li>Pitot tube: total pressure. Static ports: static pressure.</li>
-        <li>Dynamic pressure is total pressure minus static pressure.</li>
-        <li>Airspeed indicator: pitot and static. Altimeter: static. Vertical speed indicator: static pressure changing over time.</li>
-      </ul>
-    </section>
-
-    <section class="step" data-title="Explore the System" aria-labelledby="s2" hidden>
-      <h2 id="s2">2. Explore the System</h2>
-      <p>Look at each part of the system and see what it does and which instruments depend on it.</p>
-      <ul>
-        <li>Pitot tube</li>
-        <li>Static ports</li>
-        <li>Pipes (the lines that carry the pressure)</li>
-        <li>Airspeed indicator, altimeter and vertical speed indicator</li>
-      </ul>
-      <div class="soon"><strong>Coming soon:</strong> a labelled diagram you can tap to explore each part.</div>
     </section>
 
     <section class="step" data-title="Flight Simulation" aria-labelledby="s3" hidden>

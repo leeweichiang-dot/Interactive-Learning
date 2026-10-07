@@ -161,7 +161,7 @@
   titleEl.textContent = "Fault investigation: pitot-static system and three instruments";
   descEl.textContent = "A generic training aircraft. It shows a pitot tube, a heater, a drain opening, two static ports, pressure lines and three instruments. Fault markers and moving pulses change with the chosen condition. A text description of the diagram is announced when you choose a condition.";
   svg.setAttribute("aria-labelledby", "fdTitle fdDesc");
-  svg.setAttribute("aria-describedby", "fReadings");
+  svg.setAttribute("aria-describedby", "fCompare");
   svg.removeAttribute("id");
   Array.from(svg.querySelectorAll("text")).forEach(function (t) {
     if (t.textContent.indexOf("Generic training aircraft") === 0) t.textContent = "Simulated values. Generic training aircraft.";
@@ -203,11 +203,48 @@
   const ice = add("circle", { "class": "ice", cx: 36, cy: 230, r: 0, visibility: "hidden" });
   const water = add("ellipse", { "class": "water", cx: 82, cy: 263, rx: 0, ry: 0, visibility: "hidden" });
 
+  // Each dial gives two readings: the actual one (dark needle) and the one shown with the fault
+  // (amber needle with an open ring). The shown reading stays hidden until the prediction is submitted.
+  const shown = {}, shownValue = {};
+  Object.keys(INSTRUMENT).forEach(function (k) {
+    const g = C.GAUGES[k];
+    const group = needle[k].parentNode;
+    const names = Array.from(group.querySelectorAll("text")).filter(function (t) {
+      return !t.classList.contains("num") && !t.classList.contains("unit") && !t.classList.contains("val");
+    });
+    const top = g.cy - (names.length === 2 ? 44 : 36);
+    names.forEach(function (t, i) { t.setAttribute("y", top + i * 15); });
+    const labelY = top + (names.length - 1) * 15 + 18;
+    const textAt = function (cls, y, text) {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", cls); t.setAttribute("x", 686); t.setAttribute("y", y);
+      t.textContent = text;
+      group.appendChild(t);
+      return t;
+    };
+    textAt("lab", labelY, "Actual");
+    value[k].setAttribute("y", labelY + 16);   // the existing value text becomes the actual value
+    textAt("lab", labelY + 36, "Shown with fault");
+    shownValue[k] = textAt("val shown", labelY + 52, "");
+    const amber = document.createElementNS(NS, "g");
+    amber.setAttribute("class", "shown-needle");
+    amber.setAttribute("visibility", "hidden");
+    const line = document.createElementNS(NS, "line");
+    line.setAttribute("class", "needle");
+    line.setAttribute("x1", g.cx); line.setAttribute("y1", g.cy); line.setAttribute("x2", g.cx); line.setAttribute("y2", g.cy - 24);
+    const ring = document.createElementNS(NS, "circle");
+    ring.setAttribute("class", "ring-tip");
+    ring.setAttribute("cx", g.cx); ring.setAttribute("cy", g.cy - 21); ring.setAttribute("r", 3);
+    amber.appendChild(line); amber.appendChild(ring);
+    group.insertBefore(amber, needle[k]);   // under the dark needle, so a match shows as an amber edge
+    shown[k] = amber;
+  });
+
   // "May be affected" flags beside each instrument (shown after the reveal)
   const flags = {};
   Object.keys(INSTRUMENT).forEach(function (k) {
-    const y = value[k].getAttribute("y");
-    flags[k] = add("text", { "class": "flag", x: 686, y: Number(y) + 18, visibility: "hidden" });
+    const y = shownValue[k].getAttribute("y");
+    flags[k] = add("text", { "class": "flag", x: 686, y: Number(y) + 16, visibility: "hidden" });
     flags[k].textContent = "May be affected";
   });
 
@@ -247,22 +284,55 @@
   function turn(g, gauge, deg) {
     g.setAttribute("transform", "rotate(" + deg.toFixed(1) + " " + gauge.cx + " " + gauge.cy + ")");
   }
+  const FORMAT = {
+    asi: function (v) { return C.fmt(v) + " kt"; },
+    alt: function (v) { return C.fmt(Math.round(v / 10) * 10) + " ft"; },
+    vsi: function (v) { return C.signed(v) + " ft/min"; }
+  };
+  const KEY = { asi: "ias", alt: "alt", vsi: "vs" };
+  const DEG = { asi: C.asiDeg, alt: C.altDeg, vsi: C.vsiDeg };
+
   function showNeedles() {
-    turn(needle.asi, C.GAUGES.asi, C.asiDeg(cur.ias));
-    turn(needle.alt, C.GAUGES.alt, C.altDeg(cur.alt));
-    turn(needle.vsi, C.GAUGES.vsi, C.vsiDeg(cur.vs));
-    value.asi.textContent = C.fmt(cur.ias) + " kt";
-    value.alt.textContent = C.fmt(Math.round(cur.alt / 10) * 10) + " ft";
-    value.vsi.textContent = C.signed(cur.vs) + " ft/min";
-    const readings = describe();
-    if (readings !== lastReadings) { $("fReadings").textContent = readings; lastReadings = readings; }
+    Object.keys(INSTRUMENT).forEach(function (k) {
+      const g = C.GAUGES[k];
+      // Actual reading: the true (simulated) flight values. They never change in this activity.
+      turn(needle[k], g, DEG[k](BASE[KEY[k]]));
+      value[k].textContent = FORMAT[k](BASE[KEY[k]]);
+      // Reading shown with the fault: only after the prediction is submitted
+      shown[k].setAttribute("visibility", revealed ? "visible" : "hidden");
+      if (revealed) turn(shown[k], g, DEG[k](cur[KEY[k]]));
+      shownValue[k].textContent = revealed ? FORMAT[k](cur[KEY[k]]) : "Predict first";
+      shownValue[k].classList.toggle("pending", !revealed);   // grey until there is a reading to show
+    });
   }
-  let lastReadings = "";
-  function describe() {   // the instrument values in words
-    const vs = Math.round(cur.vs / 10) * 10;
-    const trend = vs > 0 ? "climbing at " + C.fmt(vs) + " feet per minute" : vs < 0 ? "descending at " + C.fmt(-vs) + " feet per minute" : "zero (not climbing or descending)";
-    return (revealed ? "Simulated instrument readings after your prediction (illustrative values, not real aircraft data). " : "Simulated instrument readings for a normal system. ") +
-      "Airspeed indicator: " + C.fmt(cur.ias) + " knots. Altimeter: " + C.fmt(Math.round(cur.alt / 10) * 10) + " feet. Vertical speed indicator: " + trend + ".";
+
+  // The same two readings as a table, with the effect in words (not colour alone)
+  function effect(k, actual, shownReading) {
+    if (Math.abs(shownReading - actual) <= (k === "asi" ? 3 : 30)) return "Same as actual";
+    if (k === "vsi" && shownReading === 0) return "Shows no climb";
+    const much = Math.abs(shownReading - actual) / Math.max(1, Math.abs(actual)) >= 0.5 ? "Much " : "";
+    return (much ? "Much lower" : shownReading < actual ? "Lower" : "Higher") + " than actual";
+  }
+  function renderCompare(res) {
+    const body = $("fCompareBody");
+    body.textContent = "";
+    Object.keys(INSTRUMENT).forEach(function (k) {
+      const tr = document.createElement("tr");
+      const th = document.createElement("th");
+      th.scope = "row";
+      th.textContent = INSTRUMENT[k];
+      tr.appendChild(th);
+      const cells = [
+        FORMAT[k](BASE[KEY[k]]),
+        res ? FORMAT[k](res[KEY[k]]) : "Hidden until you submit your prediction",
+        res ? effect(k, BASE[KEY[k]], res[KEY[k]]) : "Not shown yet"
+      ];
+      cells.forEach(function (text) { const td = document.createElement("td"); td.textContent = text; tr.appendChild(td); });
+      body.appendChild(tr);
+    });
+    $("fCompareCaption").textContent = res
+      ? "Instrument readings (simulated). The values shown with the fault are illustrative, not real aircraft data."
+      : "Instrument readings (simulated). The reading shown with the fault stays hidden until you submit your prediction.";
   }
 
   function buildLevel() {   // 0 to 1: how far ice or moisture has built up
@@ -453,8 +523,10 @@
     });
 
     revealEl.hidden = false;
-    $("fRevealNeedles").textContent = "The needles show illustrative generic values for this condition, not data for any real aircraft.";
+    $("fRevealNeedles").textContent = "On each dial, the dark needle is the actual reading. The amber needle with the open ring is the reading shown with this fault. The values are illustrative generic numbers, not data for any real aircraft.";
     showFlags(res.affected);
+    renderCompare(res);
+    showNeedles();
     setTarget(res);
     $("fExplainTitle").focus();
   }
@@ -481,6 +553,7 @@
     showFlags([]);
     applyCondition();
     buildForm();
+    renderCompare(null);
     showNeedles();
     drawFlow();
     diagramText();
@@ -509,6 +582,7 @@
     if (revealed) {
       const res = cond().result({ icing: icing });
       showFlags(res.affected);
+      renderCompare(res);
       setTarget(res);
       $("fAffected").textContent = "Instruments that may be affected: " + sentence(icing ? names(res.affected, INSTRUMENT) : "None in dry air. The airspeed indicator may be affected if ice forms");
     }

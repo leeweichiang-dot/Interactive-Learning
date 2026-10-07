@@ -147,11 +147,12 @@
     .schematic .body { fill: var(--sil); stroke: var(--grey); stroke-width: 2; stroke-linejoin: round; }
     .schematic .line { fill: none; stroke: var(--c); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
     .schematic .line.dash { stroke-dasharray: 9 5; }
-    .schematic .line.dot { stroke-dasharray: 2 5; }
+    .schematic .line.dotted { stroke-dasharray: 2 5; }
     .schematic .line[data-c="red"] { marker-end: url(#g-red); }
     .schematic .line[data-c="blue"] { marker-end: url(#g-blue); }
     .schematic .line[data-c="purple"] { marker-end: url(#g-purple); }
     .schematic .line.dyn { marker-start: url(#g-purple); }
+    .schematic .line.dyn { stroke-width: 2.5; }
     .schematic .line.nomark { marker-end: none !important; }
     .schematic .air { fill: none; stroke: var(--grey); stroke-width: 2; marker-end: url(#g-grey); }
     .schematic .hit { fill: none; stroke: transparent; stroke-width: 18; pointer-events: stroke; }
@@ -476,7 +477,7 @@
 
         <!-- Dynamic pressure: the difference between total and static at the airspeed indicator -->
         <g>
-          <path class="line dyn dot" data-c="purple" d="M556 82 V108"/>
+          <path class="line dyn dotted" data-c="purple" d="M556 82 V108"/>
           <text class="purple" x="672" y="126">Dynamic =</text>
           <text class="purple" x="672" y="143">Total &#8722; Static</text>
         </g>
@@ -575,7 +576,7 @@
         <!-- Dynamic pressure: the difference between total and static at the airspeed indicator -->
         <g data-pick="dynamic" data-dim="text">
           <path class="hit" d="M556 80 V110"/>
-          <path class="line dyn dot" data-c="purple" data-el="dyn" d="M556 82 V108"/>
+          <path class="line dyn dotted" data-c="purple" data-el="dyn" d="M556 82 V108"/>
           <text class="purple" x="672" y="126">Dynamic =</text>
           <text class="purple" x="672" y="143">Total &#8722; Static</text>
         </g>

@@ -212,9 +212,9 @@
     const names = Array.from(group.querySelectorAll("text")).filter(function (t) {
       return !t.classList.contains("num") && !t.classList.contains("unit") && !t.classList.contains("val");
     });
-    const top = g.cy - (names.length === 2 ? 44 : 36);
-    names.forEach(function (t, i) { t.setAttribute("y", top + i * 15); });
-    const labelY = top + (names.length - 1) * 15 + 18;
+    const top = g.cy - (names.length === 2 ? 48 : 40);
+    names.forEach(function (t, i) { t.setAttribute("y", top + i * 17); });
+    const labelY = top + (names.length - 1) * 17 + 19;   // lines are spaced so no text box touches another
     const textAt = function (cls, y, text) {
       const t = document.createElementNS(NS, "text");
       t.setAttribute("class", cls); t.setAttribute("x", 686); t.setAttribute("y", y);
@@ -223,9 +223,9 @@
       return t;
     };
     textAt("lab", labelY, "Actual");
-    value[k].setAttribute("y", labelY + 16);   // the existing value text becomes the actual value
-    textAt("lab", labelY + 36, "Shown with fault");
-    shownValue[k] = textAt("val shown", labelY + 52, "");
+    value[k].setAttribute("y", labelY + 19);   // the existing value text becomes the actual value
+    textAt("lab", labelY + 41, "Shown with fault");
+    shownValue[k] = textAt("val shown", labelY + 60, "");
     const amber = document.createElementNS(NS, "g");
     amber.setAttribute("class", "shown-needle");
     amber.setAttribute("visibility", "hidden");
@@ -244,7 +244,7 @@
   const flags = {};
   Object.keys(INSTRUMENT).forEach(function (k) {
     const y = shownValue[k].getAttribute("y");
-    flags[k] = add("text", { "class": "flag", x: 686, y: Number(y) + 16, visibility: "hidden" });
+    flags[k] = add("text", { "class": "flag", x: 686, y: Number(y) + 17, visibility: "hidden" });
     flags[k].textContent = "May be affected";
   });
 

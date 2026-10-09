@@ -244,21 +244,27 @@
   var CABIN_LIMIT = 8000;   // normal maximum cabin altitude (ft)
   var MAX_DIFF = 8.6;       // maximum differential pressure (PSI)
 
-  // Work out cabin altitude and differential pressure from the two slider values
+  // Work out cabin altitude and differential pressure from the two slider values.
+  // It also returns the working, so the "how it is worked out" panel can show every step.
   function simulate(alt, valve) {
-    // Simple linear model, capped at 8,000 ft
-    var normalCabin = Math.min(alt * 0.2, CABIN_LIMIT);
+    // Simple linear model, held at 8,000 ft
+    var normalCabin = Math.round(Math.min(alt * 0.2, CABIN_LIMIT));
     var cabin = normalCabin;
+    var leak = 0;
     if (valve < NORMAL_FROM) {
       // Valve open too far: air escapes, so the cabin climbs toward the aircraft altitude.
       // At "fully open" the cabin altitude equals the aircraft altitude.
-      var leak = (NORMAL_FROM - valve) / NORMAL_FROM;
+      leak = (NORMAL_FROM - valve) / NORMAL_FROM;
       cabin = normalCabin + (alt - normalCabin) * leak;
     }
     cabin = Math.round(cabin);
-    var diff = (alt - cabin) / 10000 * MAX_DIFF;
-    diff = Math.min(MAX_DIFF, Math.max(0, Math.round(diff * 10) / 10));
-    return { cabin: cabin, diff: diff, normalCabin: normalCabin };
+    var gap = alt - cabin;                                      // pressure gap in feet
+    var raw = Math.round(gap / 10000 * MAX_DIFF * 10) / 10;     // PSI before the limit is applied
+    var diff = Math.min(MAX_DIFF, Math.max(0, raw));            // PSI after the limit
+    // The safety valve only lifts when the outflow valve cannot release air (fully closed)
+    // and the pressure would go over the limit.
+    var relief = valve === 100 && raw > MAX_DIFF;
+    return { cabin: cabin, normalCabin: normalCabin, leak: leak, gap: gap, raw: raw, diff: diff, relief: relief };
   }
 
   // Describe the valve slider in words
@@ -285,7 +291,9 @@
     if (valve >= NORMAL_FROM) {
       var lead = "At " + altTxt + " with the outflow valve in its normal position, the cabin is pressurised to the equivalent of " + cabTxt;
       if (valve === 100) {
-        return lead + ". The valve is fully closed, so no air can leave through it. In a real aircraft the pressure controller and safety valve stop the pressure from rising above its limit.";
+        return r.relief
+          ? "The outflow valve is fully closed, so no air can leave through it and the pressure would keep rising. The safety valve opens by itself to hold the differential pressure at " + MAX_DIFF + " PSI."
+          : lead + ". The valve is fully closed, but the pressure is still inside the limit, so the safety valve stays closed.";
       }
       if (r.cabin === CABIN_LIMIT) return lead + " – the top of the normal range. This is still safe.";
       return lead + " – safe and comfortable.";
@@ -294,6 +302,129 @@
     if (status.cls === "status-red") return open + ". This is too high. The crew would have to descend and use oxygen.";
     if (status.cls === "status-amber") return open + ". This is above the normal 8,000 ft limit. Check the outflow valve and the pressure controller.";
     return open + ". At this height that is still safe, but the pressure is not being held properly.";
+  }
+
+  /* ---- Valve view (the cross-section diagram) ---- */
+
+  // Blue arrows inside the cabin push on the skin. Each is {tip x, tip y, direction x, direction y}.
+  var PUSH_ARROWS = [
+    [38, 110, -1, 0], [38, 160, -1, 0], [38, 210, -1, 0],       // left wall
+    [382, 110, 1, 0], [382, 160, 1, 0], [382, 210, 1, 0],       // right wall
+    [90, 68, 0, -1], [150, 68, 0, -1], [225, 68, 0, -1],        // roof
+    [90, 242, 0, 1], [250, 242, 0, 1], [310, 242, 0, 1]         // floor
+  ];
+
+  // Make an arrow path inside a group and return it
+  function makeArrow(group, className, marker) {
+    var p = document.createElementNS(SVG_NS, "path");
+    p.setAttribute("class", className);
+    p.setAttribute("marker-end", "url(#" + marker + ")");
+    group.appendChild(p);
+    return p;
+  }
+
+  // Set an arrow to run from (x1, y1) to (x2, y2)
+  function setArrow(p, x1, y1, x2, y2) {
+    p.setAttribute("d", "M" + x1 + "," + y1 + " L" + x2 + "," + y2);
+  }
+
+  var pushGroup = $("sim-push");
+  var pushPaths = PUSH_ARROWS.map(function () { return makeArrow(pushGroup, "sim-push-arrow", "sim-arrow-blue"); });
+  var airOutGroup = $("sim-air-out");
+  var airOutPaths = [130, 190].map(function () { return makeArrow(airOutGroup, "sim-air-arrow", "sim-arrow-grey"); });
+  var reliefGroup = $("sim-relief");
+  var reliefPath = makeArrow(reliefGroup, "sim-air-arrow", "sim-arrow-grey");
+  var cabinFill = $("sim-cabin-fill");
+
+  // Redraw the valves, arrows and labels for the current slider values
+  function drawValves(alt, valve, r, status) {
+    var open = (100 - valve) / 100;          // 0 = fully closed, 1 = fully open
+    var load = r.diff / MAX_DIFF;            // 0 to 1: how close the pressure is to the limit
+
+    // Outflow valve: a flap that turns edge-on as it opens
+    $("sim-flap").setAttribute("transform", "rotate(" + (open * 90) + " 160 250)");
+    $("sim-outflow-state").textContent = valve === 0 ? "FULLY OPEN" : valve === 100 ? "FULLY CLOSED" : valve + "% closed";
+
+    // Air leaving through the outflow valve (longer arrows = more air)
+    var outLength = r.diff > 0 ? open * (14 + 36 * load) : 0;
+    airOutPaths.forEach(function (p, i) {
+      var x = i === 0 ? 128 : 192;
+      if (outLength < 6) { p.setAttribute("d", ""); return; }
+      setArrow(p, x, 262, x, 262 + outLength);
+    });
+
+    // Safety valve: the plug lifts and air escapes only when it is relieving pressure
+    $("sim-poppet").setAttribute("transform", "translate(0," + (r.relief ? -16 : 0) + ")");
+    var safetyState = $("sim-safety-state");
+    safetyState.textContent = r.relief ? "OPEN \u2013 relieving" : "CLOSED";
+    safetyState.setAttribute("class", "sim-state end" + (r.relief ? " is-open" : ""));
+    if (r.relief) setArrow(reliefPath, 290, 32, 290, 6); else reliefPath.setAttribute("d", "");
+
+    // Push on the skin: longer arrows mean more differential pressure
+    var push = r.diff > 0 ? 6 + 28 * load : 0;
+    PUSH_ARROWS.forEach(function (a, i) {
+      if (push === 0) { pushPaths[i].setAttribute("d", ""); return; }
+      setArrow(pushPaths[i], a[0] - a[2] * push, a[1] - a[3] * push, a[0], a[1]);
+    });
+
+    // Cabin colour follows the status bar
+    cabinFill.setAttribute("class", "sim-cabin sim-cabin-" + status.cls.replace("status-", ""));
+    $("sim-svg-cabin").textContent = fmt(r.cabin) + " ft";
+    $("sim-svg-outside").textContent = fmt(alt) + " ft";
+  }
+
+  /* ---- Step-by-step working ---- */
+
+  // Fill the "how the differential pressure is worked out" list with the current numbers
+  function drawWorking(alt, valve, r) {
+    var list = $("calc-steps");
+    clear(list);
+    function step(title, lines, note, isResult) {
+      var li = el("li", "calc-step" + (isResult ? " calc-result" : ""));
+      li.appendChild(el("strong", "", title));
+      lines.forEach(function (line) { li.appendChild(el("span", "calc-formula", line)); });
+      if (note) li.appendChild(el("span", "calc-note", note));
+      list.appendChild(li);
+    }
+    var psi = function (n) { return n.toFixed(1) + " PSI"; };
+
+    // Step 1: cabin altitude
+    if (valve >= NORMAL_FROM) {
+      step("Find the cabin altitude",
+        [fmt(alt) + " ft \u00D7 0.2 = " + fmt(r.cabin) + " ft"],
+        "The outflow valve is in its normal range, so the cabin altitude is held at no more than " + fmt(CABIN_LIMIT) + " ft.");
+    } else {
+      step("Find the cabin altitude",
+        ["Normal cabin altitude: " + fmt(alt) + " \u00D7 0.2 = " + fmt(r.normalCabin) + " ft",
+         "Air escaping: (" + NORMAL_FROM + " \u2212 " + valve + ") \u00F7 " + NORMAL_FROM + " = " + r.leak.toFixed(2),
+         fmt(r.normalCabin) + " + (" + fmt(alt) + " \u2212 " + fmt(r.normalCabin) + ") \u00D7 " + r.leak.toFixed(2) + " = " + fmt(r.cabin) + " ft"],
+        "The valve is open too far, so the cabin altitude climbs toward the aircraft altitude.");
+    }
+
+    // Step 2: the gap in feet
+    step("Find the height gap",
+      [fmt(alt) + " \u2212 " + fmt(r.cabin) + " = " + fmt(r.gap) + " ft"],
+      "Aircraft altitude minus cabin altitude.");
+
+    // Step 3: feet to PSI
+    step("Change the gap into PSI",
+      [fmt(r.gap) + " \u00F7 10,000 \u00D7 " + MAX_DIFF + " = " + psi(r.raw)],
+      "In this simple model, every 10,000 ft of gap counts as " + MAX_DIFF + " PSI.");
+
+    // Step 4: apply the limit
+    if (r.raw > MAX_DIFF) {
+      step("Apply the " + MAX_DIFF + " PSI limit",
+        [psi(r.raw) + " is more than " + psi(MAX_DIFF) + ", so it is held at " + psi(MAX_DIFF)],
+        r.relief ? "The outflow valve is fully closed, so the safety valve opens to hold the pressure here."
+          : valve < NORMAL_FROM ? "The valve is open too far, so the cabin is not holding this pressure. The value is capped at the limit."
+          : "The controller adjusts the outflow valve to hold the pressure here.");
+    } else {
+      step("Apply the " + MAX_DIFF + " PSI limit",
+        [psi(r.raw) + " is not more than " + psi(MAX_DIFF) + ", so it stays at " + psi(r.diff)],
+        "Inside the limit, so nothing needs to hold it back.");
+    }
+
+    step("Result", ["Differential pressure = " + psi(r.diff)], "", true);
   }
 
   // Update all the readouts when a slider moves
@@ -313,6 +444,8 @@
     bar.className = "status " + status.cls;
     bar.textContent = status.text;
     $("sim-explain").textContent = explain(alt, valve, r, status);
+    drawValves(alt, valve, r, status);
+    drawWorking(alt, valve, r);
   }
   altSlider.addEventListener("input", updateSimulation);
   valveSlider.addEventListener("input", updateSimulation);

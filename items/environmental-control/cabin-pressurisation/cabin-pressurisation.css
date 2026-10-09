@@ -227,6 +227,49 @@ p { margin: 0 0 0.9rem; }
 .status-red { background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
 .sim-explain { margin-top: 1rem; font-size: 1.1rem; }
 
+/* Valve view: cross-section of the cabin with the outflow and safety valves */
+.sim-main { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.2rem; margin-bottom: 1.2rem; align-items: start; }
+@media (min-width: 900px) { .sim-main { grid-template-columns: minmax(0, 440px) minmax(0, 1fr); } }
+.valve-figure { margin: 0; padding: 0.8rem; background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); }
+.valve-figure svg { width: 100%; max-width: 440px; height: auto; margin: 0 auto; display: block; }
+.valve-figure figcaption { margin-top: 0.5rem; text-align: center; color: var(--muted); font-size: 1rem; }
+.fill-accent { fill: var(--accent); }
+.sim-cabin { stroke: none; }
+.sim-cabin-green { fill: var(--good-bg); }
+.sim-cabin-amber { fill: var(--warn-bg); }
+.sim-cabin-red { fill: var(--bad-bg); }
+.skin, .housing { fill: none; stroke: var(--navy-2); stroke-width: 8; stroke-linecap: round; }
+.housing { stroke-width: 4; }
+.flap { fill: var(--accent); stroke: var(--navy-2); stroke-width: 2; }
+.hinge { fill: var(--navy-2); }
+.sim-push-arrow { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round; }
+.sim-air-arrow { fill: none; stroke: var(--grey-flow); stroke-width: 5; stroke-linecap: round; }
+.sim-title { font-size: 21px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+.sim-big { font-size: 28px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+.sim-small { font-size: 17px; fill: var(--muted); text-anchor: middle; }
+.sim-label { font-size: 19px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+.sim-state { font-size: 18px; fill: var(--muted); text-anchor: middle; }
+.sim-label.end, .sim-state.end { text-anchor: end; }
+.sim-state.is-open { fill: var(--warn); font-weight: 700; }
+@media (prefers-color-scheme: dark) { .skin, .housing, .flap, .hinge { stroke: var(--grey-flow); } .hinge { fill: var(--grey-flow); } }
+
+/* Step-by-step working and the "why 8.6 PSI" explanation */
+.calc, .why-limit { margin: 1.2rem 0; padding: 0.4rem 1.1rem 1rem; background: var(--surface-2); border-left: 6px solid var(--accent); border-radius: var(--radius); }
+.calc h3, .why-limit h3 { margin-top: 0.8rem; }
+.calc-steps { list-style: none; counter-reset: calc; padding: 0; margin: 0.6rem 0 0; display: grid; gap: 0.7rem; }
+.calc-step { counter-increment: calc; position: relative; padding: 0.6rem 0.8rem 0.6rem 3rem; background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); }
+.calc-step::before {
+  content: counter(calc); position: absolute; left: 0.7rem; top: 0.6rem; width: 1.7rem; height: 1.7rem;
+  display: flex; align-items: center; justify-content: center; border-radius: 50%;
+  background: var(--accent); color: var(--on-accent); font-weight: 700;
+}
+.calc-step strong, .calc-formula, .calc-note { display: block; }
+.calc-formula { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 1rem; font-weight: 700; margin-top: 0.2rem; overflow-wrap: anywhere; }
+.calc-note { color: var(--muted); margin-top: 0.2rem; }
+.calc-step.calc-result { border-color: var(--accent); background: var(--surface); }
+.calc-step.calc-result::before { content: "="; }
+.calc-step.calc-result .calc-formula { font-size: 1.15rem; color: var(--accent); }
+
 /* ----- Fault Scenarios ----- */
 .fault-list { display: grid; gap: 0.8rem; }
 .fault-card { border: 2px solid var(--border); border-radius: var(--radius); background: var(--surface); }

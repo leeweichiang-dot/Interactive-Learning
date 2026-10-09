@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cabin Pressurisation System</title>
+  <!-- Saves progress on this device only. The page works even if this file fails to load. -->
+  <script src="../../../tracker.js" data-module="environmental-control" data-item="cabin-pressurisation" data-type="lesson"></script>
+  <link rel="stylesheet" href="cabin-pressurisation.css">
+</head>
+<body>
+
+  <!-- ===== Navigation bar: title and back button ===== -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1>Cabin Pressurisation System</h1>
+      <a class="back" href="../../../index.html">&larr; Back to Modules</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <p class="subtitle">Environmental Control Systems &middot; Generic transport aircraft with an Air Cycle Machine (ACM)</p>
+
+    <!-- ===== Section tabs (only one section is shown at a time) ===== -->
+    <div class="tabs" role="tablist" aria-label="Lesson sections">
+      <button class="tab" role="tab" id="tab-overview" aria-controls="sec-overview" aria-selected="true">Overview</button>
+      <button class="tab" role="tab" id="tab-explorer" aria-controls="sec-explorer" aria-selected="false" tabindex="-1">Air Circulation Explorer</button>
+      <button class="tab" role="tab" id="tab-simulation" aria-controls="sec-simulation" aria-selected="false" tabindex="-1">Pressure Simulation</button>
+      <button class="tab" role="tab" id="tab-faults" aria-controls="sec-faults" aria-selected="false" tabindex="-1">Fault Scenarios</button>
+      <button class="tab" role="tab" id="tab-check" aria-controls="sec-check" aria-selected="false" tabindex="-1">Competency Check</button>
+    </div>
+
+    <!-- ===== Section 1: Overview ===== -->
+    <section class="panel" id="sec-overview" role="tabpanel" aria-labelledby="tab-overview">
+      <h2>Overview</h2>
+
+      <h3>Why do we pressurise the cabin?</h3>
+      <p>Aircraft fly very high, often at 35,000 feet. At that height the air is too thin to breathe. A person who breathes it would soon feel dizzy and then pass out.</p>
+      <p>To keep people safe, the aircraft pumps air into the cabin and keeps it under pressure. This is called <strong>pressurisation</strong>.</p>
+
+      <h3>How much pressure is enough?</h3>
+      <p>The cabin is not kept at ground-level pressure. That would put too much strain on the aircraft body. Instead, the cabin is kept at a safe pressure equal to the air at <strong>6,000 to 8,000 feet</strong>. This holds even when the aircraft flies at 35,000 feet.</p>
+      <p>We call this the <strong>cabin altitude</strong>. It is the height the cabin &ldquo;feels like&rdquo; to the people inside.</p>
+
+      <h3>Two terms to remember</h3>
+      <ul class="plain-list">
+        <li><strong>Cabin altitude</strong> &ndash; the height the air pressure inside the cabin matches.</li>
+        <li><strong>Differential pressure</strong> &ndash; how much higher the pressure is inside the cabin than outside. The aircraft body is built to take a set maximum.</li>
+      </ul>
+
+      <!-- Summary box: the 5 key components -->
+      <div class="summary-box">
+        <h3>Key components at a glance</h3>
+        <ol>
+          <li><strong>Bleed air from the engines</strong> &ndash; hot, high-pressure air taken from the engines to supply the system.</li>
+          <li><strong>Air conditioning packs</strong> &ndash; machines that cool and clean the hot bleed air so it is safe to breathe.</li>
+          <li><strong>Outflow valve</strong> &ndash; a door that lets air out of the cabin to hold the right pressure.</li>
+          <li><strong>Safety valve</strong> &ndash; a backup valve that opens if the pressure gets too high or too low.</li>
+          <li><strong>Differential pressure controller</strong> &ndash; the &ldquo;brain&rdquo; that tells the outflow valve how far to open.</li>
+        </ol>
+      </div>
+
+      <p class="next-hint">Next: open <strong>Air Circulation Explorer</strong> to follow the air through the system.</p>
+    </section>
+
+    <!-- ===== Section 2: Air Circulation Explorer ===== -->
+    <section class="panel" id="sec-explorer" role="tabpanel" aria-labelledby="tab-explorer" hidden>
+      <h2>Air Circulation Explorer</h2>
+      <p>Follow the air from the engine to the cabin and out of the aircraft. <strong>Click or tap any component</strong> to learn what it does.</p>
+
+      <div class="legend">
+        <span><i class="swatch swatch-blue"></i> Blue = pressurised air flow</span>
+        <span><i class="swatch swatch-grey"></i> Grey = return / exhaust flow</span>
+        <button type="button" class="btn small" id="flow-toggle" aria-pressed="false">Pause flow</button>
+      </div>
+
+      <div class="explorer">
+        <!-- Diagram: coordinates are in a 520 x 760 box that scales to fit the screen -->
+        <svg id="diagram" viewBox="0 0 520 760" role="group" aria-label="Diagram of the cabin pressurisation air path">
+          <defs>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" class="fill-blue"/>
+            </marker>
+            <marker id="arrow-grey" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" class="fill-grey"/>
+            </marker>
+          </defs>
+
+          <!-- Flow lines. data-flow marks the paths that get moving dots (added by the JS). -->
+          <path id="f1" class="flow flow-blue" data-flow="blue" d="M135,90 V136" marker-end="url(#arrow-blue)"/>
+          <path id="f2" class="flow flow-blue" data-flow="blue" d="M135,210 V256" marker-end="url(#arrow-blue)"/>
+          <path id="f3" class="flow flow-blue" data-flow="blue" d="M135,330 V376" marker-end="url(#arrow-blue)"/>
+          <path id="f4" class="flow flow-blue" data-flow="blue" d="M135,450 V496" marker-end="url(#arrow-blue)"/>
+          <path id="f5" class="flow flow-grey" data-flow="grey" d="M135,590 V646" marker-end="url(#arrow-grey)"/>
+          <path id="f6" class="flow flow-grey" data-flow="grey" d="M230,685 H296" marker-end="url(#arrow-grey)"/>
+          <path id="f7" class="flow flow-grey" data-flow="grey" d="M230,522 H265 V415 H234" marker-end="url(#arrow-grey)"/>
+          <!-- Dashed link from the cabin to the safety valve (no flow in normal operation) -->
+          <path class="link" d="M230,552 H298"/>
+
+          <!-- Labels on the flow lines -->
+          <text class="flow-label" x="160" y="118">Hot bleed air</text>
+          <text class="flow-label" x="160" y="238">Cooled air</text>
+          <text class="flow-label" x="160" y="358">Cold, conditioned air</text>
+          <text class="flow-label" x="160" y="478">Mixed air</text>
+          <text class="flow-label" x="160" y="624">Cabin air out</text>
+          <text class="flow-label" x="275" y="385">Recirculated</text>
+          <text class="flow-label" x="275" y="405">cabin air</text>
+          <text class="flow-label" x="306" y="691">Overboard</text>
+
+          <!-- Components: each group is clickable and keyboard-focusable -->
+          <g class="part" data-part="engine" tabindex="0" role="button" aria-label="Engine, bleed air source">
+            <rect x="40" y="20" width="190" height="70" rx="10"/>
+            <text x="135" y="50" class="part-title">Engine</text>
+            <text x="135" y="72" class="part-sub">(bleed air source)</text>
+          </g>
+          <g class="part" data-part="precooler" tabindex="0" role="button" aria-label="Pre-cooler">
+            <rect x="40" y="140" width="190" height="70" rx="10"/>
+            <text x="135" y="181" class="part-title">Pre-cooler</text>
+          </g>
+          <g class="part" data-part="pack" tabindex="0" role="button" aria-label="Air Conditioning Pack, ACM">
+            <rect x="40" y="260" width="190" height="70" rx="10"/>
+            <text x="135" y="289" class="part-title">Air Conditioning</text>
+            <text x="135" y="313" class="part-title">Pack (ACM)</text>
+          </g>
+          <g class="part" data-part="mix" tabindex="0" role="button" aria-label="Mix Manifold">
+            <rect x="40" y="380" width="190" height="70" rx="10"/>
+            <text x="135" y="421" class="part-title">Mix Manifold</text>
+          </g>
+          <g class="part part-cabin" data-part="cabin" tabindex="0" role="button" aria-label="Cabin">
+            <rect x="40" y="500" width="190" height="90" rx="10"/>
+            <text x="135" y="540" class="part-title">Cabin</text>
+            <text x="135" y="564" class="part-sub">(people on board)</text>
+          </g>
+          <g class="part" data-part="outflow" tabindex="0" role="button" aria-label="Outflow Valve">
+            <rect x="40" y="650" width="190" height="70" rx="10"/>
+            <text x="135" y="691" class="part-title">Outflow Valve</text>
+          </g>
+          <g class="part" data-part="safety" tabindex="0" role="button" aria-label="Safety and Negative Pressure Relief Valve">
+            <rect x="300" y="510" width="200" height="84" rx="10"/>
+            <text x="400" y="537" class="part-title small-title">Safety / Negative</text>
+            <text x="400" y="557" class="part-title small-title">Pressure Relief</text>
+            <text x="400" y="577" class="part-title small-title">Valve</text>
+          </g>
+        </svg>
+
+        <!-- Pop-up information panel (shown beside the diagram on wide screens, below it on phones) -->
+        <aside class="popup" id="part-popup" aria-live="polite" hidden>
+          <button type="button" class="popup-close" id="popup-close" aria-label="Close panel">&times;</button>
+          <h3 id="popup-name"></h3>
+          <p class="popup-label">What it does</p>
+          <p id="popup-does"></p>
+          <p class="popup-label">Why it matters for pressurisation</p>
+          <p id="popup-why"></p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ===== Section 3: Pressure Simulation ===== -->
+    <section class="panel" id="sec-simulation" role="tabpanel" aria-labelledby="tab-simulation" hidden>
+      <h2>Pressure Simulation</h2>
+      <p>Move the sliders to change the aircraft altitude and the outflow valve position. Watch how the cabin responds.</p>
+
+      <div class="sim-controls">
+        <div class="slider-box">
+          <label for="sim-alt">Aircraft Altitude: <strong id="sim-alt-text">0 ft</strong></label>
+          <input type="range" id="sim-alt" min="0" max="40000" step="500" value="0">
+          <div class="slider-ends"><span>0 ft</span><span>40,000 ft</span></div>
+        </div>
+        <div class="slider-box">
+          <label for="sim-valve">Outflow Valve Position: <strong id="sim-valve-text">Normal operating range</strong></label>
+          <input type="range" id="sim-valve" min="0" max="100" step="1" value="70">
+          <div class="slider-ends"><span>Fully Open</span><span>Fully Closed</span></div>
+        </div>
+      </div>
+
+      <div class="readouts">
+        <div class="readout">
+          <span class="readout-label">Cabin Altitude</span>
+          <span class="readout-value"><span id="sim-cabin">0</span> ft</span>
+        </div>
+        <div class="readout">
+          <span class="readout-label">Differential Pressure</span>
+          <span class="readout-value"><span id="sim-diff">0.0</span> PSI</span>
+        </div>
+      </div>
+
+      <div class="status status-green" id="sim-status" role="status"></div>
+      <p class="sim-explain" id="sim-explain"></p>
+      <p class="note">This is a simplified model for learning. Cabin altitude = aircraft altitude &times; 0.2, up to a limit of 8,000 ft, while the outflow valve is in its normal range (half closed or more). Differential pressure never goes above 8.6 PSI.</p>
+    </section>
+
+    <!-- ===== Section 4: Fault Scenarios ===== -->
+    <section class="panel" id="sec-faults" role="tabpanel" aria-labelledby="tab-faults" hidden>
+      <h2>Fault Scenarios</h2>
+      <p>Read the instrument readings in each scenario and decide what the fault is. <strong>Click a card to open it.</strong></p>
+      <div id="fault-list" class="fault-list"></div>
+    </section>
+
+    <!-- ===== Section 5: Competency Check ===== -->
+    <section class="panel" id="sec-check" role="tabpanel" aria-labelledby="tab-check" hidden>
+      <h2>Competency Check</h2>
+      <div id="quiz"></div>
+    </section>
+  </main>
+
+  <script src="cabin-pressurisation.js"></script>
+</body>
+</html>

@@ -309,20 +309,99 @@
         </div>
       </div>
 
-      <div class="readouts">
-        <div class="readout">
-          <span class="readout-label">Cabin Altitude</span>
-          <span class="readout-value"><span id="sim-cabin">0</span> ft</span>
-        </div>
-        <div class="readout">
-          <span class="readout-label">Differential Pressure</span>
-          <span class="readout-value"><span id="sim-diff">0.0</span> PSI</span>
+      <div class="sim-main">
+        <!-- Valve view: a cross-section of the cabin skin showing the two valves.
+             The JS moves the outflow valve flap, lifts the safety valve and sizes the arrows. -->
+        <figure class="valve-figure">
+          <svg id="valve-svg" viewBox="0 0 420 400" role="img"
+               aria-label="Cross-section of the cabin showing the outflow valve in the floor and the safety valve in the roof. The text in the diagram and the explanation below give the current valve positions.">
+            <defs>
+              <marker id="sim-arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" class="fill-accent"/>
+              </marker>
+              <marker id="sim-arrow-grey" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto">
+                <path d="M0,0 L10,5 L0,10 z" class="fill-grey"/>
+              </marker>
+            </defs>
+
+            <!-- The cabin (its colour follows the status bar) -->
+            <path id="sim-cabin-fill" class="sim-cabin sim-cabin-green" d="M70,250 H350 A40,40 0 0 0 390,210 V100 A40,40 0 0 0 350,60 H70 A40,40 0 0 0 30,100 V210 A40,40 0 0 0 70,250 Z"/>
+            <!-- The cabin skin, drawn in two pieces so there are gaps for the two valves -->
+            <path class="skin" d="M210,250 H350 A40,40 0 0 0 390,210 V100 A40,40 0 0 0 350,60 H310"/>
+            <path class="skin" d="M270,60 H70 A40,40 0 0 0 30,100 V210 A40,40 0 0 0 70,250 H110"/>
+
+            <!-- Blue arrows inside the cabin: how hard the air pushes on the skin (longer = more differential pressure) -->
+            <g id="sim-push"></g>
+
+            <text class="sim-title" x="210" y="130">CABIN</text>
+            <text class="sim-big" id="sim-svg-cabin" x="210" y="165">0 ft</text>
+            <text class="sim-small" x="210" y="192">cabin altitude</text>
+
+            <!-- Outflow valve (floor). -->
+            <!-- The flap turns about the centre of the gap: flat = closed, edge-on = fully open -->
+            <g id="sim-flap"><rect class="flap" x="110" y="246" width="100" height="8" rx="3"/></g>
+            <circle class="hinge" cx="160" cy="250" r="6"/>
+            <g id="sim-air-out"></g>
+            <text class="sim-label" x="160" y="335">Outflow valve</text>
+            <text class="sim-state" id="sim-outflow-state" x="160" y="357">70% closed</text>
+
+            <!-- Safety valve (roof). The plug sits in the gap and lifts when it opens. -->
+            <path class="housing" d="M266,60 V36 M314,60 V36"/>
+            <g id="sim-poppet"><rect class="flap" x="268" y="56" width="44" height="8" rx="3"/></g>
+            <g id="sim-relief"></g>
+            <text class="sim-label end" x="256" y="32">Safety valve</text>
+            <text class="sim-state end" id="sim-safety-state" x="256" y="52">CLOSED</text>
+
+            <text class="sim-small" x="210" y="392">Outside air: <tspan id="sim-svg-outside">0 ft</tspan></text>
+          </svg>
+          <figcaption>Cross-section of the cabin. Blue arrows show the push on the skin. Grey arrows show air leaving.</figcaption>
+        </figure>
+
+        <div class="sim-side">
+          <div class="readouts">
+            <div class="readout">
+              <span class="readout-label">Cabin Altitude</span>
+              <span class="readout-value"><span id="sim-cabin">0</span> ft</span>
+            </div>
+            <div class="readout">
+              <span class="readout-label">Differential Pressure</span>
+              <span class="readout-value"><span id="sim-diff">0.0</span> PSI</span>
+            </div>
+          </div>
+
+          <div class="status status-green" id="sim-status" role="status"></div>
+          <p class="sim-explain" id="sim-explain"></p>
         </div>
       </div>
 
-      <div class="status status-green" id="sim-status" role="status"></div>
-      <p class="sim-explain" id="sim-explain"></p>
-      <p class="note">This is a simplified model for learning. Cabin altitude = aircraft altitude &times; 0.2, up to a limit of 8,000 ft, while the outflow valve is in its normal range (half closed or more). Differential pressure never goes above 8.6 PSI.</p>
+      <!-- How the numbers are worked out (filled in by the JS from the slider values) -->
+      <div class="calc">
+        <h3>How the differential pressure is worked out</h3>
+        <p>Differential pressure is how much higher the pressure is inside the cabin than outside. The simulation works it out in four steps. The numbers change as you move the sliders.</p>
+        <ol class="calc-steps" id="calc-steps"></ol>
+      </div>
+
+      <!-- Why the limit is 8.6 PSI -->
+      <div class="why-limit">
+        <h3>Why is differential pressure kept at 8.6 PSI?</h3>
+        <p>8.6 PSI is the <strong>maximum differential pressure</strong> this generic aircraft is built to take. It is a limit set by the strength of the fuselage.</p>
+        <ul class="plain-list">
+          <li><strong>The fuselage is like a balloon.</strong> The air inside pushes outward on the skin. Every extra PSI of difference is more push on the skin, the frames and the rivets.</li>
+          <li><strong>It is pushed and relaxed on every flight.</strong> The cabin is pressurised on the way up and relaxed on the way down. Over thousands of flights, metal can slowly crack from this (metal fatigue). Staying inside the limit keeps the aircraft safe for its whole life.</li>
+          <li><strong>Why not a higher limit?</strong> A stronger fuselage needs thicker skin. That makes the aircraft heavier, so it burns more fuel and carries less.</li>
+          <li><strong>Why not a lower limit?</strong> The cabin altitude would have to be higher when flying high. Above 8,000 ft passengers and crew start to feel the effects of thin air.</li>
+          <li><strong>It is a good compromise.</strong> A real-world check: air pressure at 8,000 ft is about 10.9 PSI. At 40,000 ft it is about 2.7 PSI. The difference is about 8.2 PSI, just inside 8.6 PSI. So the cabin can stay at or below 8,000 ft all the way up to about 40,000 ft.</li>
+        </ul>
+        <h3>What keeps it at the limit?</h3>
+        <ul class="plain-list">
+          <li>The <strong>differential pressure controller</strong> adjusts the <strong>outflow valve</strong> to hold the pressure at or below the limit.</li>
+          <li>If that fails and the pressure keeps rising, the <strong>safety valve</strong> opens by itself and lets air out. Try it: set the outflow valve to <em>Fully Closed</em> at a high altitude.</li>
+          <li>The safety valve is also a <strong>negative pressure relief valve</strong>. It opens the other way if the outside pressure ever becomes higher than the cabin pressure. That cannot happen in this simulation.</li>
+          <li>For technicians: an over-pressure event must be reported, and the structure may need an inspection.</li>
+        </ul>
+      </div>
+
+      <p class="note">This is a simplified model for learning. Above about 12,500 ft the simple calculation gives more than 8.6 PSI, so the limit is what the system actually holds. Real aircraft use pressure tables and sensors. Cabin altitude = aircraft altitude &times; 0.2, up to a limit of 8,000 ft, while the outflow valve is in its normal range (half closed or more).</p>
     </section>
 
     <!-- ===== Section 4: Fault Scenarios ===== -->

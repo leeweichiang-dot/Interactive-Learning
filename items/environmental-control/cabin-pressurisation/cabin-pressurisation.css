@@ -112,6 +112,23 @@ p { margin: 0 0 0.9rem; }
 .next-hint, .note { color: var(--muted); }
 .note { font-size: 1rem; margin-top: 1rem; }
 
+/* ----- Overview diagram (static, not clickable) ----- */
+.overview-figure { margin: 1.4rem 0; padding: 0.8rem; background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius); }
+.overview-figure svg { width: 100%; max-width: 520px; height: auto; margin: 0 auto; display: block; }
+.overview-figure figcaption { margin-top: 0.5rem; text-align: center; color: var(--muted); font-size: 1rem; }
+.line { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+.line-blue { stroke: var(--blue-flow); }
+.line-grey { stroke: var(--grey-flow); }
+.node rect { fill: var(--surface-2); stroke: var(--navy-2); stroke-width: 3; }
+.node-cabin rect { fill: var(--surface); }
+.node text { text-anchor: middle; fill: var(--text); }
+.node-title { font-size: 21px; font-weight: 700; }
+.node-sub { font-size: 17px; fill: var(--muted) !important; }
+/* Numbered circles that match the key components list */
+.badge { fill: var(--accent); stroke: var(--surface); stroke-width: 3; }
+.node text.badge-text { fill: var(--on-accent); font-size: 18px; font-weight: 700; }
+@media (prefers-color-scheme: dark) { .node rect { stroke: var(--border); } }
+
 /* ----- Buttons ----- */
 .btn {
   font: inherit; font-weight: 600; cursor: pointer; min-height: 48px; padding: 0.55rem 1.3rem;

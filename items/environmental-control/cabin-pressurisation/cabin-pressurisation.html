@@ -163,17 +163,18 @@
     <!-- ===== Section 2: Air Circulation Explorer ===== -->
     <section class="panel" id="sec-explorer" role="tabpanel" aria-labelledby="tab-explorer" hidden>
       <h2>Air Circulation Explorer</h2>
-      <p>Follow the air from the engine to the cabin and out of the aircraft. <strong>Click or tap any component</strong> to learn what it does.</p>
+      <p>See where each part sits in the aircraft and how the air moves between them. <strong>Click or tap any part</strong> to learn what it does, or press <strong>Follow the air</strong> to be taken through the system one part at a time.</p>
 
       <div class="legend">
         <span><i class="swatch swatch-blue"></i> Blue = pressurised air flow</span>
         <span><i class="swatch swatch-grey"></i> Grey = return / exhaust flow</span>
         <button type="button" class="btn small" id="flow-toggle" aria-pressed="false">Pause flow</button>
+        <button type="button" class="btn small" id="step-next">Follow the air &#9654;</button>
       </div>
 
       <div class="explorer">
         <!-- Diagram: coordinates are in a 520 x 760 box that scales to fit the screen -->
-        <svg id="diagram" viewBox="0 0 520 760" role="group" aria-label="Diagram of the cabin pressurisation air path">
+        <svg id="diagram" viewBox="0 0 520 760" role="group" aria-label="Interactive top-down diagram of an aircraft showing where the cabin pressurisation parts are and how air flows between them">
           <defs>
             <marker id="arrow-blue" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto-start-reverse">
               <path d="M0,0 L10,5 L0,10 z" class="fill-blue"/>
@@ -181,62 +182,98 @@
             <marker id="arrow-grey" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto-start-reverse">
               <path d="M0,0 L10,5 L0,10 z" class="fill-grey"/>
             </marker>
+            <!-- Fuselage outline: used to draw it and to clip the pressurised area -->
+            <clipPath id="fuselage-clip">
+              <path d="M195,160 C195,70 230,30 260,30 C290,30 325,70 325,160 L325,600 L292,740 L228,740 L195,600 Z"/>
+            </clipPath>
           </defs>
 
-          <!-- Flow lines. data-flow marks the paths that get moving dots (added by the JS). -->
-          <path id="f1" class="flow flow-blue" data-flow="blue" d="M135,90 V136" marker-end="url(#arrow-blue)"/>
-          <path id="f2" class="flow flow-blue" data-flow="blue" d="M135,210 V256" marker-end="url(#arrow-blue)"/>
-          <path id="f3" class="flow flow-blue" data-flow="blue" d="M135,330 V376" marker-end="url(#arrow-blue)"/>
-          <path id="f4" class="flow flow-blue" data-flow="blue" d="M135,450 V496" marker-end="url(#arrow-blue)"/>
-          <path id="f5" class="flow flow-grey" data-flow="grey" d="M135,590 V646" marker-end="url(#arrow-grey)"/>
-          <path id="f6" class="flow flow-grey" data-flow="grey" d="M230,685 H296" marker-end="url(#arrow-grey)"/>
-          <path id="f7" class="flow flow-grey" data-flow="grey" d="M230,522 H265 V415 H234" marker-end="url(#arrow-grey)"/>
-          <!-- Dashed link from the cabin to the safety valve (no flow in normal operation) -->
-          <path class="link" d="M230,552 H298"/>
+          <text class="dir-label" x="260" y="20">FRONT</text>
 
-          <!-- Labels on the flow lines -->
-          <text class="flow-label" x="160" y="118">Hot bleed air</text>
-          <text class="flow-label" x="160" y="238">Cooled air</text>
-          <text class="flow-label" x="160" y="358">Cold, conditioned air</text>
-          <text class="flow-label" x="160" y="478">Mixed air</text>
-          <text class="flow-label" x="160" y="624">Cabin air out</text>
-          <text class="flow-label" x="275" y="385">Recirculated</text>
-          <text class="flow-label" x="275" y="405">cabin air</text>
-          <text class="flow-label" x="306" y="691">Overboard</text>
+          <!-- The aircraft: wings and tail planes (not clickable) -->
+          <polygon class="airframe" points="195,300 40,370 40,395 195,380"/>
+          <polygon class="airframe" points="325,300 480,370 480,395 325,380"/>
+          <polygon class="airframe" points="228,668 150,715 150,732 228,708"/>
+          <polygon class="airframe" points="292,668 370,715 370,732 292,708"/>
 
-          <!-- Components: each group is clickable and keyboard-focusable -->
-          <g class="part" data-part="engine" tabindex="0" role="button" aria-label="Engine, bleed air source">
-            <rect x="40" y="20" width="190" height="70" rx="10"/>
-            <text x="135" y="50" class="part-title">Engine</text>
-            <text x="135" y="72" class="part-sub">(bleed air source)</text>
-          </g>
-          <g class="part" data-part="precooler" tabindex="0" role="button" aria-label="Pre-cooler">
-            <rect x="40" y="140" width="190" height="70" rx="10"/>
-            <text x="135" y="181" class="part-title">Pre-cooler</text>
-          </g>
-          <g class="part" data-part="pack" tabindex="0" role="button" aria-label="Air Conditioning Pack, ACM">
-            <rect x="40" y="260" width="190" height="70" rx="10"/>
-            <text x="135" y="289" class="part-title">Air Conditioning</text>
-            <text x="135" y="313" class="part-title">Pack (ACM)</text>
-          </g>
-          <g class="part" data-part="mix" tabindex="0" role="button" aria-label="Mix Manifold">
-            <rect x="40" y="380" width="190" height="70" rx="10"/>
-            <text x="135" y="421" class="part-title">Mix Manifold</text>
-          </g>
+          <!-- CABIN: the whole fuselage. Drawn first so the parts inside it sit on top and take their own clicks. -->
           <g class="part part-cabin" data-part="cabin" tabindex="0" role="button" aria-label="Cabin">
-            <rect x="40" y="500" width="190" height="90" rx="10"/>
-            <text x="135" y="540" class="part-title">Cabin</text>
-            <text x="135" y="564" class="part-sub">(people on board)</text>
+            <path class="airframe" d="M195,160 C195,70 230,30 260,30 C290,30 325,70 325,160 L325,600 L292,740 L228,740 L195,600 Z"/>
+            <rect class="zone" x="190" y="30" width="140" height="610" clip-path="url(#fuselage-clip)"/>
+            <text class="cabin-label anchor" x="260" y="514">Cabin</text>
+            <text class="sub-label mid" x="260" y="534">(people)</text>
           </g>
+          <line class="bulkhead" x1="199" y1="640" x2="321" y2="640"/>
+
+          <!-- Flow lines. data-flow adds moving dots (the JS does this). Blue = pressurised air, grey = air leaving. -->
+          <path id="f1" class="flow flow-blue" data-flow="blue" d="M124,338 H154" marker-end="url(#arrow-blue)"/>
+          <path id="f2" class="flow flow-blue" data-flow="blue" d="M188,338 H216" marker-end="url(#arrow-blue)"/>
+          <path id="f3" class="flow flow-blue" data-flow="blue" d="M260,360 V396" marker-end="url(#arrow-blue)"/>
+          <path id="f4" class="flow flow-blue" data-flow="blue" d="M260,436 V486" marker-end="url(#arrow-blue)"/>
+          <path id="f5" class="flow flow-grey" data-flow="grey" d="M260,548 V594" marker-end="url(#arrow-grey)"/>
+          <path id="f6" class="flow flow-grey" data-flow="grey" d="M285,609 H338" marker-end="url(#arrow-grey)"/>
+          <!-- Dashed line: the controller's signal to the outflow valve -->
+          <path class="link link-signal" d="M235,95 H211 V603 H231" marker-end="url(#arrow-grey)"/>
+
+          <!-- ENGINE (the right-hand engine is the same, so both are part of this group) -->
+          <g class="part" data-part="engine" tabindex="0" role="button" aria-label="Engine, bleed air source">
+            <rect class="engine anchor" x="80" y="300" width="44" height="72" rx="18"/>
+            <rect class="engine" x="396" y="300" width="44" height="72" rx="18"/>
+            <path class="leader" d="M102,180 V298"/>
+            <text class="callout end" x="185" y="150">Engine</text>
+            <text class="sub-label end" x="185" y="171">(bleed air source)</text>
+          </g>
+
+          <!-- PRE-COOLER -->
+          <g class="part" data-part="precooler" tabindex="0" role="button" aria-label="Pre-cooler">
+            <rect class="comp anchor" x="156" y="324" width="32" height="28" rx="5"/>
+            <path class="leader" d="M172,354 V462"/>
+            <text class="callout end" x="190" y="482">Pre-cooler</text>
+          </g>
+
+          <!-- AIR CONDITIONING PACK (ACM) -->
+          <g class="part" data-part="pack" tabindex="0" role="button" aria-label="Air Conditioning Pack, ACM">
+            <rect class="comp anchor" x="218" y="316" width="84" height="44" rx="6"/>
+            <text class="inside-label" x="260" y="344">Pack</text>
+            <path class="leader" d="M302,335 L340,262"/>
+            <text class="callout" x="345" y="240">Air Conditioning</text>
+            <text class="callout" x="345" y="262">Pack (ACM)</text>
+            <text class="sub-label" x="345" y="281">(under wing root)</text>
+          </g>
+
+          <!-- MIX MANIFOLD -->
+          <g class="part" data-part="mix" tabindex="0" role="button" aria-label="Mix Manifold">
+            <rect class="comp anchor" x="218" y="398" width="84" height="38" rx="6"/>
+            <text class="inside-label" x="260" y="422">Mix</text>
+            <path class="leader" d="M302,417 H340"/>
+            <text class="callout" x="345" y="424">Mix Manifold</text>
+          </g>
+
+          <!-- OUTFLOW VALVE -->
           <g class="part" data-part="outflow" tabindex="0" role="button" aria-label="Outflow Valve">
-            <rect x="40" y="650" width="190" height="70" rx="10"/>
-            <text x="135" y="691" class="part-title">Outflow Valve</text>
+            <rect class="comp anchor" x="235" y="596" width="50" height="26" rx="5"/>
+            <path class="leader" d="M235,616 H190"/>
+            <text class="callout end" x="185" y="622">Outflow Valve</text>
+            <text class="sub-label end" x="185" y="641">(rear underside)</text>
           </g>
+          <text class="sub-label" x="345" y="616">Air out</text>
+
+          <!-- SAFETY / NEGATIVE PRESSURE RELIEF VALVE -->
           <g class="part" data-part="safety" tabindex="0" role="button" aria-label="Safety and Negative Pressure Relief Valve">
-            <rect x="300" y="510" width="200" height="84" rx="10"/>
-            <text x="400" y="537" class="part-title small-title">Safety / Negative</text>
-            <text x="400" y="557" class="part-title small-title">Pressure Relief</text>
-            <text x="400" y="577" class="part-title small-title">Valve</text>
+            <rect class="comp anchor" x="313" y="530" width="24" height="36" rx="5"/>
+            <text class="callout" x="345" y="538">Safety / Negative</text>
+            <text class="callout" x="345" y="558">Pressure Relief</text>
+            <text class="callout" x="345" y="578">Valve</text>
+          </g>
+
+          <!-- DIFFERENTIAL PRESSURE CONTROLLER -->
+          <g class="part" data-part="controller" tabindex="0" role="button" aria-label="Differential Pressure Controller">
+            <rect class="comp anchor" x="235" y="80" width="50" height="30" rx="5"/>
+            <path class="leader" d="M285,95 H340"/>
+            <text class="callout" x="345" y="72">Differential</text>
+            <text class="callout" x="345" y="92">Pressure</text>
+            <text class="callout" x="345" y="112">Controller</text>
+            <text class="sub-label" x="345" y="131">(avionics bay)</text>
           </g>
         </svg>
 
@@ -244,6 +281,8 @@
         <aside class="popup" id="part-popup" aria-live="polite" hidden>
           <button type="button" class="popup-close" id="popup-close" aria-label="Close panel">&times;</button>
           <h3 id="popup-name"></h3>
+          <p class="popup-label">Where it is</p>
+          <p id="popup-where"></p>
           <p class="popup-label">What it does</p>
           <p id="popup-does"></p>
           <p class="popup-label">Why it matters for pressurisation</p>

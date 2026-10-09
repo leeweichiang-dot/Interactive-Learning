@@ -76,40 +76,57 @@
   var PARTS = {
     engine: {
       name: "Engine (bleed air source)",
+      where: "On each wing, hanging below the front edge.",
       does: "The engine takes in a lot of air to make power. A small amount of this hot, high-pressure air is \"bled\" off and sent to the cabin system.",
       why: "Bleed air is the supply that fills the cabin with air and builds up the pressure."
     },
     precooler: {
       name: "Pre-cooler",
+      where: "On the wing, next to the engine, where the bleed air pipe leaves it.",
       does: "Bleed air from the engine is very hot. The pre-cooler passes it close to cooler air so the heat is carried away.",
       why: "It protects the pipes and the air conditioning pack from overheating, so the pressure supply stays reliable."
     },
     pack: {
       name: "Air Conditioning Pack (ACM)",
+      where: "Under the wing root, where the wings join the fuselage.",
       does: "The Air Cycle Machine (ACM) is a small spinning machine that makes the air very cold by letting it expand. It cools the air and controls how warm or dry it is.",
       why: "It turns hot engine air into safe, comfortable air that can be pumped into the pressurised cabin."
     },
     mix: {
       name: "Mix Manifold",
+      where: "Under the cabin floor, just behind the air conditioning pack.",
       does: "This is a chamber where the cold air from the pack is mixed with air that has already been through the cabin (recirculated air). The mix is sent on to the cabin.",
       why: "Mixing keeps the temperature steady and makes good use of the air supply, so pressure is held with less engine air."
     },
     cabin: {
       name: "Cabin",
+      where: "The main fuselage, from the flight deck back to the rear pressure bulkhead.",
       does: "This is the sealed space where passengers and crew sit. Fresh air flows in and used air flows out all the time.",
       why: "The cabin is the part that must be held at a safe pressure, equal to 6,000 to 8,000 feet or lower."
     },
     outflow: {
       name: "Outflow Valve",
+      where: "On the underside of the rear fuselage, just in front of the rear pressure bulkhead.",
       does: "A controlled door in the aircraft skin. It opens a little to let cabin air escape to the outside, or closes a little to keep more air in.",
       why: "It is the main control for cabin pressure: more open means lower pressure, more closed means higher pressure."
     },
     safety: {
       name: "Safety / Negative Pressure Relief Valve",
+      where: "On the skin of the rear fuselage, close to the outflow valve.",
       does: "A backup valve. It opens if the cabin pressure gets too high, and it also opens if the outside pressure becomes higher than the cabin pressure.",
       why: "It stops the pressure difference from damaging the aircraft body if the normal controls fail."
+    },
+    controller: {
+      name: "Differential Pressure Controller",
+      where: "In the avionics bay (the electronics compartment) near the nose.",
+      does: "The \"brain\" of the system. It reads the cabin and outside pressure and tells the outflow valve how far to open or close.",
+      why: "It keeps the cabin at the right pressure automatically, so the crew do not have to adjust the valve by hand."
     }
   };
+
+  // The order the air travels through the system, used by the "Follow the air" button
+  var ORDER = ["engine", "precooler", "pack", "mix", "cabin", "outflow"];
+  var stepIndex = -1;   // -1 means the trainee has not started the walk-through
 
   var diagram = $("diagram");
   var popup = $("part-popup");
@@ -122,7 +139,9 @@
     if (popup.hidden) return;
     var wide = window.matchMedia("(min-width: 900px)").matches;
     if (!wide || !selectedPart) { popup.style.marginTop = ""; return; }
-    var top = selectedPart.getBoundingClientRect().top - diagram.getBoundingClientRect().top;
+    // Line the panel up with the main shape of the part (not its label or leader line)
+    var anchor = selectedPart.querySelector(".anchor") || selectedPart;
+    var top = anchor.getBoundingClientRect().top - diagram.getBoundingClientRect().top;
     var maxTop = diagram.getBoundingClientRect().height - popup.offsetHeight;
     popup.style.marginTop = Math.max(0, Math.min(top, maxTop)) + "px";
   }
@@ -133,7 +152,10 @@
     if (!info) return;
     parts.forEach(function (p) { p.classList.toggle("selected", p === group); });
     selectedPart = group;
+    stepIndex = ORDER.indexOf(group.getAttribute("data-part"));
+    updateStepButton();
     $("popup-name").textContent = info.name;
+    $("popup-where").textContent = info.where;
     $("popup-does").textContent = info.does;
     $("popup-why").textContent = info.why;
     popup.hidden = false;
@@ -149,6 +171,8 @@
     parts.forEach(function (p) { p.classList.remove("selected"); });
     if (selectedPart) selectedPart.focus();
     selectedPart = null;
+    stepIndex = -1;
+    updateStepButton();
   }
 
   parts.forEach(function (group) {
@@ -163,15 +187,27 @@
   });
   window.addEventListener("resize", positionPopup);
 
-  // Moving dots: two dots travel along every flow line (blue = pressurised, grey = return/exhaust)
+  // "Follow the air": each press selects the next part along the air path
+  var stepButton = $("step-next");
+  function updateStepButton() {
+    stepButton.textContent = stepIndex < 0 ? "Follow the air \u25B6"
+      : stepIndex >= ORDER.length - 1 ? "Start again \u21BA" : "Next part \u25B6";
+  }
+  stepButton.addEventListener("click", function () {
+    var next = stepIndex >= ORDER.length - 1 ? 0 : stepIndex + 1;
+    selectPart(diagram.querySelector('[data-part="' + ORDER[next] + '"]'));
+  });
+
+  // Moving dots travel along every flow line (blue = pressurised, grey = return/exhaust).
+  // Short lines get one dot so they do not look crowded; longer lines get two.
   Array.prototype.forEach.call(diagram.querySelectorAll("[data-flow]"), function (path) {
-    [0, 1].forEach(function (n) {
+    (path.getTotalLength() < 60 ? [0] : [0, 1]).forEach(function (n) {
       var dot = document.createElementNS(SVG_NS, "circle");
       dot.setAttribute("r", "6");
       dot.setAttribute("class", "flow-dot " + path.getAttribute("data-flow"));
       var motion = document.createElementNS(SVG_NS, "animateMotion");
-      motion.setAttribute("dur", "1.6s");
-      motion.setAttribute("begin", "-" + (n * 0.8) + "s");   // negative = already part-way along, so no dot waits at the corner
+      motion.setAttribute("dur", Math.max(1, path.getTotalLength() / 40) + "s");   // longer lines take longer, so the dots move at one speed
+      motion.setAttribute("begin", "-" + (n * 0.5 * Math.max(1, path.getTotalLength() / 40)) + "s");   // negative = already part-way along, so no dot waits at the corner
       motion.setAttribute("repeatCount", "indefinite");
       var mpath = document.createElementNS(SVG_NS, "mpath");
       mpath.setAttribute("href", "#" + path.id);

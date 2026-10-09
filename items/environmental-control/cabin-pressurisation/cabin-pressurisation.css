@@ -119,15 +119,26 @@ p { margin: 0 0 0.9rem; }
 .line { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
 .line-blue { stroke: var(--blue-flow); }
 .line-grey { stroke: var(--grey-flow); }
-.node rect { fill: var(--surface-2); stroke: var(--navy-2); stroke-width: 3; }
-.node-cabin rect { fill: var(--surface); }
-.node text { text-anchor: middle; fill: var(--text); }
-.node-title { font-size: 21px; font-weight: 700; }
-.node-sub { font-size: 17px; fill: var(--muted) !important; }
+/* The aircraft: outline, pressurised area, bulkhead */
+.airframe { fill: var(--surface-2); stroke: var(--navy-2); stroke-width: 3; stroke-linejoin: round; }
+.zone { fill: var(--blue-flow); fill-opacity: 0.14; }
+.bulkhead { stroke: var(--navy-2); stroke-width: 6; stroke-linecap: round; }
+.engine { fill: var(--surface); stroke: var(--accent); stroke-width: 3; }
+.engine-plain { stroke: var(--grey-flow); }
+/* Components and their labels */
+.comp { fill: var(--surface); stroke: var(--accent); stroke-width: 3; }
+.callout { font-size: 19px; font-weight: 700; fill: var(--text); }
+.sub-label { font-size: 16px; fill: var(--muted); }
+.inside-label { font-size: 18px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+.cabin-label { font-size: 21px; font-weight: 700; fill: var(--text); text-anchor: middle; }
+.dir-label { font-size: 15px; font-weight: 700; letter-spacing: 0.1em; fill: var(--muted); text-anchor: middle; }
+.end { text-anchor: end; }
+.mid { text-anchor: middle; }
+.leader { fill: none; stroke: var(--muted); stroke-width: 2; }
 /* Numbered circles that match the key components list */
 .badge { fill: var(--accent); stroke: var(--surface); stroke-width: 3; }
-.node text.badge-text { fill: var(--on-accent); font-size: 18px; font-weight: 700; }
-@media (prefers-color-scheme: dark) { .node rect { stroke: var(--border); } }
+.badge-text { fill: var(--on-accent); font-size: 17px; font-weight: 700; text-anchor: middle; }
+@media (prefers-color-scheme: dark) { .airframe, .bulkhead { stroke: var(--grey-flow); } }
 
 /* ----- Buttons ----- */
 .btn {

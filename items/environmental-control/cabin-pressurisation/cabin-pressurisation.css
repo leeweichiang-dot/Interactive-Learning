@@ -1,0 +1,265 @@
+/* ==========================================================================
+   Cabin Pressurisation System: styles
+   Dark blue and white scheme. Light and dark themes follow the device setting.
+   ========================================================================== */
+
+/* ----- Colour tokens (light theme first, dark theme below) ----- */
+:root {
+  color-scheme: light dark;
+  --navy: #0b2545;          /* nav bar and headings */
+  --navy-2: #13315c;
+  --bg: #f1f5fb;
+  --surface: #ffffff;
+  --surface-2: #e8eef9;     /* soft panels */
+  --text: #0e1c33;
+  --muted: #475569;
+  --border: #c9d5e8;
+  --accent: #1d5fd1;        /* buttons, active tab */
+  --on-accent: #ffffff;
+  --focus: #f59e0b;
+  --blue-flow: #1f78e6;     /* pressurised air */
+  --grey-flow: #7b8697;     /* return / exhaust air */
+  --good: #176a35;  --good-bg: #dff3e6;
+  --warn: #8a4b00;  --warn-bg: #fdecc8;
+  --bad: #a31d1d;   --bad-bg: #fbdcdc;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navy: #07162b;
+    --navy-2: #0f2a4f;
+    --bg: #0a1424;
+    --surface: #111f38;
+    --surface-2: #17294a;
+    --text: #e8eef9;
+    --muted: #a9b6cc;
+    --border: #2b4067;
+    --accent: #5b9bff;
+    --on-accent: #07162b;
+    --blue-flow: #4c9bff;
+    --grey-flow: #98a3b5;
+    --good: #7fdc9e;  --good-bg: #123a22;
+    --warn: #ffd37a;  --warn-bg: #4a3408;
+    --bad: #ff9c9c;   --bad-bg: #4d1616;
+  }
+}
+
+/* ----- Base ----- */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 1.0625rem;        /* 17px: larger than the 16px minimum */
+  line-height: 1.6;
+}
+h1, h2, h3 { line-height: 1.25; }
+h2 { font-size: 1.6rem; margin: 0 0 0.75rem; color: var(--navy-2); }
+h3 { font-size: 1.2rem; margin: 1.4rem 0 0.4rem; }
+@media (prefers-color-scheme: dark) { h2 { color: var(--text); } }
+p { margin: 0 0 0.9rem; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* ----- Navigation bar ----- */
+.topbar { background: var(--navy); color: #ffffff; border-bottom: 4px solid var(--accent); }
+.topbar-inner {
+  max-width: 1000px; margin: 0 auto; padding: 0.9rem 1rem;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem;
+}
+.topbar h1 { margin: 0; font-size: 1.5rem; }
+.back {
+  color: #ffffff; text-decoration: none; font-weight: 600;
+  border: 2px solid #ffffff; border-radius: 8px; padding: 0.45rem 0.9rem; min-height: 44px;
+  display: inline-flex; align-items: center;
+}
+.back:hover { background: #ffffff; color: var(--navy); }
+
+/* ----- Page wrapper ----- */
+.wrap { max-width: 1000px; margin: 0 auto; padding: 1rem; }
+.subtitle { color: var(--muted); margin-bottom: 1rem; }
+
+/* ----- Section tabs ----- */
+.tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+.tab {
+  flex: 1 1 auto; min-height: 48px; padding: 0.55rem 0.9rem;
+  font: inherit; font-weight: 600; cursor: pointer;
+  background: var(--surface); color: var(--text);
+  border: 2px solid var(--border); border-radius: 8px;
+}
+.tab:hover { border-color: var(--accent); }
+/* The active tab is solid blue with a thick underline so it is easy to spot */
+.tab[aria-selected="true"] {
+  background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+  box-shadow: 0 4px 0 var(--navy-2);
+}
+
+/* ----- Section panels ----- */
+.panel {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1.25rem;
+}
+.panel[hidden] { display: none; }
+.plain-list { padding-left: 1.2rem; }
+.plain-list li { margin-bottom: 0.4rem; }
+.summary-box {
+  background: var(--surface-2); border-left: 6px solid var(--accent);
+  border-radius: var(--radius); padding: 0.5rem 1.1rem 0.9rem; margin: 1.4rem 0 1rem;
+}
+.summary-box h3 { margin-top: 0.7rem; }
+.summary-box ol { margin: 0; padding-left: 1.3rem; }
+.summary-box li { margin-bottom: 0.5rem; }
+.next-hint, .note { color: var(--muted); }
+.note { font-size: 1rem; margin-top: 1rem; }
+
+/* ----- Buttons ----- */
+.btn {
+  font: inherit; font-weight: 600; cursor: pointer; min-height: 48px; padding: 0.55rem 1.3rem;
+  background: var(--accent); color: var(--on-accent); border: 2px solid var(--accent); border-radius: 8px;
+}
+.btn:hover { filter: brightness(1.1); }
+.btn.small { min-height: 40px; padding: 0.3rem 0.9rem; background: transparent; color: var(--accent); }
+.btn[disabled] { opacity: 0.5; cursor: default; }
+
+/* ----- Air Circulation Explorer ----- */
+.legend { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.2rem; margin-bottom: 0.8rem; }
+.swatch { display: inline-block; width: 28px; height: 6px; border-radius: 3px; vertical-align: middle; margin-right: 0.3rem; }
+.swatch-blue { background: var(--blue-flow); }
+.swatch-grey { background: var(--grey-flow); }
+
+.explorer { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+#diagram { width: 100%; max-width: 520px; height: auto; margin: 0 auto; display: block; }
+/* Wide screens: the pop-up sits beside the diagram, level with the clicked part */
+@media (min-width: 900px) {
+  .explorer { grid-template-columns: 520px minmax(0, 1fr); align-items: start; }
+}
+
+/* Diagram colours and text */
+.fill-blue { fill: var(--blue-flow); }
+.fill-grey { fill: var(--grey-flow); }
+.flow { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 10 8; }
+.flow-blue { stroke: var(--blue-flow); }
+.flow-grey { stroke: var(--grey-flow); }
+.link { fill: none; stroke: var(--grey-flow); stroke-width: 3; stroke-dasharray: 4 6; }
+.flow-dot { stroke: none; }
+.flow-dot.blue { fill: var(--blue-flow); }
+.flow-dot.grey { fill: var(--grey-flow); }
+.flow-label { font-size: 18px; fill: var(--muted); }
+/* Dashes march along each line to show the direction of flow */
+.flowing .flow { animation: march 0.9s linear infinite; }
+@keyframes march { to { stroke-dashoffset: -18; } }
+
+.part { cursor: pointer; }
+.part rect { fill: var(--surface-2); stroke: var(--navy-2); stroke-width: 3; }
+.part-cabin rect { fill: var(--surface); }
+.part text { text-anchor: middle; fill: var(--text); }
+.part-title { font-size: 21px; font-weight: 700; }
+.small-title { font-size: 18px; }
+.part-sub { font-size: 17px; fill: var(--muted) !important; }
+.part:hover rect { stroke: var(--accent); stroke-width: 4; }
+.part:focus-visible { outline: none; }
+.part:focus-visible rect { stroke: var(--focus); stroke-width: 5; }
+.part.selected rect { fill: var(--accent); stroke: var(--navy-2); }
+.part.selected text { fill: var(--on-accent) !important; }
+@media (prefers-color-scheme: dark) { .part rect { stroke: var(--border); } }
+
+/* Pop-up information panel */
+.popup {
+  position: relative; background: var(--surface); border: 3px solid var(--accent);
+  border-radius: var(--radius); padding: 0.9rem 3rem 0.4rem 1.1rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+.popup[hidden] { display: none; }
+.popup h3 { margin: 0 0 0.5rem; color: var(--accent); }
+.popup-label { margin: 0 0 0.1rem; font-size: 0.95rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+.popup-close {
+  position: absolute; top: 0.4rem; right: 0.4rem; width: 44px; height: 44px; cursor: pointer;
+  font-size: 1.6rem; line-height: 1; background: transparent; color: var(--text);
+  border: 2px solid var(--border); border-radius: 8px;
+}
+
+/* ----- Pressure Simulation ----- */
+.sim-controls { display: grid; grid-template-columns: 1fr; gap: 1.2rem; margin-bottom: 1.2rem; }
+@media (min-width: 700px) { .sim-controls { grid-template-columns: 1fr 1fr; } }
+.slider-box label { display: block; margin-bottom: 0.4rem; }
+.slider-box input[type="range"] { width: 100%; height: 36px; accent-color: var(--accent); }
+.slider-ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 1rem; }
+
+.readouts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem; }
+.readout {
+  background: var(--navy); color: #ffffff; border-radius: var(--radius); padding: 0.8rem 1rem;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.readout-label { font-size: 1rem; opacity: 0.85; }
+.readout-value { font-size: 1.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (max-width: 480px) { .readouts { grid-template-columns: 1fr; } }
+
+/* Colour-coded status bar (the text says the same thing, so colour is never the only cue) */
+.status { padding: 0.8rem 1rem; border-radius: var(--radius); font-weight: 700; border: 3px solid; text-align: center; }
+.status-green { background: var(--good-bg); color: var(--good); border-color: var(--good); }
+.status-amber { background: var(--warn-bg); color: var(--warn); border-color: var(--warn); }
+.status-red { background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
+.sim-explain { margin-top: 1rem; font-size: 1.1rem; }
+
+/* ----- Fault Scenarios ----- */
+.fault-list { display: grid; gap: 0.8rem; }
+.fault-card { border: 2px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.fault-card.open { border-color: var(--accent); }
+.fault-head {
+  width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 0.6rem;
+  min-height: 56px; padding: 0.7rem 1rem; font: inherit; font-weight: 700; text-align: left; cursor: pointer;
+  background: var(--surface-2); color: var(--text); border: 0; border-radius: var(--radius);
+}
+.fault-card.open .fault-head { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.fault-badge { font-weight: 700; color: var(--good); white-space: nowrap; }
+.fault-body { padding: 1rem; }
+.fault-body[hidden] { display: none; }
+.symptoms { padding-left: 1.2rem; margin-top: 0; }
+.gauges { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.7rem; margin: 0.8rem 0 1.1rem; }
+.gauge { border: 2px solid var(--border); border-radius: var(--radius); padding: 0.6rem 0.8rem; background: var(--surface-2); }
+.gauge-label { display: block; font-size: 1rem; color: var(--muted); }
+.gauge-value { display: block; font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.gauge-note { display: block; font-size: 0.95rem; font-weight: 700; }
+.gauge.ok { border-color: var(--good); } .gauge.ok .gauge-note { color: var(--good); }
+.gauge.warn { border-color: var(--warn); } .gauge.warn .gauge-note { color: var(--warn); }
+.gauge.bad { border-color: var(--bad); } .gauge.bad .gauge-note { color: var(--bad); }
+
+.options { display: grid; gap: 0.6rem; margin: 0.6rem 0; }
+.option {
+  width: 100%; min-height: 52px; padding: 0.6rem 1rem; text-align: left; font: inherit; cursor: pointer;
+  background: var(--surface); color: var(--text); border: 2px solid var(--border); border-radius: 8px;
+}
+.option:hover:not([disabled]) { border-color: var(--accent); }
+.option.correct { background: var(--good-bg); border-color: var(--good); color: var(--good); font-weight: 700; }
+.option.wrong { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); }
+.option[disabled] { cursor: default; }
+.feedback { margin: 0.6rem 0; padding: 0.7rem 1rem; border-radius: var(--radius); border-left: 6px solid; }
+.feedback.good { background: var(--good-bg); border-color: var(--good); }
+.feedback.bad { background: var(--bad-bg); border-color: var(--bad); }
+.action-note { margin-top: 0.8rem; padding: 0.7rem 1rem; background: var(--surface-2); border-left: 6px solid var(--accent); border-radius: var(--radius); }
+.action-note strong:first-child { display: block; color: var(--accent); }
+
+/* ----- Competency Check ----- */
+.quiz-progress { color: var(--muted); font-weight: 600; margin-bottom: 0.4rem; }
+.progress-track { height: 10px; background: var(--surface-2); border-radius: 5px; overflow: hidden; margin-bottom: 1rem; }
+.progress-fill { height: 100%; background: var(--accent); transition: width 0.3s; }
+.quiz-question { font-size: 1.3rem; margin: 0 0 1rem; }
+.quiz-actions { margin-top: 1rem; }
+.result { text-align: center; padding: 1rem 0; }
+.score { font-size: 3rem; font-weight: 800; margin: 0; }
+.result-msg { display: inline-block; padding: 0.8rem 1.2rem; border-radius: var(--radius); border: 3px solid; font-weight: 700; margin: 0.5rem 0 1.2rem; }
+.result-msg.pass { background: var(--good-bg); color: var(--good); border-color: var(--good); }
+.result-msg.fail { background: var(--bad-bg); color: var(--bad); border-color: var(--bad); }
+
+/* ----- Small screens ----- */
+@media (max-width: 480px) {
+  .topbar h1 { font-size: 1.3rem; }
+  .panel { padding: 1rem; }
+  .tab { flex: 1 1 100%; }   /* tabs stack so nothing scrolls sideways */
+}
+
+/* Respect the "reduce motion" device setting */
+@media (prefers-reduced-motion: reduce) {
+  .flowing .flow { animation: none; }
+  .progress-fill { transition: none; }
+}

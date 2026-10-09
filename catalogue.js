@@ -51,6 +51,11 @@ window.CATALOGUE = {
       id: "pitot-static",
       title: "Pitot-Static Flight Instruments",
       description: "How pitot and static air pressure produce the airspeed, altitude and climb-rate readings in a generic fighter-style cockpit, in plain English."
+    },
+    {
+      id: "environmental-control",
+      title: "Environmental Control Systems",
+      description: "How the aircraft keeps the air in the cabin safe to breathe: pressurisation, air conditioning and the faults that can affect them, in plain English."
     }
   ],
 
@@ -103,6 +108,13 @@ window.CATALOGUE = {
       type: "lesson",
       title: "Pitot-Static Flight Instruments",
       summary: "Learn how pitot and static pressure move three cockpit instruments. Includes an interactive diagram, five guided flight scenarios, a fault investigation and a 12-question competency check."
+    },
+    {
+      id: "cabin-pressurisation",
+      module: "environmental-control",
+      type: "lesson",
+      title: "Cabin Pressurisation System",
+      summary: "Follow the air through a labelled diagram, try a pressure simulation, investigate three faults and take a five-question competency check."
     }
   ]
 };

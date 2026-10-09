@@ -172,24 +172,22 @@ p { margin: 0 0 0.9rem; }
 .flow-dot { stroke: none; }
 .flow-dot.blue { fill: var(--blue-flow); }
 .flow-dot.grey { fill: var(--grey-flow); }
-.flow-label { font-size: 18px; fill: var(--muted); }
 /* Dashes march along each line to show the direction of flow */
 .flowing .flow { animation: march 0.9s linear infinite; }
 @keyframes march { to { stroke-dashoffset: -18; } }
 
+/* Clickable parts. The shapes use the same classes as the Overview diagram (.comp, .engine, .zone, ...). */
 .part { cursor: pointer; }
-.part rect { fill: var(--surface-2); stroke: var(--navy-2); stroke-width: 3; }
-.part-cabin rect { fill: var(--surface); }
-.part text { text-anchor: middle; fill: var(--text); }
-.part-title { font-size: 21px; font-weight: 700; }
-.small-title { font-size: 18px; }
-.part-sub { font-size: 17px; fill: var(--muted) !important; }
-.part:hover rect { stroke: var(--accent); stroke-width: 4; }
+.part:hover .comp, .part:hover .engine { stroke-width: 5; }
+.part:hover .zone { fill-opacity: 0.25; }
 .part:focus-visible { outline: none; }
-.part:focus-visible rect { stroke: var(--focus); stroke-width: 5; }
-.part.selected rect { fill: var(--accent); stroke: var(--navy-2); }
-.part.selected text { fill: var(--on-accent) !important; }
-@media (prefers-color-scheme: dark) { .part rect { stroke: var(--border); } }
+.part:focus-visible .comp, .part:focus-visible .engine { stroke: var(--focus); stroke-width: 6; }
+.part:focus-visible .zone { stroke: var(--focus); stroke-width: 5; }
+/* The selected part is filled solid blue */
+.part.selected .comp, .part.selected .engine { fill: var(--accent); stroke: var(--navy-2); }
+.part.selected .inside-label { fill: var(--on-accent); }
+.part.selected .zone { fill-opacity: 0.38; stroke: var(--accent); stroke-width: 4; }
+.part.selected .callout { fill: var(--accent); }
 
 /* Pop-up information panel */
 .popup {

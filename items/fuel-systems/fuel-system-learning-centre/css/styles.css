@@ -199,3 +199,20 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 1r
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Home: roadmap */
+.roadmap { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; position: relative; }
+.road-card { display: grid; grid-template-columns: auto 1fr; gap: 0 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; box-shadow: var(--shadow); position: relative; }
+.road-card.next { border-color: var(--amber); box-shadow: 0 0 0 3px var(--amber-soft), var(--shadow); }
+.road-card.complete { border-color: var(--ok); }
+.road-num { width: 3rem; height: 3rem; border-radius: 50%; background: var(--sky); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 1.3rem; align-self: start; }
+.road-card.complete .road-num { background: var(--ok); }
+.road-card.next .road-num { background: var(--amber); color: #1a1200; }
+.road-body h3 { margin: 0 0 .15rem; }
+.road-body .label { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+.road-bar { display: flex; align-items: center; gap: .6rem; margin: .5rem 0; font-size: .85rem; font-weight: 600; }
+.road-bar .track { flex: 1; height: 10px; background: var(--line); border-radius: 99px; overflow: hidden; max-width: 260px; }
+.road-bar .track i { display: block; height: 100%; background: var(--sky); border-radius: 99px; transition: width .6s ease; }
+.road-card.complete .road-bar .track i { background: var(--ok); }
+.chip.ok { background: var(--ok-soft); color: var(--ok); } .chip.go { background: var(--amber-soft); color: var(--ink); }
+@media (min-width: 800px) { .roadmap { grid-template-columns: 1fr 1fr; } }

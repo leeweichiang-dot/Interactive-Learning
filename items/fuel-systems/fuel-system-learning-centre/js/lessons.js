@@ -60,12 +60,22 @@
       b.setAttribute("aria-pressed", String(c === current));
       b.addEventListener("click", function () {
         current = c;
+        if (c !== "All") FL.store.visit("cat:" + c);
+        if (FL.refreshProgress) FL.refreshProgress();
         filters.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
         draw();
       });
       filters.appendChild(b);
     });
     draw();
+    // A roadmap link such as #components?cat=Store opens with that filter chosen.
+    return {
+      show: function () {
+        var want = FL.query && FL.query.cat;
+        if (!want) return;
+        filters.querySelectorAll("button").forEach(function (b) { if (b.textContent === want) b.click(); });
+      }
+    };
   };
 
   /* ---------- 5. Quantity ---------- */

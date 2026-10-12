@@ -43,7 +43,7 @@
     document.getElementById("home-progress").textContent = p.n + " of " + FL.learningPages.length + " sections visited (" + p.pct + "%)";
     document.getElementById("start-btn").textContent = p.n ? "Continue learning" : "Start learning";
     document.querySelectorAll("#nav a").forEach(function (a) { a.classList.toggle("done", !!d.visited[a.dataset.id]); });
-    document.querySelectorAll(".section-card .done").forEach(function (s) { s.textContent = d.visited[s.dataset.id] ? "✓ Visited" : ""; });
+    refreshRoadmap();
     if (!completed && p.n === FL.learningPages.length) {
       completed = true;
       if (window.Tracker) Tracker.complete();
@@ -73,32 +73,69 @@
     document.getElementById("menu-btn").setAttribute("aria-expanded", "false");
   }
 
-  function buildHome() {
-    var grid = document.getElementById("home-cards");
-    FL.learningPages.forEach(function (p, i) {
-      var a = el("a", "card section-card");
-      a.href = "#" + p.id;
-      a.appendChild(el("span", "num", String(i + 2)));
-      var h = el("h3");
-      h.appendChild(el("span", "icon", p.icon));
-      h.appendChild(document.createTextNode(p.title));
-      a.appendChild(h);
-      a.appendChild(el("p", null, p.text));
-      var done = el("span", "done");
-      done.dataset.id = p.id;
-      a.appendChild(done);
-      grid.appendChild(a);
+  // The eight roadmap modules. `steps` are keys saved by FL.store.visit when a page
+  // (or, for tanks and pumps, a Components filter) is opened.
+  var ROADMAP = [
+    { title: "Introduction to Aircraft Fuel Systems", text: "What a fuel system does, and how fuel flows from tank to engine.", icon: "✈️", href: "#overview", steps: ["overview", "explorer"] },
+    { title: "Fuel Tanks", text: "Where fuel is stored, and how vents and drains protect the tank.", icon: "🛢️", href: "#components?cat=Store", steps: ["cat:Store"] },
+    { title: "Fuel Pumps", text: "How boost and transfer pumps move fuel, and which parts control it.", icon: "⚙️", href: "#components?cat=Move", steps: ["cat:Move"] },
+    { title: "Fuel Quantity Indication", text: "How probes and gauges tell the crew how much fuel is left.", icon: "📊", href: "#quantity", steps: ["quantity"] },
+    { title: "Fuel Transfer", text: "Moving fuel between tanks to keep the aircraft balanced.", icon: "🔄", href: "#transfer", steps: ["transfer"] },
+    { title: "Refuelling & Defuelling", text: "The safe order of steps, and the hazards of working with fuel.", icon: "⛽", href: "#refuel", steps: ["refuel", "hazards"] },
+    { title: "Troubleshooting", text: "Find the cause of a fuel leak without taking risks.", icon: "🔍", href: "#simulator", steps: ["simulator"] },
+    { title: "Assessment", text: "A 12-question quiz to check what you have learned.", icon: "📝", href: "#quiz", steps: ["quiz"] }
+  ];
+
+  function refreshRoadmap() {
+    var d = FL.store.get();
+    var nextFound = false;
+    var cards = document.querySelectorAll("#roadmap .road-card");
+    ROADMAP.forEach(function (m, i) {
+      var done = m.steps.filter(function (k) { return d.visited[k]; }).length;
+      var pct = Math.round(done / m.steps.length * 100);
+      var card = cards[i];
+      var isDone = pct === 100;
+      var isNext = !isDone && !nextFound;
+      if (isNext) { nextFound = true; document.getElementById("start-btn").href = m.href; }
+      card.classList.toggle("complete", isDone);
+      card.classList.toggle("next", isNext);
+      card.querySelector(".track i").style.width = pct + "%";
+      card.querySelector(".pct").textContent = pct + "%";
+      var chip = card.querySelector(".chip");
+      chip.textContent = isDone ? "✓ Done" : done ? "In progress" : isNext ? "Up next" : "Not started";
+      chip.className = "chip" + (isDone ? " ok" : done || isNext ? " go" : "");
+      card.querySelector(".btn").textContent = isDone ? "Review" : done ? "Continue" : "Start";
     });
-    var dash = el("a", "card section-card");
-    dash.href = "#dashboard";
-    dash.appendChild(el("span", "num", "11"));
-    var h = el("h3");
-    h.appendChild(el("span", "icon", "📈"));
-    h.appendChild(document.createTextNode("My Progress"));
-    dash.appendChild(h);
-    dash.appendChild(el("p", null, "See your scores and topics to review."));
-    grid.appendChild(dash);
   }
+
+  function buildRoadmap() {
+    var list = document.getElementById("roadmap");
+    ROADMAP.forEach(function (m, i) {
+      var li = el("li", "road-card");
+      li.appendChild(el("div", "road-num", String(i + 1)));
+      var body = el("div", "road-body");
+      body.appendChild(el("div", "label", "Module " + (i + 1)));
+      var h = el("h3");
+      h.appendChild(el("span", "icon", m.icon));
+      h.appendChild(document.createTextNode(" " + m.title));
+      body.appendChild(h);
+      body.appendChild(el("p", null, m.text));
+      var bar = el("div", "road-bar");
+      var tr = el("div", "track");
+      tr.appendChild(el("i"));
+      bar.appendChild(tr);
+      bar.appendChild(el("span", "pct", "0%"));
+      bar.appendChild(el("span", "chip"));
+      body.appendChild(bar);
+      var go = el("a", "btn", "Start");
+      go.href = m.href;
+      body.appendChild(go);
+      li.appendChild(body);
+      list.appendChild(li);
+    });
+  }
+
+  function buildHome() { buildRoadmap(); }
 
   function buildPagers() {
     ALL.forEach(function (p, i) {
@@ -111,7 +148,13 @@
   }
 
   function route() {
-    var id = (location.hash || "#home").slice(1);
+    var parts = (location.hash || "#home").slice(1).split("?");
+    var id = parts[0];
+    FL.query = {};
+    (parts[1] || "").split("&").forEach(function (kv) {
+      var p = kv.split("=");
+      if (p[0]) FL.query[p[0]] = decodeURIComponent(p[1] || "");
+    });
     if (!ALL.some(function (p) { return p.id === id; })) id = "home";
     if (current && handles[current] && handles[current].hide) handles[current].hide();
     current = id;

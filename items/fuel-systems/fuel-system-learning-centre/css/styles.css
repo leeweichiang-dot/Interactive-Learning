@@ -397,3 +397,46 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 1r
 .recs .icon { font-size: 1.4rem; }
 .rec-text { flex: 1; min-width: 0; } .rec-text b { display: block; } .rec-text small { color: var(--muted); }
 tr.you td { background: var(--amber-soft); font-weight: 700; }
+
+/* Overview: typical fuel system diagram */
+.ov-controls { display: grid; gap: .6rem; margin-bottom: .5rem; }
+.ov-row { display: flex; flex-wrap: wrap; gap: .4rem; }
+.ov-chip { border: 1px solid var(--line); background: var(--card); border-radius: 99px; padding: .3rem .9rem; font-size: .88rem; }
+.ov-chip[aria-pressed="true"] { background: var(--sky); color: #fff; border-color: var(--sky); }
+.ov-swipe { display: none; }
+.ov-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.ov-svg { display: block; width: 100%; min-width: 620px; height: auto; }
+@media (max-width: 700px) { .ov-swipe { display: block; } }
+.ov-svg .airframe { fill: var(--card); stroke: var(--muted); stroke-width: 2; }
+.ov-svg .pipe { fill: none; stroke: var(--muted); stroke-width: 5; stroke-linecap: round; }
+.ov-svg .pipe.refuel { stroke: var(--amber); }
+.ov-svg .junction { fill: var(--amber); }
+.ov-svg .vent { fill: none; stroke: var(--ok); stroke-width: 3; stroke-dasharray: 8 5; stroke-linecap: round; }
+.ov-svg .wire { fill: none; stroke: var(--sky); stroke-width: 2; stroke-dasharray: 2 4; stroke-linecap: round; }
+.ov-svg.mode-flight .p-flight, .ov-svg.mode-refuel .p-refuel { stroke: var(--fuel); stroke-dasharray: 10 8; animation: txdash .7s linear infinite; }
+.ov-svg .part { cursor: pointer; transition: opacity .2s; }
+.ov-svg .shape { fill: var(--sky-soft); stroke: var(--sky); stroke-width: 2.5; }
+.ov-svg .shape.tank { fill: var(--fuel-soft); stroke: var(--fuel); }
+.ov-svg .shape.engine { fill: var(--card); stroke: var(--ink); }
+.ov-svg .probe line { stroke: var(--sky); stroke-width: 5; stroke-linecap: round; }
+.ov-svg .lbl { font-size: 12px; font-weight: 600; fill: var(--ink); pointer-events: none; }
+.ov-svg .lbl.sm { font-size: 10px; } .ov-svg .lbl.out { fill: var(--muted); font-size: 13px; }
+.ov-svg .badge circle { fill: var(--navy); stroke: #fff; stroke-width: 2; }
+.ov-svg .badge text { fill: #fff; font-size: 13px; font-weight: 700; pointer-events: none; }
+.ov-svg .part:hover .shape, .ov-svg .part:focus-visible .shape { stroke: var(--amber); stroke-width: 4; }
+.ov-svg .part.sel .shape { stroke: var(--amber); stroke-width: 4; }
+.ov-svg .part.sel .badge circle, .ov-svg .part:hover .badge circle { fill: var(--amber); }
+.ov-svg .part.sel .badge text, .ov-svg .part:hover .badge text { fill: #1a1200; }
+.ov-svg .part:focus-visible { outline: none; filter: drop-shadow(0 0 4px var(--amber)); }
+.ov-svg .dim { opacity: .18; }
+.ov-svg .key text { font-size: 13px; fill: var(--ink); }
+.ov-detail { margin-top: .8rem; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: .8rem 1rem; }
+.ov-detail .head { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin-bottom: .3rem; }
+.ov-detail .head h3 { margin: 0; }
+.ov-num { min-width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: .85rem; flex: none; }
+.ov-legend-title { margin: 1rem 0 .4rem; }
+.ov-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: .4rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.ov-legend li { transition: opacity .2s; } .ov-legend li.dim { opacity: .3; }
+.ov-item { width: 100%; display: flex; align-items: center; gap: .6rem; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .4rem .6rem; }
+.ov-item[aria-pressed="true"] { border-color: var(--amber); background: var(--amber-soft); }
+.ov-item-text b { display: block; font-size: .9rem; } .ov-item-text small { color: var(--muted); }

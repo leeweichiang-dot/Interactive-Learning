@@ -64,7 +64,7 @@
     <section class="page" id="page-overview" aria-labelledby="h-overview">
       <h2 id="h-overview">Aircraft Fuel System Overview</h2>
       <p class="lead">The fuel system is the part of the aircraft that holds fuel and delivers it to the engine, safely, in every flight condition.</p>
-      <div class="goal">After this page you can name the <b>five jobs</b> of a fuel system and explain why maintenance matters.</div>
+      <div class="goal">After this page you can name the <b>five jobs</b> of a fuel system, find the main parts on a typical diagram, and explain why maintenance matters.</div>
       <h3>The five jobs of a fuel system</h3>
       <div class="journey">
         <div class="step"><b>Store</b>Tanks hold the fuel, in the wings and body.</div>
@@ -72,6 +72,96 @@
         <div class="step"><b>Transfer</b>Fuel moves between tanks to keep the aircraft balanced.</div>
         <div class="step"><b>Vent</b>Air flows in as fuel leaves, so the tank is not crushed.</div>
         <div class="step"><b>Measure</b>Probes and gauges tell the crew how much is left.</div>
+      </div>
+
+      <h3>A typical aircraft fuel system</h3>
+      <p class="lead" style="font-size:.95rem">This simple diagram looks down on a twin-engine aircraft. Real aircraft differ, but most have these same parts. <b>Tap a number or a part</b> to learn about it, or choose a job to see which parts do it.</p>
+      <div class="panel ov-panel">
+        <div class="ov-controls">
+          <div class="ov-row" id="ov-systems" role="group" aria-label="Show the parts that do this job"></div>
+          <div class="ov-row" id="ov-modes" role="group" aria-label="Fuel flow animation"></div>
+        </div>
+        <p class="hint ov-swipe">Swipe sideways to see the whole diagram.</p>
+        <div class="ov-scroll" tabindex="0" role="region" aria-label="Fuel system diagram">
+          <svg class="ov-svg" id="ov-svg" viewBox="0 0 800 520" role="img" aria-labelledby="ov-title ov-desc">
+            <title id="ov-title">Typical aircraft fuel system</title>
+            <desc id="ov-desc">Top view of a twin-engine aircraft. A refuel point fills the left, right and centre tanks. Boost pumps and transfer valves move fuel to a feed tank above each engine. Each feed line passes a shut-off valve, a filter, an engine driven pump and a fuel control unit before the engine. Vent lines leave the tanks. Probes in the tanks send signals to a cockpit gauge.</desc>
+            <path class="airframe" d="M400 22 C440 40 472 80 472 150 L472 460 L492 500 L308 500 L328 460 L328 150 C328 80 360 40 400 22Z"/>
+            <polygon class="airframe" points="330,170 56,296 56,348 330,300"/>
+            <polygon class="airframe" points="470,170 744,296 744,348 470,300"/>
+
+            <!-- refuel line -->
+            <path class="pipe refuel p-refuel" data-sys="store" d="M316 184 L316 236 L484 236"/>
+            <path class="pipe refuel p-refuel" data-sys="store" d="M400 236 L400 220"/>
+            <circle cx="400" cy="236" r="4" class="junction" data-sys="store"/>
+            <!-- fuel pipes in flight -->
+            <path class="pipe p-flight" data-sys="supply" d="M338 268 L350 290 L350 325"/>
+            <path class="pipe p-flight" data-sys="supply" d="M462 268 L450 290 L450 325"/>
+            <path class="pipe p-flight" data-sys="transfer" d="M400 220 L400 250 L377 250 L377 325"/>
+            <path class="pipe p-flight" data-sys="transfer" d="M400 250 L423 250 L423 325"/>
+            <path class="pipe" data-sys="transfer" d="M390 345 L410 345"/>
+            <path class="pipe p-flight" data-sys="supply" d="M362 365 L362 420"/>
+            <path class="pipe p-flight" data-sys="supply" d="M438 365 L438 420"/>
+            <path class="pipe" data-sys="supply" d="M362 441 L362 445"/>
+            <path class="pipe" data-sys="supply" d="M438 441 L438 445"/>
+            <!-- signal wires -->
+            <path class="wire" data-sys="measure" d="M365 71 L250 71 L250 244"/>
+            <path class="wire" data-sys="measure" d="M435 71 L550 71 L550 244"/>
+            <path class="wire" data-sys="measure" d="M400 84 L400 100"/>
+
+            <!-- 1 refuel point -->
+            <g class="part" data-n="1" data-sys="store" tabindex="0" role="button" aria-label="1 Refuel point"><rect class="shape" x="296" y="160" width="40" height="24" rx="5"/><text class="lbl" x="316" y="176" text-anchor="middle">Fill</text><g class="badge" transform="translate(296 160)"><circle r="11"/><text y="4.5" text-anchor="middle">1</text></g></g>
+            <!-- 2 wing tanks -->
+            <g class="part" data-n="2" data-sys="store" tabindex="0" role="button" aria-label="2 Wing tanks">
+              <polygon class="shape tank" points="340,195 110,300 110,335 340,275"/><polygon class="shape tank" points="460,195 690,300 690,335 460,275"/>
+              <text class="lbl out" x="92" y="262">Left wing tank</text><text class="lbl out" x="708" y="262" text-anchor="end">Right wing tank</text>
+              <g class="badge" transform="translate(215 272)"><circle r="11"/><text y="4.5" text-anchor="middle">2</text></g><g class="badge" transform="translate(585 272)"><circle r="11"/><text y="4.5" text-anchor="middle">2</text></g></g>
+            <!-- 3 centre tank -->
+            <g class="part" data-n="3" data-sys="store" tabindex="0" role="button" aria-label="3 Centre tank"><rect class="shape tank" x="362" y="100" width="76" height="120" rx="8"/><text class="lbl" x="400" y="123" text-anchor="middle">Centre tank</text><g class="badge" transform="translate(400 170)"><circle r="11"/><text y="4.5" text-anchor="middle">3</text></g></g>
+            <!-- 14 probes -->
+            <g class="part" data-n="14" data-sys="measure" tabindex="0" role="button" aria-label="14 Quantity probes">
+              <g class="probe"><line x1="250" y1="244" x2="250" y2="290"/><line x1="180" y1="275" x2="180" y2="309"/><line x1="550" y1="244" x2="550" y2="290"/><line x1="620" y1="275" x2="620" y2="309"/><line x1="372" y1="140" x2="372" y2="208"/><line x1="428" y1="140" x2="428" y2="208"/></g>
+              <g class="badge" transform="translate(268 262)"><circle r="11"/><text y="4.5" text-anchor="middle">14</text></g></g>
+            <!-- 15 cockpit gauge -->
+            <g class="part" data-n="15" data-sys="measure" tabindex="0" role="button" aria-label="15 Cockpit gauge"><rect class="shape" x="365" y="58" width="70" height="26" rx="6"/><text class="lbl" x="400" y="75" text-anchor="middle">Gauge</text><g class="badge" transform="translate(368 58)"><circle r="11"/><text y="4.5" text-anchor="middle">15</text></g></g>
+            <!-- 16 drain valves -->
+            <g class="part" data-n="16" data-sys="store" tabindex="0" role="button" aria-label="16 Water drain valves"><rect class="shape" x="134" y="326" width="12" height="10" rx="2"/><rect class="shape" x="654" y="326" width="12" height="10" rx="2"/><g class="badge" transform="translate(140 354)"><circle r="11"/><text y="4.5" text-anchor="middle">16</text></g></g>
+            <!-- 13 vents -->
+            <g class="part" data-n="13" data-sys="vent" tabindex="0" role="button" aria-label="13 Vent lines and outlets">
+              <path class="vent" d="M150 296 L84 318"/><path class="vent" d="M650 296 L716 318"/><path class="vent" d="M438 112 L512 112"/>
+              <circle class="shape" cx="76" cy="320" r="6"/><circle class="shape" cx="724" cy="320" r="6"/><circle class="shape" cx="520" cy="112" r="6"/>
+              <text class="lbl out" x="76" y="342" text-anchor="middle">Vent</text><text class="lbl out" x="724" y="342" text-anchor="middle">Vent</text>
+              <g class="badge" transform="translate(98 292)"><circle r="11"/><text y="4.5" text-anchor="middle">13</text></g></g>
+            <!-- 4 feed tanks -->
+            <g class="part" data-n="4" data-sys="supply" tabindex="0" role="button" aria-label="4 Feed tanks"><rect class="shape tank" x="335" y="325" width="55" height="40" rx="6"/><rect class="shape tank" x="410" y="325" width="55" height="40" rx="6"/><g class="badge" transform="translate(362 345)"><circle r="11"/><text y="4.5" text-anchor="middle">4</text></g></g>
+            <!-- 5 boost pumps -->
+            <g class="part" data-n="5" data-sys="supply" tabindex="0" role="button" aria-label="5 Boost pumps"><circle class="shape" cx="350" cy="306" r="11"/><circle class="shape" cx="450" cy="306" r="11"/><text class="lbl" x="350" y="310" text-anchor="middle">P</text><text class="lbl" x="450" y="310" text-anchor="middle">P</text><g class="badge" transform="translate(326 300)"><circle r="11"/><text y="4.5" text-anchor="middle">5</text></g></g>
+            <!-- 6 transfer valves -->
+            <g class="part" data-n="6" data-sys="transfer" tabindex="0" role="button" aria-label="6 Transfer valves"><polygon class="shape" points="377,277 385,285 377,293 369,285"/><polygon class="shape" points="423,277 431,285 423,293 415,285"/><g class="badge" transform="translate(400 285)"><circle r="11"/><text y="4.5" text-anchor="middle">6</text></g></g>
+            <!-- 7 crossfeed -->
+            <g class="part" data-n="7" data-sys="transfer" tabindex="0" role="button" aria-label="7 Crossfeed valve"><polygon class="shape" points="400,338 407,345 400,352 393,345"/><g class="badge" transform="translate(400 364)"><circle r="11"/><text y="4.5" text-anchor="middle">7</text></g></g>
+            <!-- 8 shut-off valves -->
+            <g class="part" data-n="8" data-sys="supply" tabindex="0" role="button" aria-label="8 Shut-off valves"><polygon class="shape" points="362,370 370,378 362,386 354,378"/><polygon class="shape" points="438,370 446,378 438,386 430,378"/><g class="badge" transform="translate(383 383)"><circle r="11"/><text y="4.5" text-anchor="middle">8</text></g></g>
+            <!-- 9 filters -->
+            <g class="part" data-n="9" data-sys="supply" tabindex="0" role="button" aria-label="9 Fuel filters"><rect class="shape" x="352" y="391" width="20" height="13" rx="3"/><rect class="shape" x="428" y="391" width="20" height="13" rx="3"/><g class="badge" transform="translate(338 400)"><circle r="11"/><text y="4.5" text-anchor="middle">9</text></g></g>
+            <!-- 12 engines -->
+            <g class="part" data-n="12" data-sys="supply" tabindex="0" role="button" aria-label="12 Engines"><rect class="shape engine" x="335" y="420" width="55" height="65" rx="8"/><rect class="shape engine" x="410" y="420" width="55" height="65" rx="8"/><text class="lbl" x="362" y="479" text-anchor="middle">Engine</text><text class="lbl" x="438" y="479" text-anchor="middle">Engine</text><g class="badge" transform="translate(362 500)"><circle r="11"/><text y="4.5" text-anchor="middle">12</text></g></g>
+            <!-- 10 engine driven pump, 11 fuel control unit -->
+            <g class="part" data-n="10" data-sys="supply" tabindex="0" role="button" aria-label="10 Engine driven pumps"><rect class="shape" x="343" y="426" width="39" height="15" rx="3"/><rect class="shape" x="418" y="426" width="39" height="15" rx="3"/><text class="lbl sm" x="362" y="437" text-anchor="middle">EDP</text><text class="lbl sm" x="438" y="437" text-anchor="middle">EDP</text><g class="badge" transform="translate(400 433)"><circle r="11"/><text y="4.5" text-anchor="middle">10</text></g></g>
+            <g class="part" data-n="11" data-sys="supply" tabindex="0" role="button" aria-label="11 Fuel control units"><rect class="shape" x="343" y="445" width="39" height="15" rx="3"/><rect class="shape" x="418" y="445" width="39" height="15" rx="3"/><text class="lbl sm" x="362" y="456" text-anchor="middle">FCU</text><text class="lbl sm" x="438" y="456" text-anchor="middle">FCU</text><g class="badge" transform="translate(400 456)"><circle r="11"/><text y="4.5" text-anchor="middle">11</text></g></g>
+
+            <!-- key -->
+            <g class="key" aria-hidden="true">
+              <line class="pipe" x1="20" y1="428" x2="56" y2="428"/><text x="64" y="432">Fuel pipe</text>
+              <line class="pipe refuel" x1="20" y1="448" x2="56" y2="448"/><text x="64" y="452">Refuel line</text>
+              <line class="vent" x1="20" y1="468" x2="56" y2="468"/><text x="64" y="472">Vent line</text>
+              <line class="wire" x1="20" y1="488" x2="56" y2="488"/><text x="64" y="492">Signal wire</text>
+            </g>
+          </svg>
+        </div>
+        <div class="ov-detail" id="ov-detail" aria-live="polite"></div>
+        <h4 class="ov-legend-title">Parts list</h4>
+        <ol class="ov-legend" id="ov-legend"></ol>
       </div>
       <div class="grid">
         <div class="card"><h3><span class="icon">🔥</span>Why fuel matters</h3><p>No fuel at the engine means no thrust. Even a short break in flow can stop the engine.</p></div>
@@ -370,6 +460,7 @@
   <footer>Teaching diagrams only. Always follow the approved aircraft manual and your supervisor.</footer>
 
   <script src="js/store.js"></script>
+  <script src="js/overview.js"></script>
   <script src="js/explorer.js"></script>
   <script src="js/lessons.js"></script>
   <script src="js/safety.js"></script>

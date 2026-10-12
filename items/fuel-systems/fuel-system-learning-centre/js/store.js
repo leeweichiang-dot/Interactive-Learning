@@ -53,6 +53,13 @@
       if (d.sim[id] == null || score > d.sim[id]) d.sim[id] = score;
       save(d);
     },
+    addBadge: function (id) {
+      var d = load();
+      d.badges = d.badges || [];
+      if (d.badges.indexOf(id) >= 0) return;
+      d.badges.push(id);
+      save(d);
+    },
     // Best score (0-100) for a safety scenario.
     setSafety: function (id, score) {
       var d = load();

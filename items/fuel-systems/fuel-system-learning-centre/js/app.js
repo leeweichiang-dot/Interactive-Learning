@@ -12,7 +12,7 @@
     { id: "transfer", title: "Fuel Transfer", icon: "🔄", text: "Move fuel between tanks and keep balance." },
     { id: "refuel", title: "Refuelling and Defuelling", icon: "⛽", text: "Put the safe steps in order." },
     { id: "hazards", title: "Fuel System Safety", icon: "⚠️", text: "Six hazards, and scenarios to practise safe choices." },
-    { id: "simulator", title: "Leak Troubleshooting", icon: "🔍", text: "Find a leak without taking risks." },
+    { id: "simulator", title: "Troubleshooting Simulator", icon: "🔍", text: "Five faults, four steps each. Earn points and badges." },
     { id: "quiz", title: "Knowledge Quiz", icon: "📝", text: "Check what you have learned." }
   ];
   var ALL = [{ id: "home", title: "Home" }].concat(FL.learningPages, [{ id: "dashboard", title: "My Progress" }]);
@@ -82,7 +82,7 @@
     { title: "Fuel Quantity Indication", text: "How probes and gauges tell the crew how much fuel is left.", icon: "📊", href: "#quantity", steps: ["quantity"] },
     { title: "Fuel Transfer", text: "Moving fuel between tanks to keep the aircraft balanced.", icon: "🔄", href: "#transfer", steps: ["transfer"] },
     { title: "Refuelling & Defuelling", text: "The safe order of steps, plus six fuel hazards and safety scenarios.", icon: "⛽", href: "#refuel", steps: ["refuel", "hazards"] },
-    { title: "Troubleshooting", text: "Find the cause of a fuel leak without taking risks.", icon: "🔍", href: "#simulator", steps: ["simulator"] },
+    { title: "Troubleshooting", text: "Five fault scenarios: observe, inspect, find the cause, fix it. Earn points and badges.", icon: "🔍", href: "#simulator", steps: ["simulator"] },
     { title: "Assessment", text: "A 12-question quiz to check what you have learned.", icon: "📝", href: "#quiz", steps: ["quiz"] }
   ];
 

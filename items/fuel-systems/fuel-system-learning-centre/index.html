@@ -330,21 +330,21 @@
       <div class="pager"></div>
     </section>
 
-    <!-- 9. SIMULATOR -->
+    <!-- 9. TROUBLESHOOTING SIMULATOR -->
     <section class="page" id="page-simulator" aria-labelledby="h-simulator">
-      <h2 id="h-simulator">Fuel Leak Troubleshooting Simulator</h2>
-      <p class="lead">You are the technician. Read the report, choose your actions, and decide the cause. Unsafe actions lose points.</p>
-      <div class="panel">
-        <h3>Leak size guide (teaching example)</h3>
-        <div class="table-wrap"><table>
-          <tr><th>Type</th><th>What you see</th><th>Typical action</th></tr>
-          <tr><td>Stain</td><td>Dry mark, no wet fuel</td><td>Clean, watch it</td></tr>
-          <tr><td>Seep</td><td>Damp, no drip</td><td>Record and repair soon</td></tr>
-          <tr><td>Heavy seep</td><td>Wet area, slow drip over time</td><td>Repair before flight</td></tr>
-          <tr><td>Running leak</td><td>Fuel flows or drips freely</td><td>Stop work, make safe, report at once</td></tr>
-        </table></div>
-        <p style="margin-top:.5rem;font-size:.85rem" class="lead">Real limits come from the aircraft manual.</p>
+      <h2 id="h-simulator">Fuel System Troubleshooting Simulator</h2>
+      <p class="lead">You are the technician. For each fault, follow four steps: <b>observe</b> the symptoms, <b>inspect</b> the system, <b>identify</b> the probable cause and <b>select</b> the corrective action. Your instructor comments on every choice. Earn points, stars and badges.</p>
+
+      <div class="panel ts-hud">
+        <div class="ts-hud-main">
+          <div><span class="ts-label">Total points</span><b class="ts-big" id="ts-points">0</b></div>
+          <div><span class="ts-label">Rank</span><b class="ts-big" id="ts-rank">Trainee</b></div>
+        </div>
+        <div class="meter" style="margin:.5rem 0"><div class="bar" style="max-width:none"><i id="ts-rankbar" style="width:0"></i></div></div>
+        <p class="ts-next" id="ts-next"></p>
+        <div class="ts-badges" id="ts-badges" aria-label="Badges"></div>
       </div>
+
       <div id="sim-pick" class="grid"></div>
       <div id="sim-play" hidden></div>
       <div class="pager"></div>

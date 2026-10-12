@@ -38,7 +38,8 @@
       var seen = pages.filter(function (p) { return d.visited[p.id]; }).length;
       var quiz = d.quiz;
       var pcts = quiz.map(function (x) { return Math.round(x.score / x.total * 100); });
-      var simIds = Object.keys(d.sim);
+      var known = (FL.troubleshooting || []).map(function (s) { return s.id; });
+      var simIds = Object.keys(d.sim).filter(function (id) { return known.indexOf(id) >= 0; });
       box.textContent = "";
 
       var stats = el("div", "grid");
@@ -47,7 +48,7 @@
       stats.appendChild(stat(pcts.length ? pcts[pcts.length - 1] + "%" : "–", "Latest quiz score"));
       var checks = (FL.componentIds || []).filter(function (id) { return d.visited["check:" + id]; }).length;
       stats.appendChild(stat(checks + " of " + (FL.componentIds || []).length, "Component checks passed"));
-      stats.appendChild(stat(String(simIds.length), "Leak scenarios tried (of 3)"));
+      stats.appendChild(stat(String(simIds.length), "Troubleshooting scenarios tried (of " + (FL.troubleshooting || []).length + ")"));
       box.appendChild(stats);
 
       var secs = el("div", "panel");
@@ -83,9 +84,10 @@
       box.appendChild(qp);
 
       var sp = el("div", "panel");
-      sp.appendChild(el("h3", null, "Leak Troubleshooting best scores"));
+      var simPoints = simIds.reduce(function (n, id) { return n + d.sim[id]; }, 0);
+      sp.appendChild(el("h3", null, "Troubleshooting best scores (" + simPoints + " points)"));
       if (!simIds.length) sp.appendChild(el("p", "empty", "No scenarios tried yet."));
-      else { var sl = el("div", "bars"); simIds.forEach(function (id) { sl.appendChild(bar(id.replace(/-/g, " "), d.sim[id], d.sim[id] >= 80 ? "high" : d.sim[id] < 50 ? "low" : "")); }); sp.appendChild(sl); }
+      else { var sl = el("div", "bars"); simIds.forEach(function (id) { sl.appendChild(bar((FL.troubleshooting.filter(function (s) { return s.id === id; })[0] || {}).title || id, d.sim[id], d.sim[id] >= 80 ? "high" : d.sim[id] < 50 ? "low" : "")); }); sp.appendChild(sl); }
       box.appendChild(sp);
 
       var safe = d.safety || {};

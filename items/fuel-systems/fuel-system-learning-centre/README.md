@@ -24,7 +24,7 @@ Every section is linked from the menu and from the Previous / Next buttons at th
 | # | Section | What the trainee does |
 |---|---------|-----------------------|
 | 1 | **Home** (`#home`) | Reads the plain-English introduction, sees overall progress, follows the 8-module roadmap. |
-| 2 | **Overview** (`#overview`) | Learns the five jobs of a fuel system (store, supply, transfer, vent, measure) and key words. |
+| 2 | **Overview** (`#overview`) | Learns the five jobs of a fuel system (store, supply, transfer, vent, measure) and key words. Explores a numbered diagram of a typical twin-engine fuel system (16 parts): tap a part for what it does and what maintenance checks, filter by job, and animate fuel flow in flight or while refuelling. |
 | 3 | **Fuel Flow Explorer** (`#explorer`) | Watches fuel move Tank → Pump → Filter → Fuel Control Unit → Engine. Start, Stop and Step-by-step modes. Hover or tap a part for Purpose, Location, Common faults and Maintenance. |
 | 4 | **Components** (`#components`) | Eight click-to-reveal cards (tanks, boost pumps, engine driven pumps, filters, shutoff valves, quantity sensors, gauges, vent system). Each has Function, Location, Importance, Failure symptoms, Maintenance concern, an image placeholder and a knowledge check. |
 | 5 | **Fuel Quantity Indication** (`#quantity`) | Moves a 0–100% slider and sees the tank, the cockpit dial, digital readout, bar and LOW FUEL / FUEL CRITICAL lights change. Can switch on a "stuck reading" fault. |
@@ -45,6 +45,7 @@ fuel-system-learning-centre/
 │   └── styles.css    theme (light and dark), layout, animations
 └── js/               plain scripts, loaded in this order
     ├── store.js      saves progress in localStorage
+    ├── overview.js   Overview diagram of a typical fuel system (the 16 part descriptions live here)
     ├── explorer.js   Fuel Flow Explorer (part descriptions live here)
     ├── lessons.js    components lesson, quantity simulator, transfer simulator, refuelling
     ├── safety.js     hazard cards and safety scenarios
@@ -62,6 +63,7 @@ The scripts are classic scripts (not ES modules) so they run from `file://`.
   Give each question a `topic` (reuse the existing names so the radar chart and weak topics stay correct) and keep
   each question's text unique and stable, because the portal scores questions by their text.
 - **Pass mark:** `PASS` at the top of `js/quiz.js` (and the same number in `js/dashboard.js`).
+- **Overview diagram:** the drawing is the `<svg id="ov-svg">` in `index.html` (each part has a `data-n` number and a `data-sys` job); the descriptions are `PARTS` in `js/overview.js`.
 - **Explorer parts:** `PARTS` in `js/explorer.js`.
 - **Component cards and their checks:** `COMPONENTS` in `js/lessons.js`.
 - **Hazards and safety scenarios:** `HAZARDS` and `SCENARIOS` in `js/safety.js`.

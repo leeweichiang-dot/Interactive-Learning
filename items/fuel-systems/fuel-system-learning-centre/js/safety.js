@@ -36,6 +36,78 @@
       prevent: ["Tool control: count tools in and out", "Cover open pipes and ports", "Clean as you work", "Do a final look inside before you close up"] }
   ];
 
+
+  /* ---- Pictures for the six hazards: original illustrations (they follow the light and dark theme).
+   * To use a real photo instead, put it in images/ and set `image` and `credit` on the hazard. ---- */
+  var BG = '<rect width="320" height="180" rx="12" fill="var(--sky-soft)"/>';
+  function cap(t) { return '<text x="160" y="171" text-anchor="middle" style="font-size:13px;font-weight:700;fill:var(--ink)">' + t + '</text>'; }
+  var JAR = '<rect x="104" y="14" width="112" height="16" rx="4" fill="var(--muted)"/><rect x="110" y="28" width="100" height="116" rx="14" fill="var(--card)" stroke="var(--ink)" stroke-width="4"/>';
+  var PICTURES = {
+    contamination: { alt: "A jar of cloudy fuel with dark specks and a strand of slime, seen through a magnifying glass",
+      svg: BG + JAR + '<rect x="114" y="58" width="92" height="82" rx="10" fill="var(--fuel-soft)"/><rect x="114" y="58" width="92" height="82" rx="10" fill="#fff" opacity=".28"/>' +
+        '<circle cx="140" cy="86" r="2.6" fill="#3a2a10"/><circle cx="165" cy="108" r="3.2" fill="#3a2a10"/><circle cx="188" cy="84" r="2.2" fill="#3a2a10"/><circle cx="150" cy="128" r="3" fill="#3a2a10"/><circle cx="178" cy="130" r="2.6" fill="#3a2a10"/><circle cx="127" cy="110" r="2.2" fill="#3a2a10"/>' +
+        '<path d="M152 66 C146 84 164 96 152 120" stroke="#5b6b2a" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+        '<circle cx="256" cy="66" r="26" fill="var(--card)" fill-opacity=".85" stroke="var(--ink)" stroke-width="5"/><line x1="275" y1="85" x2="298" y2="110" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/><circle cx="252" cy="66" r="6" fill="#3a2a10"/><path d="M242 78 C248 70 262 74 268 62" stroke="#5b6b2a" stroke-width="4" fill="none" stroke-linecap="round"/>' + cap("Cloudy fuel, specks and slime") },
+    water: { alt: "A jar of fuel with a layer of water at the bottom and a drain valve",
+      svg: BG + JAR + '<rect x="114" y="58" width="92" height="44" rx="6" fill="var(--fuel-soft)"/><rect x="114" y="102" width="92" height="38" rx="10" fill="#5aaaf0"/>' +
+        '<path d="M114 102 C130 96 146 108 162 102 C178 96 192 108 206 102" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/>' +
+        '<circle cx="136" cy="120" r="4" fill="#fff" opacity=".7"/><circle cx="170" cy="126" r="3" fill="#fff" opacity=".7"/><circle cx="188" cy="114" r="3.5" fill="#fff" opacity=".7"/>' +
+        '<path d="M150 38 C146 46 144 50 150 54 C156 50 154 46 150 38Z" fill="#5aaaf0"/><path d="M174 42 C171 48 170 51 174 54 C178 51 177 48 174 42Z" fill="#5aaaf0"/>' +
+        '<text x="226" y="96" style="font-size:12px;font-weight:700;fill:var(--ink)">fuel</text><text x="226" y="128" style="font-size:12px;font-weight:700;fill:#2b6cb0">water</text><path d="M222 100 L222 124" stroke="var(--muted)" stroke-width="2"/>' + cap("Water sinks to the bottom") },
+    leaks: { alt: "A wing panel with a blue stain trail and drops of fuel falling onto the ground",
+      svg: BG + '<rect y="146" width="320" height="34" fill="var(--line)"/><rect x="36" y="22" width="248" height="76" rx="8" fill="var(--card)" stroke="var(--muted)" stroke-width="3"/>' +
+        '<rect x="104" y="36" width="112" height="46" rx="4" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-dasharray="6 4"/>' +
+        '<circle cx="110" cy="42" r="3" fill="var(--muted)"/><circle cx="210" cy="42" r="3" fill="var(--muted)"/><circle cx="110" cy="76" r="3" fill="var(--muted)"/><circle cx="210" cy="76" r="3" fill="var(--muted)"/>' +
+        '<path d="M160 82 C156 100 166 110 160 128" stroke="#4a8fd8" stroke-width="7" fill="none" stroke-linecap="round" opacity=".85"/>' +
+        '<path d="M160 132 C155 140 154 144 160 148 C166 144 165 140 160 132Z" fill="#4a8fd8"/>' +
+        '<ellipse cx="160" cy="156" rx="46" ry="8" fill="#4a8fd8" opacity=".55"/>' + cap("A stain trail points to the leak") },
+    static: { alt: "A fuel truck connected to an aircraft by a hose and a green bonding wire, with a warning spark",
+      svg: BG + '<rect y="150" width="320" height="30" fill="var(--line)"/><rect x="14" y="88" width="94" height="50" rx="10" fill="var(--card)" stroke="var(--muted)" stroke-width="3"/>' +
+        '<circle cx="36" cy="142" r="10" fill="var(--ink)"/><circle cx="88" cy="142" r="10" fill="var(--ink)"/><rect x="26" y="98" width="70" height="16" rx="6" fill="var(--fuel-soft)"/>' +
+        '<rect x="204" y="62" width="102" height="38" rx="8" fill="var(--card)" stroke="var(--muted)" stroke-width="3"/>' +
+        '<path d="M108 108 C150 108 150 82 196 82" stroke="var(--ink)" stroke-width="6" fill="none" stroke-linecap="round"/><rect x="194" y="75" width="16" height="14" rx="3" fill="var(--muted)"/>' +
+        '<path d="M60 88 C70 24 230 18 256 62" stroke="var(--ok)" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="60" cy="88" r="6" fill="var(--ok)"/><circle cx="256" cy="62" r="6" fill="var(--ok)"/>' +
+        '<text x="150" y="13" text-anchor="middle" style="font-size:12px;font-weight:700;fill:var(--ok)">bonding wire</text>' +
+        '<polygon points="236,112 226,132 234,132 228,150 246,124 237,124 243,112" fill="var(--amber)" stroke="var(--bad)" stroke-width="2"/>' + cap("Bond first, or a spark can jump") },
+    fire: { alt: "A flame above a spreading fuel puddle, with a fire extinguisher beside it",
+      svg: BG + '<rect y="152" width="320" height="28" fill="var(--line)"/><ellipse cx="170" cy="154" rx="84" ry="10" fill="var(--fuel-soft)" stroke="var(--fuel)" stroke-width="2"/>' +
+        '<path d="M170 22 C186 58 214 70 206 112 C200 142 140 142 134 112 C126 80 158 68 170 22Z" fill="var(--bad)"/>' +
+        '<path d="M170 58 C180 80 198 88 192 114 C188 132 152 132 148 114 C142 94 164 86 170 58Z" fill="var(--amber)"/>' +
+        '<path d="M170 92 C176 104 184 108 180 120 C177 128 163 128 160 120 C157 110 167 106 170 92Z" fill="#ffe38a"/>' +
+        '<rect x="36" y="84" width="30" height="66" rx="10" fill="var(--bad)"/><rect x="44" y="74" width="14" height="12" rx="3" fill="var(--ink)"/><path d="M58 78 C78 70 88 80 96 92" stroke="var(--ink)" stroke-width="4" fill="none" stroke-linecap="round"/><rect x="40" y="108" width="22" height="16" rx="3" fill="#fff" opacity=".85"/>' + cap("Fuel vapour + a spark = fire") },
+    fod: { alt: "An open access panel with a wrench, a bolt and a rag left inside",
+      svg: BG + '<rect x="40" y="26" width="240" height="116" rx="12" fill="var(--card)" stroke="var(--muted)" stroke-width="4"/><rect x="54" y="40" width="212" height="88" rx="8" fill="#0d1b2e"/>' +
+        '<line x1="100" y1="40" x2="100" y2="128" stroke="#25384f" stroke-width="3"/><line x1="160" y1="40" x2="160" y2="128" stroke="#25384f" stroke-width="3"/><line x1="220" y1="40" x2="220" y2="128" stroke="#25384f" stroke-width="3"/>' +
+        '<g transform="rotate(-22 130 88)"><rect x="84" y="82" width="94" height="13" rx="6" fill="#b9c6d6"/><circle cx="84" cy="88" r="15" fill="#b9c6d6"/><rect x="68" y="84" width="16" height="8" fill="#0d1b2e"/></g>' +
+        '<polygon points="208,96 218,90 230,96 230,108 218,114 208,108" fill="#b9c6d6"/><circle cx="219" cy="102" r="4" fill="#0d1b2e"/>' +
+        '<path d="M170 112 C180 100 196 116 206 108 C210 122 190 128 174 124 C168 122 166 116 170 112Z" fill="var(--amber)"/>' +
+        '<circle cx="262" cy="36" r="15" fill="var(--bad)" stroke="var(--card)" stroke-width="3"/><text x="262" y="42" text-anchor="middle" style="font-size:18px;font-weight:800;fill:#fff">!</text>' + cap("Left behind in a tank = danger") }
+  };
+
+  // The picture for a hazard: a photo if one is set, otherwise the illustration.
+  function hazardPicture(h) {
+    var fig = document.createElement("figure");
+    fig.className = "hz-figure";
+    var p = PICTURES[h.id];
+    if (h.image) {
+      var img = document.createElement("img");
+      img.src = h.image;
+      img.alt = p.alt;
+      fig.appendChild(img);
+      var credit = document.createElement("figcaption");
+      credit.textContent = h.credit || "";
+      fig.appendChild(credit);
+    } else {
+      var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 320 180");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", "Illustration: " + p.alt);
+      svg.innerHTML = p.svg;
+      fig.appendChild(svg);
+    }
+    return fig;
+  }
+
   // kind: "best" ends the decision, "partial" and "bad" let the learner try again.
   var SCENARIOS = [
     { id: "contamination", hazard: "Fuel contamination", title: "Cloudy fuel sample",
@@ -141,6 +213,8 @@
   ];
 
   FL.safetyScenarios = SCENARIOS.map(function (s) { return { id: s.id, title: s.title }; });
+  function hazardFor(id) { return HAZARDS.filter(function (h) { return h.id === id; })[0]; }
+
   var TOTAL_STEPS = SCENARIOS.reduce(function (n, s) { return n + s.steps.length; }, 0);
 
   FL.inits.hazards = function () {
@@ -181,6 +255,7 @@
       head.appendChild(el("span", "lc-state", "▾"));
       var body = el("div", "lc-body");
       body.hidden = true;
+      body.appendChild(hazardPicture(h));
       var grid = el("div", "hz-blocks");
       grid.appendChild(block("cause", "Cause", h.cause));
       grid.appendChild(block("impact", "Impact", h.impact));
@@ -220,6 +295,7 @@
       var scores = best();
       SCENARIOS.forEach(function (s, i) {
         var c = el("div", "card");
+        c.appendChild(hazardPicture(hazardFor(s.id)));
         c.appendChild(el("span", "chip", s.hazard));
         c.appendChild(el("h3", null, (i + 1) + ". " + s.title));
         c.appendChild(el("p", null, s.intro));
@@ -245,6 +321,9 @@
         var tries = 0;
         play.textContent = "";
         var panel = el("div", "panel");
+        var pic = hazardPicture(hazardFor(s.id));
+        pic.classList.add("hz-small");
+        panel.appendChild(pic);
         panel.appendChild(el("span", "chip", s.hazard));
         panel.appendChild(el("h3", null, s.title));
         panel.appendChild(el("p", null, s.story));

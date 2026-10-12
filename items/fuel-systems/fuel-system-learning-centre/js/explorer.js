@@ -60,6 +60,9 @@
     var nextBtn = document.getElementById("fx-next");
 
     var buttons = [], pipes = [];
+    var diagram = document.getElementById("fx-svg");
+    var dParts = Array.prototype.slice.call(diagram.querySelectorAll(".part"));      // aircraft parts, data-stage 0-4
+    var dPipes = Array.prototype.slice.call(diagram.querySelectorAll("[data-pipe]")); // aircraft pipes, data-pipe i joins stage i and i+1
     var index = -1;        // part the fuel has reached (-1 = still in the supply, not started)
     var timer = null;      // set while the animation runs
     var stepMode = false;
@@ -97,6 +100,19 @@
       }
     });
 
+    // The aircraft parts work like the buttons in the row: hover, focus, tap or Enter.
+    dParts.forEach(function (g) {
+      var i = Number(g.dataset.stage);
+      g.addEventListener("mouseenter", function () { hovered = i; renderInfo(); });
+      g.addEventListener("mouseleave", function () { hovered = null; renderInfo(); });
+      g.addEventListener("focus", function () { hovered = i; renderInfo(); });
+      g.addEventListener("blur", function () { hovered = null; renderInfo(); });
+      g.addEventListener("click", function () { pinned = i; renderInfo(); });
+      g.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pinned = i; renderInfo(); }
+      });
+    });
+
     function listOf(items) {
       var ul = el("ul");
       items.forEach(function (x) { ul.appendChild(el("li", null, x)); });
@@ -123,6 +139,7 @@
     function renderInfo() {
       var i = shownIndex();
       buttons.forEach(function (b, k) { b.classList.toggle("shown", k === i); });
+      dParts.forEach(function (g) { g.classList.toggle("shown", Number(g.dataset.stage) === i); });
       info.textContent = "";
       if (i == null) {
         info.appendChild(el("p", "empty", "Hover over, tap or press Tab to a part to read its purpose, location, common faults and maintenance."));
@@ -149,6 +166,12 @@
         if (i === index) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
       });
       pipes.forEach(function (p, i) { p.classList.toggle("flow", lapDone || i < index); });
+      dParts.forEach(function (g) {
+        var s = Number(g.dataset.stage);
+        g.classList.toggle("active", s === index);
+        g.classList.toggle("seen", s < index || (lapDone && s !== index));
+      });
+      dPipes.forEach(function (p) { p.classList.toggle("flow", lapDone || Number(p.dataset.pipe) < index); });
       if (index < 0) caption.textContent = stepMode ? "Press Next step to follow the fuel." : "Press Start, or choose Step by step.";
       else caption.textContent = "Step " + (index + 1) + " of " + PARTS.length + ": " + PARTS[index].step;
       caption.className = "status " + (index === PARTS.length - 1 ? "good" : "mid");
@@ -209,6 +232,13 @@
     });
 
     paint();
-    return { hide: function () { stop(); paint(); } };
+    // On a narrow screen the aircraft scrolls sideways. Start with the fuselage in view.
+    var scroller = document.getElementById("fx-scroll");
+    return {
+      show: function () {
+        requestAnimationFrame(function () { scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2; });
+      },
+      hide: function () { stop(); paint(); }
+    };
   };
 })();

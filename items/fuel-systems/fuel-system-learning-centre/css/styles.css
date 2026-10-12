@@ -440,3 +440,71 @@ tr.you td { background: var(--amber-soft); font-weight: 700; }
 .ov-item { width: 100%; display: flex; align-items: center; gap: .6rem; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .4rem .6rem; }
 .ov-item[aria-pressed="true"] { border-color: var(--amber); background: var(--amber-soft); }
 .ov-item-text b { display: block; font-size: .9rem; } .ov-item-text small { color: var(--muted); }
+
+/* Fuel Flow Explorer: aircraft diagram */
+.fx-svg .part .shape { transition: fill .25s, stroke .25s; }
+.fx-svg .part.seen .shape { fill: var(--fuel-soft); stroke: var(--fuel); }
+.fx-svg .part.active .shape { fill: var(--amber); stroke: var(--amber); }
+.fx-svg .part.active { filter: drop-shadow(0 0 6px var(--amber)); }
+.fx-svg .part.active .lbl { fill: #1a1200; }
+.fx-svg .part.shown .shape { stroke: var(--sky); stroke-width: 4; }
+.fx-svg .part.active.shown .shape { stroke: var(--amber); }
+.fx-svg .pipe.flow { stroke: var(--fuel); stroke-dasharray: 10 8; animation: txdash .7s linear infinite; }
+#page-explorer .ov-scroll { margin-bottom: 1rem; }
+#page-explorer .fx-svg { max-height: 460px; }
+.ov-svg .key .badge text { fill: #fff; }
+
+/* Components: location diagram + photo */
+.lc-media { display: grid; gap: 12px; margin: 1rem 0 .5rem; }
+@media (min-width: 700px) { .lc-media { grid-template-columns: 1fr 1fr; align-items: start; } }
+.lc-media .lc-figure { margin: 0; }
+.lc-media .img-ph { height: 100%; min-height: 200px; }
+.loc-svg { display: block; width: 100%; height: auto; max-height: 300px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; }
+.loc-svg .airframe { fill: var(--card); stroke: var(--muted); stroke-width: 2; }
+.loc-svg .ctx * , .loc-svg .ctx > * { fill: none; stroke: var(--line); stroke-width: 3; stroke-dasharray: 6 5; }
+.loc-svg .ctx-line { fill: none; stroke: var(--muted); stroke-width: 4; stroke-linecap: round; }
+.loc-svg .hl { fill: var(--amber); stroke: var(--navy); stroke-width: 2.5; animation: hlpulse 1.4s ease-in-out infinite; }
+.loc-svg .hl-line { fill: none; stroke: var(--amber); stroke-width: 9; stroke-linecap: round; animation: hlpulse 1.4s ease-in-out infinite; }
+@keyframes hlpulse { 50% { opacity: .55; } }
+.loc-svg .hl-label { font-size: 30px; font-weight: 700; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+.lc-figure img { width: 100%; max-height: 300px; object-fit: cover; border-radius: 10px; display: block; }
+
+/* Quantity: aircraft measurement diagram */
+@media (min-width: 900px) { .qi-top.qi-air { grid-template-columns: 1.5fr 1fr; } }
+.qi-aircraft .ov-svg { min-width: 560px; }
+.qa-svg .qa-tank { fill: var(--bg); stroke: var(--muted); stroke-width: 4; }
+.qa-svg .qa-tank.low { stroke: var(--amber); stroke-width: 6; }
+.qa-svg .qa-tank.crit { stroke: var(--bad); stroke-width: 6; animation: blink 0.8s steps(2, jump-none) infinite; }
+.qa-svg .qa-fuel { fill: var(--fuel); opacity: .88; }
+.qa-svg .probe-dry { stroke: var(--muted); stroke-width: 7; stroke-linecap: round; opacity: .55; }
+.qa-svg .probe-wet { stroke: var(--sky); stroke-width: 7; stroke-linecap: round; }
+.qa-svg .sig { fill: none; stroke: var(--sky); stroke-linecap: round; stroke-dasharray: 10 8; animation: txdash .7s linear infinite; }
+.qa-svg .sig.none { stroke-dasharray: 2 8; animation: none; opacity: .3 !important; }
+.qa-svg .sig.broken { stroke: var(--bad); stroke-dasharray: 4 8; animation: none; }
+.qa-svg .qa-break line { stroke: var(--bad); stroke-width: 6; stroke-linecap: round; }
+.qa-svg .qa-box { fill: var(--sky-soft); stroke: var(--sky); stroke-width: 2.5; }
+.qa-svg .lbl.big { font-size: 20px; font-weight: 800; }
+.qa-svg .lbl.sm { font-size: 13px; fill: var(--sky); }
+.qa-svg .lbl { font-size: 14px; }
+.qa-svg .lbl.out { fill: var(--muted); }
+.qa-sliders { display: grid; gap: .7rem; margin-top: 1rem; }
+@media (min-width: 800px) { .qa-sliders { grid-template-columns: repeat(3, 1fr); gap: 1.2rem; } }
+.qa-slider label { display: block; font-size: .95rem; }
+.qc-tanks { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; margin: .5rem 0; }
+.qc-col { text-align: center; background: #050c16; border-radius: 8px; padding: .4rem .2rem; }
+.qc-name { font-size: .7rem; letter-spacing: .06em; color: #9db0c8; }
+.qc-bar { display: flex; flex-direction: column-reverse; gap: 2px; height: 90px; margin: .3rem auto; width: 28px; }
+.qc-bar i { flex: 1; border-radius: 2px; background: #1c2e45; }
+.qc-bar i.on { background: #2e8b57; } .qc-bar i.on.amber { background: #f2a900; } .qc-bar i.on.red { background: #d23b3b; }
+.qc-kg { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .85rem; color: #5df2a0; }
+.qc-flag { min-height: 1.2em; font-size: .72rem; font-weight: 700; } .qc-flag.amber { color: #f2a900; } .qc-flag.red { color: #ff7676; }
+.qc-which { margin: .4rem 0 0; font-size: .85rem; color: #ffd36b; min-height: 1.2em; text-align: center; }
+.qi-top > *, .tx-top > *, .diagram-wrap > * { min-width: 0; }
+
+/* Safety: hazard pictures */
+.hz-figure { margin: 1rem 0 .4rem; }
+.hz-figure svg, .hz-figure img { display: block; width: 100%; max-width: 420px; height: auto; border-radius: 12px; margin: 0 auto; }
+.hz-figure img { object-fit: cover; }
+.hz-figure figcaption { font-size: .8rem; color: var(--muted); text-align: center; margin-top: .3rem; }
+.hz-figure.hz-small svg, .hz-figure.hz-small img { max-width: 280px; }
+.card .hz-figure { margin-top: 0; }

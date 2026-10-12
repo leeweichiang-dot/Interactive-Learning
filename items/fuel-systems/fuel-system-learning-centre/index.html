@@ -85,7 +85,7 @@
         <div class="ov-scroll" tabindex="0" role="region" aria-label="Fuel system diagram">
           <svg class="ov-svg" id="ov-svg" viewBox="0 0 800 520" role="img" aria-labelledby="ov-title ov-desc">
             <title id="ov-title">Typical aircraft fuel system</title>
-            <desc id="ov-desc">Top view of a twin-engine aircraft. A refuel point fills the left, right and centre tanks. Boost pumps and transfer valves move fuel to a feed tank above each engine. Each feed line passes a shut-off valve, a filter, an engine driven pump and a fuel control unit before the engine. Vent lines leave the tanks. Probes in the tanks send signals to a cockpit gauge.</desc>
+            <desc id="ov-desc">Top view of a twin-engine aircraft. A refuel point fills the left, right and centre tanks. Boost pumps and transfer valves move fuel to a feed tank above each engine. Each feed line passes a shut-off valve, a filter, an engine driven pump and a fuel control unit before the engine. Vent lines leave the wing tanks. Probes in the tanks send signals to a cockpit gauge.</desc>
             <path class="airframe" d="M400 22 C440 40 472 80 472 150 L472 460 L492 500 L308 500 L328 460 L328 150 C328 80 360 40 400 22Z"/>
             <polygon class="airframe" points="330,170 56,296 56,348 330,300"/>
             <polygon class="airframe" points="470,170 744,296 744,348 470,300"/>
@@ -128,8 +128,8 @@
             <g class="part" data-n="16" data-sys="store" tabindex="0" role="button" aria-label="16 Water drain valves"><rect class="shape" x="134" y="326" width="12" height="10" rx="2"/><rect class="shape" x="654" y="326" width="12" height="10" rx="2"/><g class="badge" transform="translate(140 354)"><circle r="11"/><text y="4.5" text-anchor="middle">16</text></g></g>
             <!-- 13 vents -->
             <g class="part" data-n="13" data-sys="vent" tabindex="0" role="button" aria-label="13 Vent lines and outlets">
-              <path class="vent" d="M150 296 L84 318"/><path class="vent" d="M650 296 L716 318"/><path class="vent" d="M438 112 L512 112"/>
-              <circle class="shape" cx="76" cy="320" r="6"/><circle class="shape" cx="724" cy="320" r="6"/><circle class="shape" cx="520" cy="112" r="6"/>
+              <path class="vent" d="M150 296 L84 318"/><path class="vent" d="M650 296 L716 318"/>
+              <circle class="shape" cx="76" cy="320" r="6"/><circle class="shape" cx="724" cy="320" r="6"/>
               <text class="lbl out" x="76" y="342" text-anchor="middle">Vent</text><text class="lbl out" x="724" y="342" text-anchor="middle">Vent</text>
               <g class="badge" transform="translate(98 292)"><circle r="11"/><text y="4.5" text-anchor="middle">13</text></g></g>
             <!-- 4 feed tanks -->
@@ -183,7 +183,7 @@
     <!-- 3. FLOW EXPLORER -->
     <section class="page" id="page-explorer" aria-labelledby="h-explorer">
       <h2 id="h-explorer">Interactive Fuel Flow Explorer</h2>
-      <p class="lead">Watch fuel travel from the tank to the engine. Press <b>Start</b> to see it move, or use <b>Step by step</b> to go one part at a time. Hover over (or tap) any part to learn about it.</p>
+      <p class="lead">Watch fuel travel through the aircraft from the tank to the engine. Press <b>Start</b> to see it move, or use <b>Step by step</b> to go one part at a time. Hover over (or tap) any part, on the aircraft or in the row below, to learn about it.</p>
       <div class="panel">
         <div class="fx-controls" role="group" aria-label="Animation controls">
           <button class="btn" id="fx-start">▶ Start</button>
@@ -194,8 +194,52 @@
             <button class="btn amber" id="fx-next">Next step →</button>
           </span>
         </div>
+        <div class="status mid" style="margin:0 0 .8rem" id="fx-caption" role="status" aria-live="polite">Press Start, or choose Step by step.</div>
+        <p class="hint ov-swipe">Swipe sideways to see the whole aircraft.</p>
+        <div class="ov-scroll" id="fx-scroll" tabindex="0" role="region" aria-label="Aircraft fuel flow diagram">
+          <svg class="ov-svg fx-svg" id="fx-svg" viewBox="0 0 800 520" role="img" aria-labelledby="fx-title fx-desc">
+            <title id="fx-title">Fuel flowing through an aircraft</title>
+            <desc id="fx-desc">Top view of a twin-engine aircraft. Fuel leaves the wing and centre tanks (1), is pushed by boost pumps (2), passes a filter (3) and a fuel control unit (4) on each side, and reaches the engines (5).</desc>
+            <path class="airframe" d="M400 22 C440 40 472 80 472 150 L472 460 L492 500 L308 500 L328 460 L328 150 C328 80 360 40 400 22Z"/>
+            <polygon class="airframe" points="330,170 56,296 56,348 330,300"/>
+            <polygon class="airframe" points="470,170 744,296 744,348 470,300"/>
+
+            <!-- pipes: data-pipe="i" joins stage i to stage i+1 -->
+            <g class="fx-pipes">
+              <path class="pipe" data-pipe="0" d="M338 268 L345 288"/><path class="pipe" data-pipe="0" d="M462 268 L455 288"/><path class="pipe" data-pipe="0" d="M400 220 L400 246"/>
+              <path class="pipe" data-pipe="1" d="M345 312 L345 345 L362 345 L362 364"/><path class="pipe" data-pipe="1" d="M455 312 L455 345 L438 345 L438 364"/>
+              <path class="pipe" data-pipe="1" d="M400 270 L400 330 L362 330 L362 364"/><path class="pipe" data-pipe="1" d="M400 330 L438 330 L438 364"/>
+              <path class="pipe" data-pipe="2" d="M362 378 L362 398"/><path class="pipe" data-pipe="2" d="M438 378 L438 398"/>
+              <path class="pipe" data-pipe="3" d="M362 414 L362 430"/><path class="pipe" data-pipe="3" d="M438 414 L438 430"/>
+            </g>
+
+            <g class="part tankp" data-stage="0" tabindex="0" role="button" aria-label="1 Fuel tank">
+              <polygon class="shape tank" points="340,195 110,300 110,335 340,275"/><polygon class="shape tank" points="460,195 690,300 690,335 460,275"/>
+              <rect class="shape tank" x="362" y="100" width="76" height="120" rx="8"/>
+              <text class="lbl" x="400" y="123" text-anchor="middle">Fuel tanks</text>
+              <g class="badge" transform="translate(215 272)"><circle r="11"/><text y="4.5" text-anchor="middle">1</text></g><g class="badge" transform="translate(585 272)"><circle r="11"/><text y="4.5" text-anchor="middle">1</text></g><g class="badge" transform="translate(400 170)"><circle r="11"/><text y="4.5" text-anchor="middle">1</text></g></g>
+            <g class="part" data-stage="1" tabindex="0" role="button" aria-label="2 Fuel pump">
+              <circle class="shape" cx="345" cy="300" r="12"/><circle class="shape" cx="455" cy="300" r="12"/><circle class="shape" cx="400" cy="258" r="12"/>
+              <text class="lbl" x="345" y="304" text-anchor="middle">P</text><text class="lbl" x="455" y="304" text-anchor="middle">P</text><text class="lbl" x="400" y="262" text-anchor="middle">P</text>
+              <g class="badge" transform="translate(321 300)"><circle r="11"/><text y="4.5" text-anchor="middle">2</text></g></g>
+            <g class="part" data-stage="2" tabindex="0" role="button" aria-label="3 Fuel filter">
+              <rect class="shape" x="352" y="364" width="20" height="14" rx="3"/><rect class="shape" x="428" y="364" width="20" height="14" rx="3"/>
+              <g class="badge" transform="translate(337 372)"><circle r="11"/><text y="4.5" text-anchor="middle">3</text></g></g>
+            <g class="part" data-stage="3" tabindex="0" role="button" aria-label="4 Fuel control unit">
+              <rect class="shape" x="343" y="398" width="39" height="16" rx="3"/><rect class="shape" x="418" y="398" width="39" height="16" rx="3"/>
+              <text class="lbl sm" x="362" y="410" text-anchor="middle">FCU</text><text class="lbl sm" x="438" y="410" text-anchor="middle">FCU</text>
+              <g class="badge" transform="translate(326 406)"><circle r="11"/><text y="4.5" text-anchor="middle">4</text></g></g>
+            <g class="part" data-stage="4" tabindex="0" role="button" aria-label="5 Engine">
+              <rect class="shape engine" x="335" y="430" width="55" height="60" rx="8"/><rect class="shape engine" x="410" y="430" width="55" height="60" rx="8"/>
+              <text class="lbl" x="362" y="466" text-anchor="middle">Engine</text><text class="lbl" x="438" y="466" text-anchor="middle">Engine</text>
+              <g class="badge" transform="translate(400 505)"><circle r="11"/><text y="4.5" text-anchor="middle">5</text></g></g>
+
+            <g class="key" aria-hidden="true">
+              <g class="badge" transform="translate(30 410)"><circle r="9"/><text y="4" text-anchor="middle" style="font-size:11px">1</text></g><text x="46" y="414">Fuel tank</text><g class="badge" transform="translate(30 430)"><circle r="9"/><text y="4" text-anchor="middle" style="font-size:11px">2</text></g><text x="46" y="434">Fuel pump</text><g class="badge" transform="translate(30 450)"><circle r="9"/><text y="4" text-anchor="middle" style="font-size:11px">3</text></g><text x="46" y="454">Filter</text><g class="badge" transform="translate(30 470)"><circle r="9"/><text y="4" text-anchor="middle" style="font-size:11px">4</text></g><text x="46" y="474">Fuel control unit</text><g class="badge" transform="translate(30 490)"><circle r="9"/><text y="4" text-anchor="middle" style="font-size:11px">5</text></g><text x="46" y="494">Engine</text>
+            </g>
+          </svg>
+        </div>
         <div class="fx-chain" id="fx-chain" aria-label="Fuel path from tank to engine"></div>
-        <div class="status mid" id="fx-caption" role="status" aria-live="polite">Press Start, or choose Step by step.</div>
       </div>
       <div class="panel fx-info" id="fx-info" aria-live="polite"></div>
       <div class="pager"></div>
@@ -233,69 +277,52 @@
           <p>When fuel falls below a set level, a <b>caution light</b> comes on. At a lower level a stronger <b>warning</b> flashes. The crew must then plan to land.</p></div>
       </div>
 
-      <h3>Try it: the fuel level simulator</h3>
-      <p class="lead" style="font-size:.95rem">Move the slider from 0% to 100%. Watch the tank, the cockpit panel and the warning lights.</p>
+      <h3>Try it: measuring the fuel in every tank</h3>
+      <p class="lead" style="font-size:.95rem">Move the three sliders, one for each tank. Watch the probes in the aircraft measure the fuel, the signals travel to the computer, and the cockpit panel show each tank and the warning lights.</p>
       <div class="panel qi-sim">
-        <div class="qi-top">
-          <div class="qi-tank">
-            <h4>Fuel tank</h4>
-            <svg viewBox="0 0 220 260" role="img" aria-label="Fuel tank with three probes. The fuel level follows the slider." id="qt-svg">
-              <clipPath id="qt-inner"><rect x="22" y="22" width="176" height="216" rx="12"/></clipPath>
-              <clipPath id="qt-wet"><rect id="qt-wetrect" x="0" y="238" width="220" height="0"/></clipPath>
-              <rect x="20" y="20" width="180" height="220" rx="14" fill="var(--bg)" stroke="var(--muted)" stroke-width="4"/>
-              <rect id="qt-fuel" x="22" y="238" width="176" height="0" fill="var(--fuel)" opacity=".85" clip-path="url(#qt-inner)"/>
-              <g stroke="var(--muted)" stroke-width="7" stroke-linecap="round" opacity=".7">
-                <line x1="60" y1="34" x2="60" y2="230"/><line x1="110" y1="34" x2="110" y2="230"/><line x1="160" y1="34" x2="160" y2="230"/>
-              </g>
-              <g stroke="var(--sky)" stroke-width="7" stroke-linecap="round" clip-path="url(#qt-wet)">
-                <line x1="60" y1="34" x2="60" y2="230"/><line x1="110" y1="34" x2="110" y2="230"/><line x1="160" y1="34" x2="160" y2="230"/>
-              </g>
-              <text x="110" y="12" text-anchor="middle" style="font-size:12px;fill:var(--muted)">Probes (blue = covered by fuel)</text>
-            </svg>
-            <p class="qi-real">Real fuel in tank: <b id="qt-pct">50%</b></p>
+        <div class="qi-top qi-air">
+          <div class="qi-aircraft">
+            <h4>The aircraft: probes and signals</h4>
+            <p class="hint ov-swipe">Swipe sideways to see the whole aircraft.</p>
+            <div class="ov-scroll" id="qa-scroll" tabindex="0" role="region" aria-label="Aircraft diagram of fuel measurement">
+              <svg class="ov-svg qa-svg" id="qa-svg" viewBox="0 0 800 520" role="img" aria-label="Top view of an aircraft with a left wing tank, a centre tank and a right wing tank. Probes in each tank measure the fuel and send a signal along a wire to the computer. A stronger signal means more fuel."></svg>
+            </div>
+            <p class="qi-note" style="margin-top:.4rem">Blue part of a probe = covered by fuel. A thicker, brighter signal wire = more fuel.</p>
           </div>
           <div class="qi-cockpit">
-            <h4>Cockpit panel</h4>
+            <h4>Cockpit indicator</h4>
             <div class="cockpit" id="qc-panel">
-              <svg viewBox="0 0 320 190" role="img" aria-label="Cockpit fuel gauge" id="qc-svg">
+              <svg viewBox="0 0 320 190" role="img" aria-label="Cockpit dial showing total fuel" id="qc-svg">
                 <g id="qc-zones" fill="none" stroke-width="16"></g>
                 <g id="qc-ticks"></g>
                 <g transform="translate(160 160)">
                   <g id="qc-needle" style="transition:transform .35s"><line x1="0" y1="0" x2="-100" y2="0" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g>
                   <circle r="9" fill="#fff"/>
                 </g>
-                <text x="160" y="184" text-anchor="middle" fill="#9db0c8" style="font-size:11px">FUEL QUANTITY</text>
+                <text x="160" y="184" text-anchor="middle" fill="#9db0c8" style="font-size:11px">TOTAL FUEL</text>
               </svg>
-              <div class="digital"><span id="qc-kg">1000</span> <small>kg</small> <span class="sep">|</span> <span id="qc-pct">50</span><small>%</small></div>
-              <div class="segs" id="qc-segs" aria-hidden="true"></div>
+              <div class="digital"><span id="qc-kg">0</span> <small>kg total</small> <span class="sep">|</span> <span id="qc-pct">0</span><small>%</small></div>
+              <div class="qc-tanks" id="qc-tanks"></div>
               <div class="lights">
                 <div class="light amber" id="qc-low"><i></i>LOW FUEL</div>
                 <div class="light red" id="qc-crit"><i></i>FUEL CRITICAL</div>
               </div>
+              <p class="qc-which" id="qc-which"></p>
             </div>
           </div>
         </div>
 
-        <div class="qi-flow" aria-label="How the reading is made">
-          <div class="qi-step"><b>1. Probes</b><span id="qf-1">50% covered</span></div>
-          <span class="qi-arrow" aria-hidden="true">→</span>
-          <div class="qi-step"><b>2. Computer</b><span id="qf-2">signal to kg</span></div>
-          <span class="qi-arrow" aria-hidden="true">→</span>
-          <div class="qi-step"><b>3. Cockpit</b><span id="qf-3">1000 kg</span></div>
-        </div>
-
-        <label for="q-range" class="qi-label"><b>Fuel level:</b> <span id="q-pct">50</span>%</label>
-        <input class="range" type="range" id="q-range" min="0" max="100" value="50" aria-describedby="q-status">
-        <div class="row" style="margin:.5rem 0">
-          <button class="btn alt" data-level="0">Empty</button>
-          <button class="btn alt" data-level="15">15%</button>
-          <button class="btn alt" data-level="50">Half</button>
-          <button class="btn alt" data-level="100">Full</button>
+        <div class="qa-sliders" id="qa-sliders"></div>
+        <div class="row" style="margin:.6rem 0">
+          <button class="btn alt" data-preset="empty">All empty</button>
+          <button class="btn alt" data-preset="half">All half</button>
+          <button class="btn alt" data-preset="full">All full</button>
+          <button class="btn alt" data-preset="left">Left tank low</button>
           <button class="btn amber" id="q-fly" aria-pressed="false">✈️ Use fuel</button>
         </div>
         <div class="status good" id="q-status" role="status" aria-live="polite"></div>
-        <button class="switch" id="q-fault" aria-pressed="false" style="margin-top:.6rem"><span>Fault: cockpit reading stuck (bad sensor wiring)</span><span class="pill" id="q-fault-pill">Off</span></button>
-        <p class="qi-note">Teaching values: caution light at 20% and below, critical warning at 10% and below. Real aircraft use their own limits.</p>
+        <button class="switch" id="q-fault" aria-pressed="false" style="margin-top:.6rem"><span>Fault: left tank signal wire broken (reading stuck)</span><span class="pill" id="q-fault-pill">Off</span></button>
+        <p class="qi-note">Teaching values: caution light at 20% and below, critical warning at 10% and below, for each tank. Real aircraft use their own limits.</p>
       </div>
 
       <div class="panel">

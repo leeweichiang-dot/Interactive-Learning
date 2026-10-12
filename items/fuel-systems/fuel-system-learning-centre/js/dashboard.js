@@ -61,7 +61,7 @@
       var qp = el("div", "panel");
       qp.appendChild(el("h3", null, "Quiz attempts"));
       if (!quiz.length) {
-        qp.appendChild(el("p", "empty", "No quiz attempts yet. Take the Knowledge Quiz to see your scores here."));
+        qp.appendChild(el("p", "empty", "No quiz attempts yet. Take the Assessment to see your scores here."));
       } else {
         var attempts = el("div", "bars");
         quiz.slice(-8).forEach(function (x, i, arr) {
@@ -70,6 +70,7 @@
           attempts.appendChild(bar("Attempt " + n, pct, pct >= 80 ? "high" : pct < 50 ? "low" : ""));
         });
         qp.appendChild(attempts);
+        qp.appendChild(el("p", "maint", Math.max.apply(null, pcts) >= 80 ? "✓ You have passed the assessment (pass mark 80%)." : "Pass mark is 80%. Your best is " + Math.max.apply(null, pcts) + "%."));
 
         // Topic results from the latest attempt, weakest first.
         var latest = quiz[quiz.length - 1].topics || {};

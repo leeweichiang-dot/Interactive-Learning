@@ -245,52 +245,162 @@
     };
   };
 
-  /* ---------- 5. Quantity ---------- */
+  /* ---------- 5. Fuel quantity indication ---------- */
+  var QUANTITY_CHECKS = [
+    { q: "What does a fuel quantity probe sense?", o: ["How much of its length is covered by fuel", "The colour of the fuel", "The speed of the aircraft"], a: 0, why: "More fuel around the probe gives a bigger signal." },
+    { q: "The cockpit shows 60% but the tank really holds 10%. Why is this dangerous?", o: ["The crew gets no low fuel warning", "The tank is too heavy", "The pump will be cold"], a: 0, why: "The warning lights follow the reading. A wrong reading can hide a real shortage." },
+    { q: "The LOW FUEL light comes on. What should the crew do?", o: ["Plan to land soon", "Ignore it", "Switch the gauge off"], a: 0, why: "The light means fuel is getting low." }
+  ];
+
   FL.inits.quantity = function () {
-    var CAPACITY = 2000; // teaching value in kg
+    var CAPACITY = 2000;   // kg, a teaching value
+    var LOW = 20, CRITICAL = 10;
+    var NS = "http://www.w3.org/2000/svg";
     var range = document.getElementById("q-range");
-    var fault = document.getElementById("q-fault");
-    var faultOn = false;
-    var stuck = 50;
-    var fill = document.getElementById("q-fill");
-    var needle = document.getElementById("q-needle");
+    var faultBtn = document.getElementById("q-fault");
+    var flyBtn = document.getElementById("q-fly");
+    var statusEl = document.getElementById("q-status");
+    var faultOn = false, stuck = 50, timer = null, lastZone = null;
+    var cx = 160, cy = 160;
+
+    function pt(p, r) {
+      var th = Math.PI * (1 - p / 100);
+      return [cx + r * Math.cos(th), cy - r * Math.sin(th)];
+    }
+    function arc(p0, p1, r, color) {
+      var a = pt(p0, r), b = pt(p1, r);
+      var path = document.createElementNS(NS, "path");
+      path.setAttribute("d", "M" + a[0] + " " + a[1] + " A" + r + " " + r + " 0 0 1 " + b[0] + " " + b[1]);
+      path.setAttribute("stroke", color);
+      return path;
+    }
+    // Dial: red 0-10, amber 10-20, green above.
+    var zones = document.getElementById("qc-zones");
+    zones.appendChild(arc(0, CRITICAL, 112, "#d23b3b"));
+    zones.appendChild(arc(CRITICAL, LOW, 112, "#f2a900"));
+    zones.appendChild(arc(LOW, 100, 112, "#2e8b57"));
+    var ticks = document.getElementById("qc-ticks");
+    [0, 25, 50, 75, 100].forEach(function (p) {
+      var a = pt(p, 124), b = pt(p, 134);
+      var line = document.createElementNS(NS, "line");
+      line.setAttribute("x1", a[0]); line.setAttribute("y1", a[1]); line.setAttribute("x2", b[0]); line.setAttribute("y2", b[1]);
+      line.setAttribute("stroke", "#9db0c8"); line.setAttribute("stroke-width", "2");
+      ticks.appendChild(line);
+      var t = document.createElementNS(NS, "text");
+      var c = pt(p, 146);
+      t.setAttribute("x", c[0]); t.setAttribute("y", c[1] + 4); t.setAttribute("text-anchor", "middle");
+      t.setAttribute("fill", "#9db0c8"); t.style.fontSize = "11px";
+      t.textContent = p === 0 ? "E" : p === 100 ? "F" : String(p);
+      ticks.appendChild(t);
+    });
+    var segsEl = document.getElementById("qc-segs");
+    var segs = [];
+    for (var i = 0; i < 10; i++) { var sg = document.createElement("i"); segs.push(sg); segsEl.appendChild(sg); }
 
     function render() {
       var actual = Number(range.value);
       var shown = faultOn ? stuck : actual;
       document.getElementById("q-pct").textContent = actual;
+      document.getElementById("qt-pct").textContent = actual + "%";
+
+      // Tank and probes follow the real level.
       var h = 216 * actual / 100;
-      fill.setAttribute("y", String(248 - h));
-      fill.setAttribute("height", String(h));
-      needle.style.transform = "rotate(" + (shown * 1.8) + "deg)";
-      document.getElementById("q-digital").textContent = Math.round(CAPACITY * shown / 100) + " kg";
-      var wet = actual > 85 ? 3 : actual > 50 ? 2 : actual > 15 ? 1 : 0;
-      document.getElementById("q-wet").textContent = wet;
-      var s = document.getElementById("q-status");
+      var fuel = document.getElementById("qt-fuel");
+      fuel.setAttribute("y", String(238 - h)); fuel.setAttribute("height", String(h));
+      var wet = document.getElementById("qt-wetrect");
+      wet.setAttribute("y", String(238 - h)); wet.setAttribute("height", String(h));
+
+      // Cockpit follows the shown level (the real one unless the reading is stuck).
+      document.getElementById("qc-needle").style.transform = "rotate(" + (shown * 1.8) + "deg)";
+      var kg = Math.round(CAPACITY * shown / 100);
+      document.getElementById("qc-kg").textContent = kg;
+      document.getElementById("qc-pct").textContent = shown;
+      var lit = Math.ceil(shown / 10);
+      segs.forEach(function (sg, k) {
+        sg.className = k < lit ? (k === 0 ? "on red" : k === 1 ? "on amber" : "on") : "";
+      });
+      var crit = shown <= CRITICAL, low = shown <= LOW;
+      document.getElementById("qc-low").classList.toggle("lit", low);
+      document.getElementById("qc-crit").classList.toggle("lit", crit);
+      document.getElementById("qc-crit").classList.toggle("flash", crit);
+
+      document.getElementById("qf-1").textContent = actual + "% of the probe covered";
+      document.getElementById("qf-2").textContent = faultOn ? "signal lost: no change" : "signal turned into kg";
+      document.getElementById("qf-3").textContent = kg + " kg shown";
+
+      var zone, cls, msg;
       if (faultOn && Math.abs(stuck - actual) > 10) {
-        s.className = "status bad";
-        s.textContent = "The gauge says " + stuck + "% but the tank holds " + actual + "%. Never trust one reading you doubt: check against a second source.";
-      } else if (shown < 15) {
-        s.className = "status bad";
-        s.textContent = "LOW FUEL warning: land soon.";
-      } else if (shown < 30) {
-        s.className = "status mid";
-        s.textContent = "Fuel is getting low. Watch it closely.";
-      } else {
-        s.className = "status good";
-        s.textContent = "Reading looks normal and matches the tank.";
-      }
+        zone = "fault"; cls = "bad";
+        msg = "The cockpit says " + stuck + "% but the tank holds " + actual + "%." + (actual <= LOW && shown > LOW ? " There is NO low fuel warning. Always check a doubtful reading against another source." : " The reading is wrong. Check it against another source.");
+      } else if (shown <= 0) { zone = "empty"; cls = "bad"; msg = "Tank empty. Fuel critical warning is flashing."; }
+      else if (crit) { zone = "crit"; cls = "bad"; msg = "FUEL CRITICAL (red, flashing): land as soon as possible."; }
+      else if (low) { zone = "low"; cls = "mid"; msg = "LOW FUEL (amber): fuel is low. Plan to land."; }
+      else { zone = "ok"; cls = "good"; msg = "Normal: no warnings. The cockpit matches the tank."; }
+      statusEl.className = "status " + cls;
+      // Only change the spoken text when the situation changes, not on every slider step.
+      if (zone !== lastZone) { statusEl.textContent = msg; lastZone = zone; }
+      else if (zone === "fault") statusEl.textContent = msg;
     }
 
-    range.addEventListener("input", render);
-    fault.addEventListener("click", function () {
+    function stopFly() {
+      clearInterval(timer);
+      timer = null;
+      flyBtn.setAttribute("aria-pressed", "false");
+      flyBtn.textContent = "✈️ Use fuel";
+    }
+
+    range.addEventListener("input", function () { stopFly(); render(); });
+    document.querySelectorAll("#page-quantity [data-level]").forEach(function (b) {
+      b.addEventListener("click", function () { stopFly(); range.value = b.dataset.level; render(); });
+    });
+    flyBtn.addEventListener("click", function () {
+      if (timer) { stopFly(); return; }
+      if (Number(range.value) <= 0) range.value = 100;
+      flyBtn.setAttribute("aria-pressed", "true");
+      flyBtn.textContent = "■ Stop";
+      timer = setInterval(function () {
+        range.value = Math.max(0, Number(range.value) - 1);
+        render();
+        if (Number(range.value) <= 0) stopFly();
+      }, 150);
+    });
+    faultBtn.addEventListener("click", function () {
       faultOn = !faultOn;
       stuck = Number(range.value);
-      fault.setAttribute("aria-pressed", String(faultOn));
+      faultBtn.setAttribute("aria-pressed", String(faultOn));
       document.getElementById("q-fault-pill").textContent = faultOn ? "On" : "Off";
       render();
     });
+
+    // Quick check questions
+    var box = document.getElementById("q-checks");
+    QUANTITY_CHECKS.forEach(function (c, n) {
+      var wrap = el("div");
+      wrap.style.marginBottom = "1rem";
+      wrap.appendChild(el("p", null, (n + 1) + ". " + c.q));
+      var list = el("div", "choice-list");
+      var fb = el("div", "feedback");
+      fb.hidden = true;
+      fb.setAttribute("role", "status");
+      c.o.forEach(function (text, i) {
+        var b = el("button", "choice", text);
+        b.addEventListener("click", function () {
+          var ok = i === c.a;
+          list.querySelectorAll("button").forEach(function (x, k) { x.disabled = true; if (k === c.a) x.classList.add("correct"); });
+          if (!ok) b.classList.add("incorrect");
+          fb.hidden = false;
+          fb.className = "feedback " + (ok ? "good" : "bad");
+          fb.textContent = (ok ? "Correct! " : "Not quite. ") + c.why;
+        });
+        list.appendChild(b);
+      });
+      wrap.appendChild(list);
+      wrap.appendChild(fb);
+      box.appendChild(wrap);
+    });
+
     render();
+    return { hide: stopFly };
   };
 
   /* ---------- 6. Transfer ---------- */

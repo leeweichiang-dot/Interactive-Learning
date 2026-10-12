@@ -127,46 +127,97 @@
 
     <!-- 5. QUANTITY -->
     <section class="page" id="page-quantity" aria-labelledby="h-quantity">
-      <h2 id="h-quantity">Fuel Quantity Indication System</h2>
-      <p class="lead">The crew cannot look inside the tank. Instead, <b>probes</b> in the tank sense how much of their length is covered by fuel, and a computer turns that into a gauge reading.</p>
-      <div class="goal">Fuel and air affect electricity differently. A probe senses this difference (this is called <b>capacitance</b>). More fuel around the probe gives a bigger signal.</div>
-      <div class="diagram-wrap two">
-        <div class="panel">
-          <svg viewBox="0 0 520 280" role="img" aria-label="Fuel tank with probes and a fuel gauge" id="q-svg">
-            <rect x="20" y="30" width="220" height="220" rx="14" fill="none" stroke="var(--muted)" stroke-width="4"/>
-            <clipPath id="q-clip"><rect x="22" y="32" width="216" height="216" rx="12"/></clipPath>
-            <rect id="q-fill" x="22" y="248" width="216" height="0" fill="var(--fuel)" opacity=".85" clip-path="url(#q-clip)"/>
-            <g stroke="var(--sky)" stroke-width="6" stroke-linecap="round">
-              <line x1="70" y1="45" x2="70" y2="240"/><line x1="130" y1="45" x2="130" y2="240"/><line x1="190" y1="45" x2="190" y2="240"/>
-            </g>
-            <text x="130" y="20" text-anchor="middle" style="font-size:13px;fill:var(--ink);font-weight:600">Tank with probes</text>
-            <path d="M240 140 C275 140 275 140 300 140" stroke="var(--muted)" stroke-width="3" fill="none" stroke-dasharray="6 5"/>
-            <g transform="translate(400 150)">
-              <path d="M-100 0 A100 100 0 0 1 100 0" fill="none" stroke="var(--line)" stroke-width="18"/>
-              <path d="M-100 0 A100 100 0 0 1 -70 -71" fill="none" stroke="var(--bad)" stroke-width="18"/>
-              <path d="M-70 -71 A100 100 0 0 1 -40 -92" fill="none" stroke="var(--amber)" stroke-width="18"/>
-              <text x="-100" y="22" text-anchor="middle" style="font-size:12px;fill:var(--muted)">E</text>
-              <text x="100" y="22" text-anchor="middle" style="font-size:12px;fill:var(--muted)">F</text>
-              <g id="q-needle" style="transition:transform .5s"><line x1="0" y1="0" x2="-85" y2="0" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
-              <circle r="9" fill="var(--ink)"/>
-              <text id="q-digital" y="60" text-anchor="middle" style="font-size:26px;font-weight:700;fill:var(--ink)">0 kg</text>
-              <text y="86" text-anchor="middle" style="font-size:12px;fill:var(--muted)">Gauge reading</text>
-            </g>
-          </svg>
-        </div>
-        <div>
-          <div class="panel" style="margin-top:0">
-            <label for="q-range"><b>Fuel in the tank:</b> <span id="q-pct">50</span>%</label>
-            <input class="range" type="range" id="q-range" min="0" max="100" value="50">
-            <p>Probes covered by fuel: <b id="q-wet">0</b> of 3 (shown by how much of each probe is wet).</p>
-            <button class="switch" id="q-fault" aria-pressed="false"><span>Fault: gauge stuck (bad probe wiring)</span><span class="pill" id="q-fault-pill">Off</span></button>
-            <div class="status" id="q-status" role="status" aria-live="polite"></div>
-          </div>
-          <div class="panel"><h3>Why it matters for maintenance</h3>
-            <ul><li>Water or dirt on a probe gives a wrong reading.</li><li>A wrong low reading may cause an unneeded stop; a wrong high reading can cause fuel starvation.</li><li>Technicians test the system and compare it with a known fuel amount.</li></ul>
-          </div>
-        </div>
+      <h2 id="h-quantity">Fuel Quantity Indication</h2>
+      <p class="lead">The crew cannot look inside a fuel tank in flight. Instead, the aircraft <b>measures</b> the fuel and <b>shows</b> the answer in the cockpit. This is the fuel quantity indication system.</p>
+      <div class="goal">After this module you can explain how fuel is measured, what the cockpit shows, and when the low fuel warning comes on.</div>
+
+      <div class="grid qi-cards">
+        <div class="card"><h3><span class="icon">📏</span>Fuel quantity sensors</h3>
+          <p>Long thin <b>probes</b> stand inside the tank. Fuel and air affect a tiny electric signal in different ways. The more of the probe that is covered by fuel, the bigger the signal.</p></div>
+        <div class="card"><h3><span class="icon">🧮</span>Fuel gauges</h3>
+          <p>A small computer reads the signals and turns them into a number, such as <b>kilograms</b> or <b>per cent</b>. The gauge is the part that shows that number.</p></div>
+        <div class="card"><h3><span class="icon">🧑‍✈️</span>Cockpit indications</h3>
+          <p>The pilot sees a needle or digital number for the fuel, often for each tank and a total. Some aircraft show bars, and some show it on a screen.</p></div>
+        <div class="card"><h3><span class="icon">🚨</span>Low fuel warnings</h3>
+          <p>When fuel falls below a set level, a <b>caution light</b> comes on. At a lower level a stronger <b>warning</b> flashes. The crew must then plan to land.</p></div>
       </div>
+
+      <h3>Try it: the fuel level simulator</h3>
+      <p class="lead" style="font-size:.95rem">Move the slider from 0% to 100%. Watch the tank, the cockpit panel and the warning lights.</p>
+      <div class="panel qi-sim">
+        <div class="qi-top">
+          <div class="qi-tank">
+            <h4>Fuel tank</h4>
+            <svg viewBox="0 0 220 260" role="img" aria-label="Fuel tank with three probes. The fuel level follows the slider." id="qt-svg">
+              <clipPath id="qt-inner"><rect x="22" y="22" width="176" height="216" rx="12"/></clipPath>
+              <clipPath id="qt-wet"><rect id="qt-wetrect" x="0" y="238" width="220" height="0"/></clipPath>
+              <rect x="20" y="20" width="180" height="220" rx="14" fill="var(--bg)" stroke="var(--muted)" stroke-width="4"/>
+              <rect id="qt-fuel" x="22" y="238" width="176" height="0" fill="var(--fuel)" opacity=".85" clip-path="url(#qt-inner)"/>
+              <g stroke="var(--muted)" stroke-width="7" stroke-linecap="round" opacity=".7">
+                <line x1="60" y1="34" x2="60" y2="230"/><line x1="110" y1="34" x2="110" y2="230"/><line x1="160" y1="34" x2="160" y2="230"/>
+              </g>
+              <g stroke="var(--sky)" stroke-width="7" stroke-linecap="round" clip-path="url(#qt-wet)">
+                <line x1="60" y1="34" x2="60" y2="230"/><line x1="110" y1="34" x2="110" y2="230"/><line x1="160" y1="34" x2="160" y2="230"/>
+              </g>
+              <text x="110" y="12" text-anchor="middle" style="font-size:12px;fill:var(--muted)">Probes (blue = covered by fuel)</text>
+            </svg>
+            <p class="qi-real">Real fuel in tank: <b id="qt-pct">50%</b></p>
+          </div>
+          <div class="qi-cockpit">
+            <h4>Cockpit panel</h4>
+            <div class="cockpit" id="qc-panel">
+              <svg viewBox="0 0 320 190" role="img" aria-label="Cockpit fuel gauge" id="qc-svg">
+                <g id="qc-zones" fill="none" stroke-width="16"></g>
+                <g id="qc-ticks"></g>
+                <g transform="translate(160 160)">
+                  <g id="qc-needle" style="transition:transform .35s"><line x1="0" y1="0" x2="-100" y2="0" stroke="#fff" stroke-width="5" stroke-linecap="round"/></g>
+                  <circle r="9" fill="#fff"/>
+                </g>
+                <text x="160" y="184" text-anchor="middle" fill="#9db0c8" style="font-size:11px">FUEL QUANTITY</text>
+              </svg>
+              <div class="digital"><span id="qc-kg">1000</span> <small>kg</small> <span class="sep">|</span> <span id="qc-pct">50</span><small>%</small></div>
+              <div class="segs" id="qc-segs" aria-hidden="true"></div>
+              <div class="lights">
+                <div class="light amber" id="qc-low"><i></i>LOW FUEL</div>
+                <div class="light red" id="qc-crit"><i></i>FUEL CRITICAL</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="qi-flow" aria-label="How the reading is made">
+          <div class="qi-step"><b>1. Probes</b><span id="qf-1">50% covered</span></div>
+          <span class="qi-arrow" aria-hidden="true">→</span>
+          <div class="qi-step"><b>2. Computer</b><span id="qf-2">signal to kg</span></div>
+          <span class="qi-arrow" aria-hidden="true">→</span>
+          <div class="qi-step"><b>3. Cockpit</b><span id="qf-3">1000 kg</span></div>
+        </div>
+
+        <label for="q-range" class="qi-label"><b>Fuel level:</b> <span id="q-pct">50</span>%</label>
+        <input class="range" type="range" id="q-range" min="0" max="100" value="50" aria-describedby="q-status">
+        <div class="row" style="margin:.5rem 0">
+          <button class="btn alt" data-level="0">Empty</button>
+          <button class="btn alt" data-level="15">15%</button>
+          <button class="btn alt" data-level="50">Half</button>
+          <button class="btn alt" data-level="100">Full</button>
+          <button class="btn amber" id="q-fly" aria-pressed="false">✈️ Use fuel</button>
+        </div>
+        <div class="status good" id="q-status" role="status" aria-live="polite"></div>
+        <button class="switch" id="q-fault" aria-pressed="false" style="margin-top:.6rem"><span>Fault: cockpit reading stuck (bad sensor wiring)</span><span class="pill" id="q-fault-pill">Off</span></button>
+        <p class="qi-note">Teaching values: caution light at 20% and below, critical warning at 10% and below. Real aircraft use their own limits.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Why it matters for maintenance</h3>
+        <ul>
+          <li>Water, dirt or corrosion on a probe gives a wrong reading.</li>
+          <li>A reading that is too high can hide a fuel shortage. A reading that is too low wastes fuel and flight time.</li>
+          <li>Technicians test the warning lights and compare the gauge with a known amount of fuel.</li>
+        </ul>
+      </div>
+
+      <h3>Quick check</h3>
+      <div class="panel" id="q-checks"></div>
       <div class="pager"></div>
     </section>
 

@@ -27,6 +27,13 @@ A portal where students browse and try a growing collection of small learning it
     scores from the `"<module title>: find the …"` question prefix. Its own login only shows when nobody is signed in
     to the portal; it uses `Tracker.signIn`/`signOut`, so both sign-ins stay in step. Keep module titles, question
     wording and keys in sync between its `app.js` and `dashboard.js`.
+  - Exception: `items/fuel-systems/fuel-system-learning-centre/` keeps its own section-visited marks, quiz history
+    and leak-simulator best scores in `localStorage` under `fuel-centre-progress-v1` (suffixed `:<trainee ID>` when
+    someone is signed in). It also reports the quiz to `Tracker.quizResult` and calls `Tracker.complete()` once all
+    nine learning sections have been visited. Its pages are sections of one `index.html`, switched by `#hash`.
+    It also keeps time spent per section, simulator attempt counts, badges and scenario best scores there. Its
+    dashboard has an opt-in leaderboard that lists every trainee's data saved under that key prefix on the same
+    device (local only; names come from the portal profile and are rendered with `textContent`).
   - A trainee shares progress by downloading a file from `progress.html` and handing it in (e.g. via the LMS).
   - `instructor.html` reads those files in the browser and keeps them in memory only: it never saves or uploads them.
   - Render names and other file content with `textContent`, never `innerHTML`.
@@ -90,3 +97,10 @@ Each item loads the tracker in its `<head>` with its own ids:
 Add an entry to `modules` in `catalogue.js` (`id`, `code`, `title`, `description`) and create `items/<module-id>/`.
 Use `hidden: true` on a module to keep it off the home page (its module page and items still open by direct link).
 The `sample` module is hidden this way; keep its folder, since its items are the templates above.
+
+## Publishing
+
+The project is static, so GitHub Pages serves it as is (see `DEPLOYMENT.md`). A `.nojekyll` file is in the root.
+Before publishing run `node tools/check-links.js` (plain Node, no packages): it finds missing files, links that start
+with `/`, folder links, web addresses or network calls in the code, and catalogue mistakes. `tools/` and `.github/`
+are developer files; the site never loads them. Every page has an inline `rel="icon"` so hosts do not log a favicon 404.

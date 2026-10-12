@@ -39,7 +39,7 @@
   }
 
   /* ---------- 4. Components lesson ---------- */
-  // `image` is null for now, so a photo placeholder is shown. Put a picture in images/ and set image: "images/fuel-tank.jpg"
+  // `image` is null for now, so only the location diagram is shown. To add a photo, put it in images/ and set image: "images/fuel-tank.jpg"
   // and credit: "Photo: <author>, <licence>, <source>" (keep the credit with any photo you add).
   var COMPONENTS = [
     { id: "tanks", name: "Fuel Tanks", icon: "🛢️", short: "Store the fuel", image: null, photo: "a wing fuel tank cut-away",
@@ -158,30 +158,22 @@
       return svg;
     }
 
-    // Two pictures side by side: where it is on the aircraft, and a photo (placeholder until one is added).
+    // The location diagram, plus a photo beside it only when the component has one (see `image` below).
     function placeholder(c) {
-      var wrap = el("div", "lc-media");
+      var wrap = el("div", "lc-media" + (c.image ? "" : " one"));
       var f1 = el("figure", "lc-figure");
       f1.appendChild(locationDiagram(c));
       f1.appendChild(el("figcaption", null, "Where it is on the aircraft (top view, simplified)."));
-      var f2 = el("figure", "lc-figure");
+      wrap.appendChild(f1);
       if (c.image) {
+        var f2 = el("figure", "lc-figure");
         var img = el("img");
         img.src = c.image;
         img.alt = c.name;
         f2.appendChild(img);
         f2.appendChild(el("figcaption", null, c.credit || ""));
-      } else {
-        var ph = el("div", "img-ph");
-        ph.setAttribute("role", "img");
-        ph.setAttribute("aria-label", "Photo placeholder: " + c.photo);
-        ph.appendChild(el("span", "ph-icon", c.icon));
-        ph.appendChild(el("span", null, "Photo to be added"));
-        f2.appendChild(ph);
-        f2.appendChild(el("figcaption", null, "Photo of " + c.photo + "."));
+        wrap.appendChild(f2);
       }
-      wrap.appendChild(f1);
-      wrap.appendChild(f2);
       return wrap;
     }
 

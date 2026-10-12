@@ -293,3 +293,28 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 1r
 @media (max-width: 520px) { .qi-arrow { display: none; } }
 .qi-label { display: block; margin-top: .4rem; }
 .qi-note { font-size: .8rem; color: var(--muted); margin: .6rem 0 0; }
+
+/* Fuel transfer simulator */
+.tx-top { display: grid; gap: 16px; }
+@media (min-width: 900px) { .tx-top { grid-template-columns: 1.5fr 1fr; align-items: start; } }
+.tx-sim h4 { margin: 0 0 .3rem; } .tx-sim h4 small { font-weight: 400; color: var(--muted); }
+.tx-name { font-size: 14px; font-weight: 600; fill: var(--ink); }
+.tx-qty { font-size: 14px; font-weight: 700; fill: var(--ink); paint-order: stroke; stroke: var(--card); stroke-width: 4px; stroke-linejoin: round; }
+.tx-pipe { fill: none; stroke: var(--line); stroke-width: 10; stroke-linecap: round; }
+.tx-pipe.on { stroke: var(--fuel); stroke-dasharray: 10 8; animation: txdash .7s linear infinite; }
+.tx-pipe.on.rev { animation-direction: reverse; }
+@keyframes txdash { to { stroke-dashoffset: -18; } }
+.tx-pump circle { fill: var(--sky-soft); stroke: var(--sky); stroke-width: 3; }
+.tx-pump text { font-size: 14px; font-weight: 700; fill: var(--ink); }
+.tx-pump.run circle { fill: var(--amber); stroke: var(--amber); animation: pulse 1s ease-in-out infinite; }
+@keyframes pulse { 50% { r: 18; } }
+.tx-side svg { max-width: 280px; margin: 0 auto; }
+.tx-balance { position: relative; height: 10px; border-radius: 99px; background: linear-gradient(90deg, var(--bad) 0 22%, var(--amber) 22% 40%, var(--ok) 40% 60%, var(--amber) 60% 78%, var(--bad) 78%); margin: .6rem 0 1rem; }
+.tx-balance i { position: absolute; top: -4px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--ink); border: 3px solid var(--card); transition: left .3s; left: 50%; }
+.tx-nums { display: grid; grid-template-columns: 1fr 1fr; gap: .4rem; margin: .6rem 0 0; }
+.tx-nums div { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: .3rem .6rem; }
+.tx-nums dt { font-size: .75rem; color: var(--muted); } .tx-nums dd { margin: 0; font-weight: 700; }
+.tx-controls { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; margin: 1rem 0 .6rem; }
+.tx-controls label { display: grid; gap: .15rem; font-size: .8rem; font-weight: 600; }
+.tx-controls select { font: inherit; padding: .5rem; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
+.tx-scale { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin: -.7rem 0 .8rem; }

@@ -10,6 +10,34 @@
     return e;
   }
 
+  // A few multiple-choice questions with instant feedback. Not scored or saved.
+  function miniCheck(box, questions) {
+    questions.forEach(function (c, n) {
+      var wrap = el("div");
+      wrap.style.marginBottom = "1rem";
+      wrap.appendChild(el("p", null, (n + 1) + ". " + c.q));
+      var list = el("div", "choice-list");
+      var fb = el("div", "feedback");
+      fb.hidden = true;
+      fb.setAttribute("role", "status");
+      c.o.forEach(function (text, i) {
+        var b = el("button", "choice", text);
+        b.addEventListener("click", function () {
+          var ok = i === c.a;
+          list.querySelectorAll("button").forEach(function (x, k) { x.disabled = true; if (k === c.a) x.classList.add("correct"); });
+          if (!ok) b.classList.add("incorrect");
+          fb.hidden = false;
+          fb.className = "feedback " + (ok ? "good" : "bad");
+          fb.textContent = (ok ? "Correct! " : "Not quite. ") + c.why;
+        });
+        list.appendChild(b);
+      });
+      wrap.appendChild(list);
+      wrap.appendChild(fb);
+      box.appendChild(wrap);
+    });
+  }
+
   /* ---------- 4. Components lesson ---------- */
   // `image` is null for now, so a placeholder is shown. Put a picture in images/ and set e.g. image: "images/fuel-tank.jpg".
   var COMPONENTS = [
@@ -372,112 +400,205 @@
       render();
     });
 
-    // Quick check questions
-    var box = document.getElementById("q-checks");
-    QUANTITY_CHECKS.forEach(function (c, n) {
-      var wrap = el("div");
-      wrap.style.marginBottom = "1rem";
-      wrap.appendChild(el("p", null, (n + 1) + ". " + c.q));
-      var list = el("div", "choice-list");
-      var fb = el("div", "feedback");
-      fb.hidden = true;
-      fb.setAttribute("role", "status");
-      c.o.forEach(function (text, i) {
-        var b = el("button", "choice", text);
-        b.addEventListener("click", function () {
-          var ok = i === c.a;
-          list.querySelectorAll("button").forEach(function (x, k) { x.disabled = true; if (k === c.a) x.classList.add("correct"); });
-          if (!ok) b.classList.add("incorrect");
-          fb.hidden = false;
-          fb.className = "feedback " + (ok ? "good" : "bad");
-          fb.textContent = (ok ? "Correct! " : "Not quite. ") + c.why;
-        });
-        list.appendChild(b);
-      });
-      wrap.appendChild(list);
-      wrap.appendChild(fb);
-      box.appendChild(wrap);
-    });
+    miniCheck(document.getElementById("q-checks"), QUANTITY_CHECKS);
 
     render();
     return { hide: stopFly };
   };
 
   /* ---------- 6. Transfer ---------- */
+  var TRANSFER_CHECKS = [
+    { q: "The left wing tank holds much more fuel than the right. What does the aircraft tend to do?", o: ["Roll toward the heavier left side", "Roll toward the lighter right side", "Nothing at all"], a: 0, why: "The heavier wing drops, so the aircraft wants to roll that way." },
+    { q: "How can the crew fix an imbalance?", o: ["Transfer fuel from the heavier side to the lighter side", "Add more fuel to the heavier side", "Switch off the fuel gauge"], a: 0, why: "Moving fuel from the heavy side to the light side evens things out." },
+    { q: "Why must a transfer stop at the right level?", o: ["So the receiving tank does not overflow", "To make the fuel colder", "To make the pump louder"], a: 0, why: "A full tank can overflow through its vent, which is a spill and a fire risk." }
+  ];
+
   FL.inits.transfer = function () {
-    var tanks = { L: 80, F: 40, R: 70 };
-    var NAMES = { L: "Left wing", F: "Feed tank", R: "Right wing" };
-    var on = { engine: false, L: false, R: false };
+    var NS = "http://www.w3.org/2000/svg";
+    var NAMES = ["Left tank", "Centre tank", "Right tank"];
+    var KEYS = ["L", "C", "R"];
+    var CAP = [1000, 2000, 1000];      // kg, teaching values
+    var RATE = 8;                       // kg moved per tick
+    var TICK_MS = 100;
+    var X = [100, 300, 500];            // centre of each tank in the drawing
+    var level = [700, 1000, 400];
+    var mode = null;                    // null, or { auto: bool } while a transfer runs
+    var flying = false;
+    var src = 1, dst = 2;
     var timer = null;
-    var fills = {}, pcts = {};
+    var shown = { src: -1, dst: -1 };
 
-    var row = document.getElementById("t-tanks");
-    ["L", "F", "R"].forEach(function (k) {
-      var t = el("div", "tank");
-      var v = el("div", "vessel");
-      fills[k] = el("div", "fill");
-      pcts[k] = el("div", "pct");
-      v.appendChild(fills[k]);
-      v.appendChild(pcts[k]);
-      t.appendChild(v);
-      t.appendChild(el("span", null, NAMES[k]));
-      row.appendChild(t);
-    });
+    var svg = document.getElementById("tx-svg");
+    var caption = document.getElementById("tx-caption");
+    var selSrc = document.getElementById("tx-src");
+    var selDst = document.getElementById("tx-dst");
+    var goBtn = document.getElementById("tx-go");
+    var balBtn = document.getElementById("tx-bal");
+    var flyBtn = document.getElementById("tx-fly");
 
-    var controls = document.getElementById("t-controls");
-    function toggle(key, label) {
-      var b = el("button", "switch");
-      b.style.width = "auto";
-      b.setAttribute("aria-pressed", "false");
-      b.appendChild(el("span", null, label));
-      var pill = el("span", "pill", "Off");
-      b.appendChild(pill);
-      b.addEventListener("click", function () {
-        on[key] = !on[key];
-        b.setAttribute("aria-pressed", String(on[key]));
-        pill.textContent = on[key] ? "On" : "Off";
-        status();
-      });
-      controls.appendChild(b);
+    function svgEl(tag, attrs) {
+      var e = document.createElementNS(NS, tag);
+      Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+      return e;
     }
-    toggle("engine", "Engine burning fuel");
-    toggle("L", "Transfer left to feed");
-    toggle("R", "Transfer right to feed");
-    var reset = el("button", "btn alt", "Reset");
-    reset.addEventListener("click", function () { tanks = { L: 80, F: 40, R: 70 }; draw(); status(); });
-    controls.appendChild(reset);
+
+    // Draw the pipes first so the tanks sit on top.
+    var pipes = {};
+    function pipe(id, d) {
+      var p = svgEl("path", { d: d, class: "tx-pipe" });
+      pipes[id] = p;
+      svg.appendChild(p);
+    }
+    for (var i = 0; i < 3; i++) pipe("s" + i, "M" + X[i] + " 226 L" + X[i] + " 296");
+    pipe("m0", "M" + X[0] + " 296 L" + X[1] + " 296");
+    pipe("m1", "M" + X[1] + " 296 L" + X[2] + " 296");
+
+    var fuels = [], texts = [], pumps = [];
+    for (var t = 0; t < 3; t++) {
+      var x0 = X[t] - 70;
+      var clip = svgEl("clipPath", { id: "tx-clip-" + t });
+      clip.appendChild(svgEl("rect", { x: x0 + 2, y: 52, width: 136, height: 172, rx: 10 }));
+      svg.appendChild(clip);
+      svg.appendChild(svgEl("rect", { x: x0, y: 50, width: 140, height: 176, rx: 12, fill: "var(--bg)", stroke: "var(--muted)", "stroke-width": 4 }));
+      var f = svgEl("rect", { x: x0 + 2, y: 224, width: 136, height: 0, fill: "var(--fuel)", opacity: ".9", "clip-path": "url(#tx-clip-" + t + ")" });
+      fuels.push(f);
+      svg.appendChild(f);
+      var name = svgEl("text", { x: X[t], y: 34, "text-anchor": "middle", class: "tx-name" });
+      name.textContent = NAMES[t];
+      svg.appendChild(name);
+      var txt = svgEl("text", { x: X[t], y: 140, "text-anchor": "middle", class: "tx-qty" });
+      texts.push(txt);
+      svg.appendChild(txt);
+      var pg = svgEl("g", { class: "tx-pump" });
+      pg.appendChild(svgEl("circle", { cx: X[t], cy: 261, r: 15 }));
+      var pt = svgEl("text", { x: X[t], y: 266, "text-anchor": "middle" });
+      pt.textContent = "P";
+      pg.appendChild(pt);
+      pumps.push(pg);
+      svg.appendChild(pg);
+    }
+    var lab = svgEl("text", { x: 300, y: 330, "text-anchor": "middle", class: "tx-name" });
+    lab.textContent = "Transfer pipe";
+    svg.appendChild(lab);
+
+    function kg(n) { return Math.round(n) + " kg"; }
+
+    function setFlow() {
+      var s = mode ? src : -1, d = mode ? dst : -1;
+      if (s === shown.src && d === shown.dst) return;
+      shown.src = s; shown.dst = d;
+      Object.keys(pipes).forEach(function (k) { pipes[k].setAttribute("class", "tx-pipe"); });
+      pumps.forEach(function (p) { p.setAttribute("class", "tx-pump"); });
+      if (s < 0) return;
+      pipes["s" + s].setAttribute("class", "tx-pipe on");
+      pipes["s" + d].setAttribute("class", "tx-pipe on rev");
+      var rightward = d > s;
+      for (var m = Math.min(s, d); m < Math.max(s, d); m++) {
+        pipes["m" + m].setAttribute("class", "tx-pipe on" + (rightward ? "" : " rev"));
+      }
+      pumps[s].setAttribute("class", "tx-pump run");
+    }
 
     function draw() {
-      ["L", "F", "R"].forEach(function (k) {
-        var v = Math.max(0, Math.min(100, tanks[k]));
-        fills[k].style.height = v + "%";
-        pcts[k].textContent = Math.round(v) + "%";
-      });
+      for (var k = 0; k < 3; k++) {
+        var h = 172 * level[k] / CAP[k];
+        fuels[k].setAttribute("y", String(224 - h));
+        fuels[k].setAttribute("height", String(h));
+        texts[k].textContent = kg(level[k]) + " · " + Math.round(level[k] / CAP[k] * 100) + "%";
+        document.getElementById("tx-n-" + KEYS[k]).textContent = kg(level[k]);
+      }
+      document.getElementById("tx-n-T").textContent = kg(level[0] + level[1] + level[2]);
+      var diff = level[0] - level[2];                     // positive = left heavier
+      var plane = document.getElementById("tx-plane-g");
+      plane.style.transform = "rotate(" + Math.max(-14, Math.min(14, -diff / 1000 * 14)) + "deg)";
+      document.getElementById("tx-dot").style.left = (50 - Math.max(-50, Math.min(50, diff / 5))) + "%";
+      var st = document.getElementById("tx-bal-status");
+      var side = diff > 0 ? "Left" : "Right";
+      if (Math.abs(diff) <= 100) { st.className = "status good"; st.textContent = "Balanced: left and right are within " + 100 + " kg."; }
+      else if (Math.abs(diff) <= 250) { st.className = "status mid"; st.textContent = "Caution: " + side + " wing is " + Math.round(Math.abs(diff)) + " kg heavier. Pilot must correct."; }
+      else { st.className = "status bad"; st.textContent = "Large imbalance: " + side + " wing is " + Math.round(Math.abs(diff)) + " kg heavier. Hard to control."; }
+      goBtn.textContent = mode && !mode.auto ? "■ Stop transfer" : "▶ Start transfer";
+      balBtn.textContent = mode && mode.auto ? "■ Stop balancing" : "⚖️ Balance wings";
+      flyBtn.setAttribute("aria-pressed", String(flying));
+      flyBtn.textContent = flying ? "■ Stop flying" : "✈️ Fly (left side uses more fuel)";
+      setFlow();
     }
 
-    function status() {
-      var s = document.getElementById("t-status");
-      var diff = Math.abs(tanks.L - tanks.R);
-      if (tanks.F <= 0) { s.className = "status bad"; s.textContent = "Feed tank empty: the engine stops! Switch on a transfer in time."; }
-      else if (tanks.F < 20 && on.engine) { s.className = "status bad"; s.textContent = "Feed tank is low. Start a transfer now."; }
-      else if (diff > 20) { s.className = "status mid"; s.textContent = "Left and right are " + Math.round(diff) + "% apart. Take fuel from the fuller side to balance the aircraft."; }
-      else { s.className = "status good"; s.textContent = "Fuel is in balance and the feed tank has enough for the engine."; }
+    function say(msg) { caption.textContent = msg; }
+
+    function stopTransfer(msg) {
+      mode = null;
+      if (msg) say(msg);
+      draw();
     }
 
     function tick() {
-      if (on.engine) tanks.F -= 1.2;
-      ["L", "R"].forEach(function (k) {
-        if (on[k] && tanks[k] > 0 && tanks.F < 100) { tanks[k] -= 1.5; tanks.F += 1.5; }
-      });
-      tanks.F = Math.max(0, Math.min(100, tanks.F));
+      if (flying) {
+        level[0] = Math.max(0, level[0] - 4);
+        level[2] = Math.max(0, level[2] - 2);
+        if (level[0] <= 0) { flying = false; say("The left tank is empty, so the flight stops."); }
+      }
+      if (mode) {
+        if (mode.auto) {
+          var diff = level[0] - level[2];
+          if (Math.abs(diff) < 1) { stopTransfer("Balanced. Both wing tanks now hold the same amount."); return; }
+          src = diff > 0 ? 0 : 2;
+          dst = diff > 0 ? 2 : 0;
+        }
+        var amount = Math.min(RATE, level[src], CAP[dst] - level[dst]);
+        if (mode.auto) amount = Math.min(amount, Math.abs(level[0] - level[2]) / 2);
+        if (amount <= 0.01) {
+          stopTransfer(level[src] <= 0.01 ? NAMES[src] + " is empty, so the transfer stops." : NAMES[dst] + " is full, so the transfer stops. Never overfill a tank.");
+          return;
+        }
+        level[src] -= amount;
+        level[dst] += amount;
+      }
       draw();
-      status();
     }
 
+    function chooseDifferent(changed) {
+      if (Number(selSrc.value) !== Number(selDst.value)) return;
+      var other = (Number(changed.value) + 1) % 3;
+      (changed === selSrc ? selDst : selSrc).value = String(other);
+    }
+    function readSelects() { src = Number(selSrc.value); dst = Number(selDst.value); }
+    selSrc.addEventListener("change", function () { chooseDifferent(selSrc); readSelects(); draw(); });
+    selDst.addEventListener("change", function () { chooseDifferent(selDst); readSelects(); draw(); });
+
+    goBtn.addEventListener("click", function () {
+      if (mode && !mode.auto) { stopTransfer("Transfer stopped."); return; }
+      readSelects();
+      mode = { auto: false };
+      say("Pumping fuel from the " + NAMES[src].toLowerCase() + " to the " + NAMES[dst].toLowerCase() + ". Watch one quantity fall and the other rise.");
+      draw();
+    });
+    balBtn.addEventListener("click", function () {
+      if (mode && mode.auto) { stopTransfer("Balancing stopped."); return; }
+      if (Math.abs(level[0] - level[2]) < 1) { say("The wings are already balanced."); return; }
+      mode = { auto: true };
+      shown.src = -2;
+      say("Balancing: fuel moves from the heavier wing to the lighter wing until both are equal.");
+      tick();
+    });
+    flyBtn.addEventListener("click", function () {
+      flying = !flying;
+      say(flying ? "Flying: the engines use fuel, and the left side uses twice as much. Watch the imbalance grow, then press Balance wings." : "Stopped flying.");
+      draw();
+    });
+    function reset(balanced) {
+      mode = null; flying = false;
+      level = balanced ? [600, 1000, 600] : [700, 1000, 400];
+      say(balanced ? "Reset: left and right are balanced." : "Reset: the left wing holds more than the right.");
+      draw();
+    }
+    document.getElementById("tx-reset-u").addEventListener("click", function () { reset(false); });
+    document.getElementById("tx-reset-b").addEventListener("click", function () { reset(true); });
+
+    miniCheck(document.getElementById("tx-checks"), TRANSFER_CHECKS);
     draw();
-    status();
     return {
-      show: function () { if (!timer) timer = setInterval(tick, 400); },
+      show: function () { if (!timer) timer = setInterval(tick, TICK_MS); },
       hide: function () { clearInterval(timer); timer = null; }
     };
   };

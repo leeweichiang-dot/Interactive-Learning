@@ -223,18 +223,61 @@
 
     <!-- 6. TRANSFER -->
     <section class="page" id="page-transfer" aria-labelledby="h-transfer">
-      <h2 id="h-transfer">Fuel Transfer System</h2>
-      <p class="lead">Wing tanks are big, but the engine only drinks from the small feed tank. <b>Transfer</b> moves fuel from the wing tanks into the feed tank, and keeps left and right sides in balance.</p>
-      <div class="panel">
-        <div class="tank-row" id="t-tanks"></div>
-        <div class="row" style="margin-top:1rem" id="t-controls"></div>
-        <div class="status" id="t-status" role="status" aria-live="polite"></div>
+      <h2 id="h-transfer">Fuel Transfer Simulator</h2>
+      <p class="lead">An aircraft often carries fuel in more than one tank. <b>Fuel transfer</b> means pumping fuel from one tank to another through a shared pipe, to keep the aircraft balanced and the engines supplied.</p>
+      <div class="goal">Try it: pick two tanks and start a transfer, press <b>Balance wings</b>, or press <b>Fly</b> to see how an imbalance can build up.</div>
+
+      <div class="panel tx-sim">
+        <div class="tx-top">
+          <div>
+            <svg viewBox="0 0 600 340" role="img" aria-label="Left, centre and right fuel tanks joined by a transfer pipe" id="tx-svg"></svg>
+          </div>
+          <div class="tx-side">
+            <h4>Balance check <small>(seen from behind the aircraft)</small></h4>
+            <svg viewBox="0 0 240 130" role="img" aria-label="Rear view of the aircraft, tilting toward the heavier wing" id="tx-plane">
+              <g id="tx-plane-g" style="transform-origin:120px 70px;transition:transform .4s">
+                <rect x="10" y="64" width="220" height="12" rx="6" fill="var(--muted)"/>
+                <ellipse cx="120" cy="70" rx="20" ry="26" fill="var(--sky)"/>
+                <path d="M120 44 L110 14 L130 14 Z" fill="var(--sky)"/>
+                <circle cx="45" cy="70" r="9" fill="var(--fuel)"/><circle cx="195" cy="70" r="9" fill="var(--fuel)"/>
+              </g>
+              <text x="12" y="122" style="font-size:12px;fill:var(--muted)">LEFT wing</text>
+              <text x="228" y="122" text-anchor="end" style="font-size:12px;fill:var(--muted)">RIGHT wing</text>
+            </svg>
+            <div class="tx-balance" aria-hidden="true"><i id="tx-dot"></i></div>
+            <div class="tx-scale" aria-hidden="true"><span>← Left heavier</span><span>Right heavier →</span></div>
+            <div class="status good" id="tx-bal-status"></div>
+            <dl class="tx-nums">
+              <div><dt>Left</dt><dd id="tx-n-L"></dd></div>
+              <div><dt>Centre</dt><dd id="tx-n-C"></dd></div>
+              <div><dt>Right</dt><dd id="tx-n-R"></dd></div>
+              <div><dt>Total</dt><dd id="tx-n-T"></dd></div>
+            </dl>
+          </div>
+        </div>
+
+        <div class="tx-controls">
+          <label>From <select id="tx-src"><option value="0">Left tank</option><option value="1" selected>Centre tank</option><option value="2">Right tank</option></select></label>
+          <label>To <select id="tx-dst"><option value="0">Left tank</option><option value="1">Centre tank</option><option value="2" selected>Right tank</option></select></label>
+          <button class="btn" id="tx-go">▶ Start transfer</button>
+          <button class="btn amber" id="tx-bal">⚖️ Balance wings</button>
+          <button class="btn alt" id="tx-fly" aria-pressed="false">✈️ Fly (left side uses more fuel)</button>
+          <button class="btn alt" id="tx-reset-u">Reset: uneven</button>
+          <button class="btn alt" id="tx-reset-b">Reset: balanced</button>
+        </div>
+        <div class="status mid" id="tx-caption" role="status" aria-live="polite">Choose two tanks and press Start transfer.</div>
+        <p class="qi-note">Teaching values. Real aircraft have their own tank sizes, transfer rates and balance limits.</p>
       </div>
+
+      <h3>Why it matters</h3>
       <div class="grid">
-        <div class="card"><h3><span class="icon">🔄</span>Transfer</h3><p>Pumps or valves move fuel from one tank to another. Fuel can also flow by gravity.</p></div>
-        <div class="card"><h3><span class="icon">⚖️</span>Balance</h3><p>Use fuel from both wings evenly. A big difference is a control problem and a warning sign for a fault.</p></div>
-        <div class="card"><h3><span class="icon">🔧</span>Maintenance</h3><p>Check transfer valves open and close fully, and that pumps run without noise or low pressure.</p></div>
+        <div class="card"><h3><span class="icon">⚖️</span>Why balancing is important</h3><p>Fuel is heavy. An aircraft flies best when its weight is spread evenly. Balanced fuel keeps the aircraft level and keeps its <b>balance point</b> (centre of gravity) in a safe place.</p></div>
+        <div class="card"><h3><span class="icon">📐</span>Effect of imbalance</h3><p>The heavier wing drops, so the aircraft wants to roll that way. The pilot must keep correcting, which adds drag and uses more fuel. A big imbalance can make the aircraft hard to control, especially at low speed when landing.</p></div>
+        <div class="card"><h3><span class="icon">🧭</span>Operational considerations</h3><p>Crews use fuel in a set order and watch the quantities. They transfer fuel only as the procedure allows. Maintenance checks that pumps and valves work, that quantity readings are right on both sides, and that transfers stop before a tank overflows through its vent.</p></div>
       </div>
+
+      <h3>Quick check</h3>
+      <div class="panel" id="tx-checks"></div>
       <div class="pager"></div>
     </section>
 

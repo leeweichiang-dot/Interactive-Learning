@@ -39,7 +39,8 @@
   }
 
   /* ---------- 4. Components lesson ---------- */
-  // `image` is null for now, so a placeholder is shown. Put a picture in images/ and set e.g. image: "images/fuel-tank.jpg".
+  // `image` is null for now, so a photo placeholder is shown. Put a picture in images/ and set image: "images/fuel-tank.jpg"
+  // and credit: "Photo: <author>, <licence>, <source>" (keep the credit with any photo you add).
   var COMPONENTS = [
     { id: "tanks", name: "Fuel Tanks", icon: "🛢️", short: "Store the fuel", image: null, photo: "a wing fuel tank cut-away",
       fn: "Store the fuel until it is needed. Many aircraft use the wing and body structure itself as a tank.",
@@ -123,23 +124,65 @@
       }
     }
 
+    // Top view of the aircraft with the component's location highlighted (same layout as the Overview diagram).
+    var NS = "http://www.w3.org/2000/svg";
+    var DIAGRAM_BASE =
+      '<path class="airframe" d="M400 22 C440 40 472 80 472 150 L472 460 L492 500 L308 500 L328 460 L328 150 C328 80 360 40 400 22Z"/>' +
+      '<polygon class="airframe" points="330,170 56,296 56,348 330,300"/><polygon class="airframe" points="470,170 744,296 744,348 470,300"/>' +
+      '<g class="ctx"><polygon points="340,195 110,300 110,335 340,275"/><polygon points="460,195 690,300 690,335 460,275"/>' +
+      '<rect x="362" y="100" width="76" height="120" rx="8"/><rect x="335" y="430" width="55" height="60" rx="8"/><rect x="410" y="430" width="55" height="60" rx="8"/>' +
+      '<rect x="365" y="58" width="70" height="26" rx="6"/></g>';
+    var WING_L = "340,195 110,300 110,335 340,275", WING_R = "460,195 690,300 690,335 460,275";
+    function diamond(x, y, r) { return '<polygon class="hl" points="' + x + ',' + (y - r) + ' ' + (x + r) + ',' + y + ' ' + x + ',' + (y + r) + ' ' + (x - r) + ',' + y + '"/>'; }
+    var LOCATIONS = {
+      tanks: { label: [400, 262, "Wing and centre tanks"], shapes: '<polygon class="hl" points="' + WING_L + '"/><polygon class="hl" points="' + WING_R + '"/><rect class="hl" x="362" y="100" width="76" height="120" rx="8"/>' },
+      boost: { label: [400, 262, "Inside the tanks, near the bottom"], shapes: '<circle class="hl" cx="326" cy="266" r="16"/><circle class="hl" cx="474" cy="266" r="16"/><circle class="hl" cx="400" cy="206" r="16"/>' },
+      edp: { label: [400, 520, "On each engine"], shapes: '<rect class="hl" x="343" y="436" width="39" height="22" rx="4"/><rect class="hl" x="418" y="436" width="39" height="22" rx="4"/>' },
+      filters: { label: [400, 340, "Between the tanks and the engines"], shapes: '<path class="ctx-line" d="M362 330 L362 392 M438 330 L438 392 M362 408 L362 430 M438 408 L438 430"/><rect class="hl" x="352" y="392" width="20" height="16" rx="3"/><rect class="hl" x="428" y="392" width="20" height="16" rx="3"/>' },
+      shutoff: { label: [400, 340, "At tank outlets and before the engines"], shapes: diamond(338, 272, 13) + diamond(462, 272, 13) + diamond(400, 232, 13) + diamond(362, 378, 13) + diamond(438, 378, 13) },
+      sensors: { label: [400, 262, "Inside every tank"], shapes: '<path class="hl-line" d="M250 244 L250 290 M180 275 L180 309 M550 244 L550 290 M620 275 L620 309 M372 140 L372 208 M428 140 L428 208"/>' },
+      gauges: { label: [560, 74, "Cockpit"], shapes: '<rect class="hl" x="365" y="58" width="70" height="26" rx="6"/>' },
+      vent: { label: [400, 400, "Wing-tip outlets"], shapes: '<path class="hl-line" d="M150 296 L84 318 M650 296 L716 318"/><circle class="hl" cx="76" cy="320" r="12"/><circle class="hl" cx="724" cy="320" r="12"/>' }
+    };
+
+    function locationDiagram(c) {
+      var spec = LOCATIONS[c.id];
+      var svg = document.createElementNS(NS, "svg");
+      svg.setAttribute("viewBox", "0 0 800 540");
+      svg.setAttribute("class", "loc-svg");
+      svg.setAttribute("role", "img");
+      svg.setAttribute("aria-label", "Top view of an aircraft. The highlighted part shows where the " + c.name.toLowerCase() + " are: " + c.loc);
+      var label = spec.label;
+      svg.innerHTML = DIAGRAM_BASE + spec.shapes +
+        '<text class="hl-label" x="' + label[0] + '" y="' + label[1] + '" text-anchor="middle">' + label[2] + '</text>';
+      return svg;
+    }
+
+    // Two pictures side by side: where it is on the aircraft, and a photo (placeholder until one is added).
     function placeholder(c) {
-      var fig = el("figure", "lc-figure");
+      var wrap = el("div", "lc-media");
+      var f1 = el("figure", "lc-figure");
+      f1.appendChild(locationDiagram(c));
+      f1.appendChild(el("figcaption", null, "Where it is on the aircraft (top view, simplified)."));
+      var f2 = el("figure", "lc-figure");
       if (c.image) {
         var img = el("img");
         img.src = c.image;
         img.alt = c.name;
-        fig.appendChild(img);
+        f2.appendChild(img);
+        f2.appendChild(el("figcaption", null, c.credit || ""));
       } else {
         var ph = el("div", "img-ph");
         ph.setAttribute("role", "img");
-        ph.setAttribute("aria-label", "Image placeholder: " + c.photo);
+        ph.setAttribute("aria-label", "Photo placeholder: " + c.photo);
         ph.appendChild(el("span", "ph-icon", c.icon));
-        ph.appendChild(el("span", null, "Image placeholder"));
-        fig.appendChild(ph);
+        ph.appendChild(el("span", null, "Photo to be added"));
+        f2.appendChild(ph);
+        f2.appendChild(el("figcaption", null, "Photo of " + c.photo + "."));
       }
-      fig.appendChild(el("figcaption", null, "Add a photo or diagram of " + c.photo + "."));
-      return fig;
+      wrap.appendChild(f1);
+      wrap.appendChild(f2);
+      return wrap;
     }
 
     function facts(c) {
@@ -281,93 +324,208 @@
   ];
 
   FL.inits.quantity = function () {
-    var CAPACITY = 2000;   // kg, a teaching value
-    var LOW = 20, CRITICAL = 10;
     var NS = "http://www.w3.org/2000/svg";
-    var range = document.getElementById("q-range");
-    var faultBtn = document.getElementById("q-fault");
-    var flyBtn = document.getElementById("q-fly");
+    var LOW = 20, CRITICAL = 10;
+    var TANKS = [
+      { key: "L", name: "Left tank", cap: 1000, level: 50 },
+      { key: "C", name: "Centre tank", cap: 2000, level: 50 },
+      { key: "R", name: "Right tank", cap: 1000, level: 50 }
+    ];
+    var faultOn = false, stuckLeft = 50, timer = null, lastZone = null;
     var statusEl = document.getElementById("q-status");
-    var faultOn = false, stuck = 50, timer = null, lastZone = null;
-    var cx = 160, cy = 160;
+    var flyBtn = document.getElementById("q-fly");
+    var faultBtn = document.getElementById("q-fault");
+    var svg = document.getElementById("qa-svg");
+    var sliders = {}, outs = {}, cols = {}, shapes = {};
 
-    function pt(p, r) {
-      var th = Math.PI * (1 - p / 100);
-      return [cx + r * Math.cos(th), cy - r * Math.sin(th)];
+    function mk(tag, attrs, parent) {
+      var e = document.createElementNS(NS, tag);
+      Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+      if (parent) parent.appendChild(e);
+      return e;
     }
+
+    /* ---- Aircraft drawing ---- */
+    mk("path", { class: "airframe", d: "M400 22 C440 40 472 80 472 150 L472 460 L492 500 L308 500 L328 460 L328 150 C328 80 360 40 400 22Z" }, svg);
+    mk("polygon", { class: "airframe", points: "330,170 56,296 56,348 330,300" }, svg);
+    mk("polygon", { class: "airframe", points: "470,170 744,296 744,348 470,300" }, svg);
+
+    // Wing tanks: the fuel level line runs from the bottom edge to the top edge, so a probe at any position
+    // is covered by exactly the fuel level (its wet part = the percentage).
+    var WING = {
+      L: { outline: "340,195 110,300 110,335 340,275", rootX: 340, tipX: 110, rootBottom: 275, tipBottom: 335, rootTop: 195, tipTop: 300, probes: [300, 220] },
+      R: { outline: "460,195 690,300 690,335 460,275", rootX: 460, tipX: 690, rootBottom: 275, tipBottom: 335, rootTop: 195, tipTop: 300, probes: [500, 580] }
+    };
+    function edge(w, x, which) {   // y of the tank's top or bottom edge at position x
+      var t = (x - w.rootX) / (w.tipX - w.rootX);
+      return which === "top" ? w.rootTop + t * (w.tipTop - w.rootTop) : w.rootBottom + t * (w.tipBottom - w.rootBottom);
+    }
+    function levelPoints(w, lvl) {   // polygon covering the fuel (and, extended downward, the wet part of the probes)
+      var yR = w.rootBottom - (w.rootBottom - w.rootTop) * lvl, yT = w.tipBottom - (w.tipBottom - w.tipTop) * lvl;
+      return [[w.rootX, yR], [w.tipX, yT], [w.tipX, 345], [w.rootX, 345]].map(function (p) { return p.join(","); }).join(" ");
+    }
+
+    var wires = {};
+    function wire(key, d) { wires[key] = mk("path", { class: "sig", d: d }, svg); }
+    wire("L", "M300 " + (edge(WING.L, 300, "top") + 4) + " L300 71 L365 71");
+    wire("R", "M500 " + (edge(WING.R, 500, "top") + 4) + " L500 71 L435 71");
+    wire("C", "M400 100 L400 84");
+
+    mk("rect", { class: "qa-box", x: 365, y: 58, width: 70, height: 26, rx: 6 }, svg);
+    mk("text", { class: "lbl", x: 400, y: 75, "text-anchor": "middle" }, svg).textContent = "Computer";
+    mk("text", { class: "lbl out", x: 400, y: 14, "text-anchor": "middle" }, svg).textContent = "to the cockpit ↑";
+
+    TANKS.forEach(function (t) {
+      var s = shapes[t.key] = {};
+      var clipId = "qa-clip-" + t.key, wetId = "qa-wet-" + t.key;
+      var clip = mk("clipPath", { id: clipId }, svg);
+      var wet = mk("clipPath", { id: wetId }, svg);
+      if (t.key === "C") {
+        mk("rect", { x: 362, y: 100, width: 76, height: 120, rx: 8 }, clip);
+        s.outline = mk("rect", { class: "qa-tank", x: 362, y: 100, width: 76, height: 120, rx: 8 }, svg);
+        s.fuel = mk("rect", { class: "qa-fuel", x: 362, y: 220, width: 76, height: 0, "clip-path": "url(#" + clipId + ")" }, svg);
+        s.wetRect = mk("rect", { x: 340, y: 220, width: 120, height: 0 }, wet);
+        [370, 430].forEach(function (x) {
+          mk("line", { class: "probe-dry", x1: x, y1: 108, x2: x, y2: 212 }, svg);
+          mk("line", { class: "probe-wet", x1: x, y1: 108, x2: x, y2: 212, "clip-path": "url(#" + wetId + ")" }, svg);
+        });
+        s.label = mk("text", { class: "lbl big", x: 400, y: 160, "text-anchor": "middle" }, svg);
+        s.name = mk("text", { class: "lbl", x: 400, y: 143, "text-anchor": "middle" }, svg);
+        s.name.textContent = "Centre";
+      } else {
+        var w = WING[t.key];
+        mk("polygon", { points: w.outline }, clip);
+        s.outline = mk("polygon", { class: "qa-tank", points: w.outline }, svg);
+        s.fuel = mk("polygon", { class: "qa-fuel", points: levelPoints(w, 0), "clip-path": "url(#" + clipId + ")" }, svg);
+        s.wetPoly = mk("polygon", { points: levelPoints(w, 0) }, wet);
+        w.probes.forEach(function (x) {
+          var y1 = edge(w, x, "top") + 5, y2 = edge(w, x, "bottom") - 5;
+          mk("line", { class: "probe-dry", x1: x, y1: y1, x2: x, y2: y2 }, svg);
+          mk("line", { class: "probe-wet", x1: x, y1: y1, x2: x, y2: y2, "clip-path": "url(#" + wetId + ")" }, svg);
+        });
+        var lx = t.key === "L" ? 190 : 610;
+        s.name = mk("text", { class: "lbl", x: lx, y: 362, "text-anchor": "middle" }, svg);
+        s.name.textContent = t.key === "L" ? "Left tank" : "Right tank";
+        s.label = mk("text", { class: "lbl big", x: lx, y: 382, "text-anchor": "middle" }, svg);
+      }
+      var sx = t.key === "L" ? 292 : t.key === "R" ? 508 : 446;
+      var sy = t.key === "C" ? 96 : 140;
+      s.sigText = mk("text", { class: "lbl sm", x: sx, y: sy, "text-anchor": t.key === "L" ? "end" : "start" }, svg);
+    });
+    // Broken-wire marker (shown only during the fault)
+    var cross = mk("g", { class: "qa-break", visibility: "hidden" }, svg);
+    mk("line", { x1: 290, y1: 120, x2: 310, y2: 140 }, cross);
+    mk("line", { x1: 310, y1: 120, x2: 290, y2: 140 }, cross);
+
+    /* ---- Cockpit: total dial and a bar for each tank ---- */
+    var cx = 160, cy = 160;
+    function pt(p, r) { var th = Math.PI * (1 - p / 100); return [cx + r * Math.cos(th), cy - r * Math.sin(th)]; }
     function arc(p0, p1, r, color) {
       var a = pt(p0, r), b = pt(p1, r);
-      var path = document.createElementNS(NS, "path");
-      path.setAttribute("d", "M" + a[0] + " " + a[1] + " A" + r + " " + r + " 0 0 1 " + b[0] + " " + b[1]);
-      path.setAttribute("stroke", color);
-      return path;
+      return mk("path", { d: "M" + a[0] + " " + a[1] + " A" + r + " " + r + " 0 0 1 " + b[0] + " " + b[1], stroke: color });
     }
-    // Dial: red 0-10, amber 10-20, green above.
     var zones = document.getElementById("qc-zones");
     zones.appendChild(arc(0, CRITICAL, 112, "#d23b3b"));
     zones.appendChild(arc(CRITICAL, LOW, 112, "#f2a900"));
     zones.appendChild(arc(LOW, 100, 112, "#2e8b57"));
-    var ticks = document.getElementById("qc-ticks");
     [0, 25, 50, 75, 100].forEach(function (p) {
-      var a = pt(p, 124), b = pt(p, 134);
-      var line = document.createElementNS(NS, "line");
-      line.setAttribute("x1", a[0]); line.setAttribute("y1", a[1]); line.setAttribute("x2", b[0]); line.setAttribute("y2", b[1]);
-      line.setAttribute("stroke", "#9db0c8"); line.setAttribute("stroke-width", "2");
-      ticks.appendChild(line);
-      var t = document.createElementNS(NS, "text");
-      var c = pt(p, 146);
-      t.setAttribute("x", c[0]); t.setAttribute("y", c[1] + 4); t.setAttribute("text-anchor", "middle");
-      t.setAttribute("fill", "#9db0c8"); t.style.fontSize = "11px";
-      t.textContent = p === 0 ? "E" : p === 100 ? "F" : String(p);
-      ticks.appendChild(t);
+      var a = pt(p, 124), b = pt(p, 134), c = pt(p, 146), g = document.getElementById("qc-ticks");
+      g.appendChild(mk("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: "#9db0c8", "stroke-width": 2 }));
+      var tx = mk("text", { x: c[0], y: c[1] + 4, "text-anchor": "middle", fill: "#9db0c8", style: "font-size:11px" });
+      tx.textContent = p === 0 ? "E" : p === 100 ? "F" : String(p);
+      g.appendChild(tx);
     });
-    var segsEl = document.getElementById("qc-segs");
-    var segs = [];
-    for (var i = 0; i < 10; i++) { var sg = document.createElement("i"); segs.push(sg); segsEl.appendChild(sg); }
+
+    var colBox = document.getElementById("qc-tanks");
+    TANKS.forEach(function (t) {
+      var col = document.createElement("div");
+      col.className = "qc-col";
+      var name = document.createElement("div"); name.className = "qc-name"; name.textContent = t.key === "L" ? "LEFT" : t.key === "C" ? "CENTRE" : "RIGHT";
+      var bar = document.createElement("div"); bar.className = "qc-bar"; bar.setAttribute("aria-hidden", "true");
+      var segs = [];
+      for (var i = 0; i < 10; i++) { var sg = document.createElement("i"); segs.push(sg); bar.appendChild(sg); }
+      var kg = document.createElement("div"); kg.className = "qc-kg";
+      var flag = document.createElement("div"); flag.className = "qc-flag";
+      col.appendChild(name); col.appendChild(bar); col.appendChild(kg); col.appendChild(flag);
+      colBox.appendChild(col);
+      cols[t.key] = { segs: segs, kg: kg, flag: flag };
+    });
+
+    /* ---- Sliders ---- */
+    var slBox = document.getElementById("qa-sliders");
+    TANKS.forEach(function (t) {
+      var wrap = document.createElement("div"); wrap.className = "qa-slider";
+      var lab = document.createElement("label"); lab.setAttribute("for", "q-" + t.key);
+      var b = document.createElement("b"); b.textContent = t.name + ": ";
+      var out = document.createElement("span"); out.id = "q-out-" + t.key;
+      lab.appendChild(b); lab.appendChild(out);
+      var inp = document.createElement("input");
+      inp.type = "range"; inp.id = "q-" + t.key; inp.className = "range"; inp.min = "0"; inp.max = "100"; inp.value = String(t.level);
+      inp.setAttribute("aria-describedby", "q-status");
+      inp.addEventListener("input", function () { stopFly(); t.level = Number(inp.value); render(); });
+      wrap.appendChild(lab); wrap.appendChild(inp);
+      slBox.appendChild(wrap);
+      sliders[t.key] = inp; outs[t.key] = out;
+    });
+
+    function shown(t) { return faultOn && t.key === "L" ? stuckLeft : t.level; }
 
     function render() {
-      var actual = Number(range.value);
-      var shown = faultOn ? stuck : actual;
-      document.getElementById("q-pct").textContent = actual;
-      document.getElementById("qt-pct").textContent = actual + "%";
-
-      // Tank and probes follow the real level.
-      var h = 216 * actual / 100;
-      var fuel = document.getElementById("qt-fuel");
-      fuel.setAttribute("y", String(238 - h)); fuel.setAttribute("height", String(h));
-      var wet = document.getElementById("qt-wetrect");
-      wet.setAttribute("y", String(238 - h)); wet.setAttribute("height", String(h));
-
-      // Cockpit follows the shown level (the real one unless the reading is stuck).
-      document.getElementById("qc-needle").style.transform = "rotate(" + (shown * 1.8) + "deg)";
-      var kg = Math.round(CAPACITY * shown / 100);
-      document.getElementById("qc-kg").textContent = kg;
-      document.getElementById("qc-pct").textContent = shown;
-      var lit = Math.ceil(shown / 10);
-      segs.forEach(function (sg, k) {
-        sg.className = k < lit ? (k === 0 ? "on red" : k === 1 ? "on amber" : "on") : "";
+      var totalCap = 0, totalKg = 0, totalShownKg = 0, alarms = [];
+      var lowList = [], critList = [];
+      TANKS.forEach(function (t) {
+        var s = shapes[t.key], lv = t.level / 100, sh = shown(t);
+        sliders[t.key].value = String(Math.round(t.level));
+        outs[t.key].textContent = Math.round(t.level) + "% (" + Math.round(t.cap * t.level / 100) + " kg)";
+        // aircraft: real fuel and probes
+        if (t.key === "C") {
+          var y = 220 - 120 * lv;
+          s.fuel.setAttribute("y", y); s.fuel.setAttribute("height", 220 - y);
+          s.wetRect.setAttribute("y", y); s.wetRect.setAttribute("height", 220 - y + 10);
+        } else {
+          var pts = levelPoints(WING[t.key], lv);
+          s.fuel.setAttribute("points", pts); s.wetPoly.setAttribute("points", pts);
+        }
+        s.outline.setAttribute("class", "qa-tank" + (t.level <= CRITICAL ? " crit" : t.level <= LOW ? " low" : ""));
+        s.label.textContent = Math.round(t.level) + "%";
+        // signal: thicker and brighter with more fuel; none if the wire is broken
+        var broken = faultOn && t.key === "L";
+        var w = wires[t.key];
+        w.setAttribute("class", "sig" + (broken ? " broken" : lv <= 0 ? " none" : ""));
+        w.style.strokeWidth = broken ? 3 : (1.5 + 6 * lv).toFixed(1);
+        w.style.opacity = broken ? 1 : (0.35 + 0.65 * lv).toFixed(2);
+        s.sigText.textContent = broken ? "no signal" : "signal " + Math.round(t.level) + "%";
+        // cockpit
+        var c = cols[t.key], lit = Math.ceil(sh / 10);
+        c.segs.forEach(function (sg, k) { sg.className = k < lit ? (k === 0 ? "on red" : k === 1 ? "on amber" : "on") : ""; });
+        c.kg.textContent = Math.round(t.cap * sh / 100) + " kg";
+        c.flag.textContent = sh <= CRITICAL ? "CRIT" : sh <= LOW ? "LOW" : "";
+        c.flag.className = "qc-flag" + (sh <= CRITICAL ? " red" : sh <= LOW ? " amber" : "");
+        if (sh <= CRITICAL) critList.push(t.name); else if (sh <= LOW) lowList.push(t.name);
+        totalCap += t.cap; totalShownKg += t.cap * sh / 100; totalKg += t.cap * t.level / 100;
       });
-      var crit = shown <= CRITICAL, low = shown <= LOW;
-      document.getElementById("qc-low").classList.toggle("lit", low);
-      document.getElementById("qc-crit").classList.toggle("lit", crit);
-      document.getElementById("qc-crit").classList.toggle("flash", crit);
+      shapes.L.sigText.parentNode.querySelector(".qa-break").setAttribute("visibility", faultOn ? "visible" : "hidden");
+      var pct = Math.round(totalShownKg / totalCap * 100);
+      document.getElementById("qc-needle").style.transform = "rotate(" + (pct * 1.8) + "deg)";
+      document.getElementById("qc-kg").textContent = Math.round(totalShownKg);
+      document.getElementById("qc-pct").textContent = pct;
+      document.getElementById("qc-low").classList.toggle("lit", lowList.length + critList.length > 0);
+      document.getElementById("qc-crit").classList.toggle("lit", critList.length > 0);
+      document.getElementById("qc-crit").classList.toggle("flash", critList.length > 0);
+      document.getElementById("qc-which").textContent = critList.length || lowList.length
+        ? "Warning for: " + critList.concat(lowList).join(", ") : "";
 
-      document.getElementById("qf-1").textContent = actual + "% of the probe covered";
-      document.getElementById("qf-2").textContent = faultOn ? "signal lost: no change" : "signal turned into kg";
-      document.getElementById("qf-3").textContent = kg + " kg shown";
-
-      var zone, cls, msg;
-      if (faultOn && Math.abs(stuck - actual) > 10) {
+      var left = TANKS[0], zone, cls, msg;
+      if (faultOn && Math.abs(stuckLeft - left.level) > 10) {
         zone = "fault"; cls = "bad";
-        msg = "The cockpit says " + stuck + "% but the tank holds " + actual + "%." + (actual <= LOW && shown > LOW ? " There is NO low fuel warning. Always check a doubtful reading against another source." : " The reading is wrong. Check it against another source.");
-      } else if (shown <= 0) { zone = "empty"; cls = "bad"; msg = "Tank empty. Fuel critical warning is flashing."; }
-      else if (crit) { zone = "crit"; cls = "bad"; msg = "FUEL CRITICAL (red, flashing): land as soon as possible."; }
-      else if (low) { zone = "low"; cls = "mid"; msg = "LOW FUEL (amber): fuel is low. Plan to land."; }
-      else { zone = "ok"; cls = "good"; msg = "Normal: no warnings. The cockpit matches the tank."; }
+        msg = "The cockpit says the left tank has " + stuckLeft + "%, but it really has " + Math.round(left.level) + "%." +
+          (left.level <= LOW && stuckLeft > LOW ? " There is NO low fuel warning for it. Always check a doubtful reading against another source." : " The reading is wrong. Check it against another source.");
+      } else if (critList.length) { zone = "crit:" + critList.join(); cls = "bad"; msg = "FUEL CRITICAL (red, flashing): " + critList.join(", ") + ". Land as soon as possible."; }
+      else if (lowList.length) { zone = "low:" + lowList.join(); cls = "mid"; msg = "LOW FUEL (amber): " + lowList.join(", ") + ". Plan to land."; }
+      else { zone = "ok"; cls = "good"; msg = "Normal: no warnings. The cockpit matches the tanks."; }
       statusEl.className = "status " + cls;
       // Only change the spoken text when the situation changes, not on every slider step.
-      if (zone !== lastZone) { statusEl.textContent = msg; lastZone = zone; }
-      else if (zone === "fault") statusEl.textContent = msg;
+      if (zone !== lastZone || zone === "fault") { statusEl.textContent = msg; lastZone = zone; }
     }
 
     function stopFly() {
@@ -377,24 +535,30 @@
       flyBtn.textContent = "✈️ Use fuel";
     }
 
-    range.addEventListener("input", function () { stopFly(); render(); });
-    document.querySelectorAll("#page-quantity [data-level]").forEach(function (b) {
-      b.addEventListener("click", function () { stopFly(); range.value = b.dataset.level; render(); });
+    var PRESETS = { empty: [0, 0, 0], half: [50, 50, 50], full: [100, 100, 100], left: [15, 60, 60] };
+    document.querySelectorAll("#page-quantity [data-preset]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        stopFly();
+        PRESETS[b.dataset.preset].forEach(function (v, i) { TANKS[i].level = v; });
+        render();
+      });
     });
     flyBtn.addEventListener("click", function () {
       if (timer) { stopFly(); return; }
-      if (Number(range.value) <= 0) range.value = 100;
+      if (TANKS.every(function (t) { return t.level <= 0; })) TANKS.forEach(function (t) { t.level = 100; });
       flyBtn.setAttribute("aria-pressed", "true");
       flyBtn.textContent = "■ Stop";
       timer = setInterval(function () {
-        range.value = Math.max(0, Number(range.value) - 1);
+        // The centre tank is used first, then both wing tanks.
+        if (TANKS[1].level > 0) TANKS[1].level = Math.max(0, TANKS[1].level - 1);
+        else { TANKS[0].level = Math.max(0, TANKS[0].level - 0.7); TANKS[2].level = Math.max(0, TANKS[2].level - 0.7); }
         render();
-        if (Number(range.value) <= 0) stopFly();
+        if (TANKS.every(function (t) { return t.level <= 0; })) stopFly();
       }, 150);
     });
     faultBtn.addEventListener("click", function () {
       faultOn = !faultOn;
-      stuck = Number(range.value);
+      stuckLeft = Math.round(TANKS[0].level);
       faultBtn.setAttribute("aria-pressed", String(faultOn));
       document.getElementById("q-fault-pill").textContent = faultOn ? "On" : "Off";
       render();
@@ -402,8 +566,12 @@
 
     miniCheck(document.getElementById("q-checks"), QUANTITY_CHECKS);
 
+    var scroller = document.getElementById("qa-scroll");
     render();
-    return { hide: stopFly };
+    return {
+      show: function () { requestAnimationFrame(function () { scroller.scrollLeft = (scroller.scrollWidth - scroller.clientWidth) / 2; }); },
+      hide: stopFly
+    };
   };
 
   /* ---------- 6. Transfer ---------- */

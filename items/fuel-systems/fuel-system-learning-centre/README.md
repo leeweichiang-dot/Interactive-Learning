@@ -26,11 +26,11 @@ Every section is linked from the menu and from the Previous / Next buttons at th
 | 1 | **Home** (`#home`) | Reads the plain-English introduction, sees overall progress, follows the 8-module roadmap. |
 | 2 | **Overview** (`#overview`) | Learns the five jobs of a fuel system (store, supply, transfer, vent, measure) and key words. Explores a numbered diagram of a typical twin-engine fuel system (16 parts): tap a part for what it does and what maintenance checks, filter by job, and animate fuel flow in flight or while refuelling. |
 | 3 | **Fuel Flow Explorer** (`#explorer`) | Watches fuel move Tank → Pump → Filter → Fuel Control Unit → Engine, both on a top-view diagram of the aircraft and in a row of parts below it. Start, Stop and Step-by-step modes. The part the fuel is in lights up, parts it has passed are shaded, and the pipes show moving fuel. Hover or tap a part, on the aircraft or in the row, for Purpose, Location, Common faults and Maintenance. |
-| 4 | **Components** (`#components`) | Eight click-to-reveal cards (tanks, boost pumps, engine driven pumps, filters, shutoff valves, quantity sensors, gauges, vent system). Each has Function, Location, Importance, Failure symptoms, Maintenance concern, an image placeholder and a knowledge check. |
-| 5 | **Fuel Quantity Indication** (`#quantity`) | Moves a 0–100% slider and sees the tank, the cockpit dial, digital readout, bar and LOW FUEL / FUEL CRITICAL lights change. Can switch on a "stuck reading" fault. |
+| 4 | **Components** (`#components`) | Eight click-to-reveal cards (tanks, boost pumps, engine driven pumps, filters, shutoff valves, quantity sensors, gauges, vent system). Each has Function, Location, Importance, Failure symptoms, Maintenance concern, a knowledge check, a top-view aircraft diagram with the component's location highlighted, and a photo slot. |
+| 5 | **Fuel Quantity Indication** (`#quantity`) | Moves a slider for each of three tanks on an aircraft diagram: probes measure the fuel, signal wires to the computer get thicker as a tank fills, and the cockpit shows each tank, a total dial and the LOW FUEL / FUEL CRITICAL lights. Can burn fuel (centre tank first) and break the left signal wire to see a stuck reading. |
 | 6 | **Fuel Transfer** (`#transfer`) | Left, Centre and Right tanks with an animated transfer pipe. Transfers fuel, balances the wings, flies to build an imbalance, and sees the aircraft tilt. |
 | 7 | **Refuelling and Defuelling** (`#refuel`) | Puts the refuelling steps in order while a tank fills. Reads the defuelling steps. |
-| 8 | **Fuel System Safety** (`#hazards`) | Six hazards (contamination, water, leaks, static electricity, fire risk, FOD) with Cause, Impact, Warning signs and Prevention, then six scenarios with feedback after every choice. |
+| 8 | **Fuel System Safety** (`#hazards`) | Six hazards (contamination, water, leaks, static electricity, fire risk, FOD) with a picture, Cause, Impact, Warning signs and Prevention, then six scenarios (each with its picture) and feedback after every choice. |
 | 9 | **Troubleshooting Simulator** (`#simulator`) | Five faults, each in four steps (observe, inspect, identify the cause, select the fix), with instructor-style feedback, points, stars, ranks and badges. |
 | 10 | **Assessment** (`#quiz`) | 20 questions: multiple choice, drag and drop, matching and fuel-flow sequencing. Easy, Medium and Hard. Instant feedback and explanations. **Pass mark 80%.** |
 | 11 | **My Progress** (`#dashboard`) | Lessons completed, assessment scores, time spent, simulator attempts, weak topics, a progress bar, a radar chart, recommendations and an optional leaderboard. |
@@ -69,9 +69,14 @@ The scripts are classic scripts (not ES modules) so they run from `file://`.
 - **Hazards and safety scenarios:** `HAZARDS` and `SCENARIOS` in `js/safety.js`.
 - **Troubleshooting faults:** `SCENARIOS` in `js/simulator.js`.
 - **Roadmap modules:** `ROADMAP` in `js/app.js`.
-- **Images:** the component cards show an "Image placeholder". To use a real picture, create an `images/` folder here,
-  add the file, and set that component's `image` field in `js/lessons.js`, for example `image: "images/fuel-tank.jpg"`.
-  Use relative paths only.
+- **Photos:** each component card shows a "Photo to be added" slot next to its location diagram. To use a real photo,
+  create an `images/` folder here, add the file, and set that component's `image` and `credit` fields in
+  `js/lessons.js`, for example `image: "images/fuel-tank.jpg"` and `credit: "Photo: Author, CC BY 4.0, source"`.
+  The hazards work the same way: set `image` and `credit` on a hazard in `js/safety.js` to replace its illustration.
+  Use relative paths only, and only photos you are allowed to publish (public domain, CC0, or CC BY with the credit
+  shown). Keep the credit with the photo.
+- **Component location diagrams:** `LOCATIONS` in `js/lessons.js` (shapes drawn on the same aircraft outline as the Overview).
+- **Hazard pictures:** the illustrations are `PICTURES` in `js/safety.js`. They are original drawings, so they need no credit.
 
 ## Saved data
 

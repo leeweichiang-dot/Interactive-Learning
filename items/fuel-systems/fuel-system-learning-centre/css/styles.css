@@ -97,19 +97,6 @@ dt { font-weight: 700; color: var(--sky); } dd { margin: 0; }
 .panel svg { width: 100%; height: auto; display: block; }
 .diagram-wrap { display: grid; gap: 14px; }
 @media (min-width: 900px) { .diagram-wrap.two { grid-template-columns: 1.5fr 1fr; align-items: start; } }
-.s-line { stroke: var(--muted); stroke-width: 4; fill: none; stroke-linecap: round; }
-.s-line.flow { stroke: var(--line); }
-.s-line.flow.on { stroke: var(--fuel); stroke-dasharray: 9 7; animation: dash .8s linear infinite; }
-@keyframes dash { to { stroke-dashoffset: -16; } }
-.part { cursor: pointer; transition: filter .2s; }
-.part .shape { fill: var(--sky-soft); stroke: var(--sky); stroke-width: 2.5; }
-.part.tank .shape { fill: var(--fuel-soft); stroke: var(--fuel); }
-.part:hover .shape, .part.sel .shape { stroke: var(--amber); stroke-width: 4; }
-.part.sel { filter: drop-shadow(0 0 6px var(--amber)); }
-.part.off .shape { fill: var(--bad-soft); stroke: var(--bad); }
-.part text { fill: var(--ink); font-size: 13px; font-weight: 600; pointer-events: none; }
-.airframe { fill: var(--line); opacity: .55; stroke: var(--muted); stroke-width: 2; }
-.toggles { display: grid; gap: .5rem; }
 .switch { display: flex; justify-content: space-between; align-items: center; gap: .6rem; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .5rem .8rem; width: 100%; text-align: left; }
 .switch .pill { padding: .1rem .7rem; border-radius: 99px; font-size: .8rem; font-weight: 700; background: var(--bad-soft); color: var(--bad); }
 .switch[aria-pressed="true"] .pill { background: var(--ok-soft); color: var(--ok); }
@@ -117,9 +104,6 @@ dt { font-weight: 700; color: var(--sky); } dd { margin: 0; }
 .status.good { background: var(--ok-soft); color: var(--ok); }
 .status.bad { background: var(--bad-soft); color: var(--bad); }
 .status.mid { background: var(--amber-soft); color: var(--ink); }
-.steps-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .35rem; }
-.steps-list button { width: 100%; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: .45rem .7rem; }
-.steps-list button.sel { border-color: var(--amber); background: var(--amber-soft); font-weight: 600; }
 
 /* Components */
 .filters { display: flex; flex-wrap: wrap; gap: .4rem; margin: 1rem 0; }
@@ -216,3 +200,36 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 1r
 .road-card.complete .road-bar .track i { background: var(--ok); }
 .chip.ok { background: var(--ok-soft); color: var(--ok); } .chip.go { background: var(--amber-soft); color: var(--ink); }
 @media (min-width: 800px) { .roadmap { grid-template-columns: 1fr 1fr; } }
+
+/* Fuel Flow Explorer: five parts joined by pipes (horizontal on wide screens, vertical on phones) */
+.fx-controls { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-bottom: 1rem; }
+.fx-controls .btn[aria-pressed="true"] { background: var(--sky); color: #fff; border-color: var(--sky); }
+.fx-steps { display: inline-flex; gap: .5rem; flex-wrap: wrap; }
+.fx-chain { display: flex; flex-direction: column; align-items: stretch; }
+.fx-part { background: var(--card); border: 2px solid var(--line); border-radius: 14px; padding: .7rem .8rem; display: flex; align-items: center; gap: .7rem; text-align: left; transition: border-color .25s, background .25s, box-shadow .25s, transform .25s; }
+.fx-part .ico { font-size: 1.8rem; line-height: 1; }
+.fx-part b { display: block; font-size: .95rem; }
+.fx-part small { color: var(--muted); font-size: .78rem; }
+.fx-part:hover, .fx-part:focus-visible { border-color: var(--sky); }
+.fx-part.seen { background: var(--fuel-soft); border-color: var(--fuel); }
+.fx-part.active { background: var(--amber); border-color: var(--amber); color: #1a1200; transform: scale(1.04); box-shadow: 0 0 0 4px var(--amber-soft), 0 4px 16px rgba(242,169,0,.45); }
+.fx-part.active small { color: #3d2c00; }
+.fx-part.shown { outline: 3px solid var(--sky); outline-offset: 2px; }
+.fx-pipe { align-self: center; width: 14px; height: 34px; background: var(--line); border-radius: 7px; position: relative; overflow: hidden; margin: -2px 0; }
+.fx-pipe.flow { background-color: #8a5d00; background-image: repeating-linear-gradient(180deg, var(--fuel) 0 9px, transparent 9px 18px); background-size: 100% 18px; animation: fxv .6s linear infinite; }
+@keyframes fxv { to { background-position: 0 18px; } }
+@keyframes fxh { to { background-position: 18px 0; } }
+@media (min-width: 900px) {
+  .fx-chain { flex-direction: row; align-items: center; }
+  .fx-part { flex: 1 1 0; flex-direction: column; text-align: center; padding: 1rem .5rem; min-width: 0; }
+  .fx-pipe { flex: 0 0 34px; width: 34px; height: 14px; margin: 0 -2px; }
+  .fx-pipe.flow { background-image: repeating-linear-gradient(90deg, var(--fuel) 0 9px, transparent 9px 18px); background-size: 18px 100%; animation-name: fxh; }
+}
+.fx-info .head { display: flex; align-items: center; gap: .7rem; flex-wrap: wrap; margin-bottom: .6rem; }
+.fx-info .head .ico { font-size: 2rem; }
+.fx-info dl { display: grid; gap: .6rem; margin: 0; }
+.fx-info dl > div { border-radius: 10px; padding: .6rem .8rem; background: var(--bg); border: 1px solid var(--line); }
+.fx-info dt { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--sky); }
+.fx-info dl > div.fault { background: var(--bad-soft); } .fx-info dl > div.maint { background: var(--amber-soft); }
+.fx-info ul { margin: .2rem 0 0; padding-left: 1.2rem; }
+@media (min-width: 800px) { .fx-info dl { grid-template-columns: 1fr 1fr; } }

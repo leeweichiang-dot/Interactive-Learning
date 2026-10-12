@@ -92,51 +92,21 @@
     <!-- 3. FLOW EXPLORER -->
     <section class="page" id="page-explorer" aria-labelledby="h-explorer">
       <h2 id="h-explorer">Interactive Fuel Flow Explorer</h2>
-      <p class="lead">Tap any part in the diagram to learn about it. Then switch pumps and valves on and off to see what happens to the engine.</p>
-      <div class="diagram-wrap two">
-        <div class="panel">
-          <svg viewBox="0 0 800 440" role="img" aria-label="Top view of a simple aircraft showing fuel tanks, pumps, valve, filter and engine" id="fx-svg">
-            <path class="airframe" d="M400 20 C430 60 440 120 440 200 L440 385 L475 425 L325 425 L360 385 L360 200 C360 120 370 60 400 20Z"/>
-            <polygon class="airframe" points="360,170 80,300 80,335 360,275"/>
-            <polygon class="airframe" points="440,170 720,300 720,335 440,275"/>
-            <!-- pipes -->
-            <path class="s-line" d="M360 120 L400 120 L400 180" id="pipe-refuel"/>
-            <path class="s-line flow" d="M300 262 L372 236" id="pipe-L"/>
-            <path class="s-line flow" d="M500 262 L428 236" id="pipe-R"/>
-            <path class="s-line flow" d="M400 270 L400 340" id="pipe-main"/>
-            <!-- parts -->
-            <g class="part" data-part="refuel" tabindex="0" role="button" aria-label="Refuel point"><rect class="shape" x="318" y="104" width="44" height="32" rx="6"/><text x="340" y="124" text-anchor="middle">Fill</text></g>
-            <g class="part tank" data-part="tankL" tabindex="0" role="button" aria-label="Left wing tank"><polygon class="shape" points="345,188 140,292 140,316 345,260"/><text x="240" y="276" text-anchor="middle">Left wing tank</text></g>
-            <g class="part tank" data-part="tankR" tabindex="0" role="button" aria-label="Right wing tank"><polygon class="shape" points="455,188 660,292 660,316 455,260"/><text x="560" y="276" text-anchor="middle">Right wing tank</text></g>
-            <g class="part tank" data-part="feed" tabindex="0" role="button" aria-label="Feed tank"><rect class="shape" x="372" y="180" width="56" height="90" rx="8"/><text x="400" y="222" text-anchor="middle">Feed</text><text x="400" y="238" text-anchor="middle">tank</text></g>
-            <g class="part" data-part="pumpL" tabindex="0" role="button" aria-label="Left boost pump"><circle class="shape" cx="335" cy="250" r="14"/><text x="335" y="255" text-anchor="middle">L</text></g>
-            <g class="part" data-part="pumpR" tabindex="0" role="button" aria-label="Right boost pump"><circle class="shape" cx="465" cy="250" r="14"/><text x="465" y="255" text-anchor="middle">R</text></g>
-            <g class="part" data-part="valve" tabindex="0" role="button" aria-label="Shut-off valve"><polygon class="shape" points="400,281 414,293 400,305 386,293"/></g>
-            <g class="part" data-part="filter" tabindex="0" role="button" aria-label="Fuel filter"><rect class="shape" x="388" y="312" width="24" height="20" rx="4"/></g>
-            <g class="part" data-part="engine" tabindex="0" role="button" aria-label="Engine"><rect class="shape" x="360" y="340" width="80" height="55" rx="10"/><text x="400" y="373" text-anchor="middle">Engine</text></g>
-            <g class="part" data-part="vent" tabindex="0" role="button" aria-label="Vent outlet"><circle class="shape" cx="100" cy="318" r="10"/><text x="100" y="352" text-anchor="middle">Vent</text></g>
-            <text x="430" y="297" style="font-size:12px;fill:var(--muted)">Shut-off valve</text>
-            <text x="424" y="327" style="font-size:12px;fill:var(--muted)">Filter</text>
-            <text x="300" y="60" style="font-size:12px;fill:var(--muted)">Refuel point</text>
-          </svg>
-          <div class="status" id="fx-status" role="status" aria-live="polite"></div>
+      <p class="lead">Watch fuel travel from the tank to the engine. Press <b>Start</b> to see it move, or use <b>Step by step</b> to go one part at a time. Hover over (or tap) any part to learn about it.</p>
+      <div class="panel">
+        <div class="fx-controls" role="group" aria-label="Animation controls">
+          <button class="btn" id="fx-start">▶ Start</button>
+          <button class="btn alt" id="fx-stop">■ Stop</button>
+          <button class="btn alt" id="fx-mode" aria-pressed="false">👣 Step by step</button>
+          <span class="fx-steps" id="fx-stepbtns" hidden>
+            <button class="btn alt" id="fx-back">← Back</button>
+            <button class="btn amber" id="fx-next">Next step →</button>
+          </span>
         </div>
-        <div>
-          <div class="panel" style="margin-top:0">
-            <h3>Controls</h3>
-            <div class="toggles" id="fx-toggles"></div>
-          </div>
-          <div class="panel">
-            <h3 id="fx-title">Tap a part</h3>
-            <p id="fx-info">Choose any part of the diagram to read what it does.</p>
-            <p class="maint" id="fx-maint" hidden></p>
-          </div>
-          <div class="panel">
-            <h3>Follow the fuel</h3>
-            <ol class="steps-list" id="fx-steps"></ol>
-          </div>
-        </div>
+        <div class="fx-chain" id="fx-chain" aria-label="Fuel path from tank to engine"></div>
+        <div class="status mid" id="fx-caption" role="status" aria-live="polite">Press Start, or choose Step by step.</div>
       </div>
+      <div class="panel fx-info" id="fx-info" aria-live="polite"></div>
       <div class="pager"></div>
     </section>
 

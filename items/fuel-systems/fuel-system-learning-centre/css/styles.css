@@ -507,3 +507,4 @@ tr.you td { background: var(--amber-soft); font-weight: 700; }
 .card .hz-figure { margin-top: 0; }
 .lc-media.one .loc-svg { max-width: 460px; margin: 0 auto; }
 .lc-media.one .lc-figure figcaption { text-align: center; }
+.lc-media.one { grid-template-columns: 1fr !important; }

@@ -88,6 +88,14 @@
       else { var sl = el("div", "bars"); simIds.forEach(function (id) { sl.appendChild(bar(id.replace(/-/g, " "), d.sim[id], d.sim[id] >= 80 ? "high" : d.sim[id] < 50 ? "low" : "")); }); sp.appendChild(sl); }
       box.appendChild(sp);
 
+      var safe = d.safety || {};
+      var safeIds = Object.keys(safe);
+      var fp = el("div", "panel");
+      fp.appendChild(el("h3", null, "Safety scenarios (best score)"));
+      if (!safeIds.length) fp.appendChild(el("p", "empty", "No safety scenarios completed yet."));
+      else { var fl = el("div", "bars"); safeIds.forEach(function (id) { fl.appendChild(bar(id.replace(/-/g, " "), safe[id], safe[id] >= 80 ? "high" : safe[id] < 50 ? "low" : "")); }); fp.appendChild(fl); }
+      box.appendChild(fp);
+
       var reset = el("button", "btn alt", "Clear my progress in this tool");
       reset.addEventListener("click", function () {
         if (window.confirm("Clear the saved progress for this tool on this device?")) {

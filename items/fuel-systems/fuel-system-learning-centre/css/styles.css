@@ -318,3 +318,14 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 1r
 .tx-controls label { display: grid; gap: .15rem; font-size: .8rem; font-weight: 600; }
 .tx-controls select { font: inherit; padding: .5rem; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); }
 .tx-scale { display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin: -.7rem 0 .8rem; }
+
+/* Safety module */
+.hz-blocks { display: grid; gap: 10px; margin: 1rem 0 .3rem; }
+@media (min-width: 800px) { .hz-blocks { grid-template-columns: 1fr 1fr; } }
+.hz-block { border-radius: 10px; padding: .6rem .9rem; border-left: 5px solid var(--line); background: var(--bg); }
+.hz-block h4 { margin: 0 0 .2rem; }
+.hz-block ul { margin: 0; padding-left: 1.2rem; } .hz-block p { margin: 0; }
+.hz-block.cause { border-left-color: var(--sky); }
+.hz-block.impact { border-left-color: var(--bad); background: var(--bad-soft); }
+.hz-block.signs { border-left-color: var(--amber); background: var(--amber-soft); }
+.hz-block.prevent { border-left-color: var(--ok); background: var(--ok-soft); }

@@ -53,6 +53,13 @@
       if (d.sim[id] == null || score > d.sim[id]) d.sim[id] = score;
       save(d);
     },
+    // Best score (0-100) for a safety scenario.
+    setSafety: function (id, score) {
+      var d = load();
+      d.safety = d.safety || {};
+      if (d.safety[id] == null || score > d.safety[id]) d.safety[id] = score;
+      save(d);
+    },
     reset: function () {
       memory = null;
       try { localStorage.removeItem(key()); } catch (e) { /* nothing to remove */ }

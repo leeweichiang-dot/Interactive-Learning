@@ -312,13 +312,21 @@
       <div class="pager"></div>
     </section>
 
-    <!-- 8. HAZARDS -->
+    <!-- 8. SAFETY -->
     <section class="page" id="page-hazards" aria-labelledby="h-hazards">
-      <h2 id="h-hazards">Fuel System Hazards</h2>
-      <p class="lead">Fuel is useful, but it can hurt people. Know the hazards and the simple rules that control them.</p>
-      <div class="grid" id="hz-grid"></div>
-      <h3>Quick check: safe or unsafe?</h3>
-      <div class="panel" id="hz-check"></div>
+      <h2 id="h-hazards">Fuel System Safety</h2>
+      <p class="lead">Fuel is useful, but it can hurt people and aircraft. This module covers six hazards. First learn each one, then practise making safe decisions in real-life scenarios.</p>
+      <div class="warn"><b>Rule of thumb:</b> if you are not sure it is safe, <b>stop, make the area safe and ask</b>. Always follow the approved procedure for your aircraft and base.</div>
+
+      <h3>Part 1: Know the six hazards</h3>
+      <p class="hint">Tap a hazard to open it.</p>
+      <div class="lesson-list" id="hz-list"></div>
+
+      <h3 style="margin-top:1.6rem">Part 2: Scenario practice</h3>
+      <p class="lead" style="font-size:.95rem">Read the situation, then choose what you would do. You get feedback after every choice.</p>
+      <div class="meter" style="margin-bottom:.6rem"><span>Scenarios completed</span><div class="bar"><i id="hz-bar" style="width:0"></i></div><span id="hz-count">0 of 6</span></div>
+      <div id="hz-pick" class="grid"></div>
+      <div id="hz-play" hidden></div>
       <div class="pager"></div>
     </section>
 
@@ -363,6 +371,7 @@
   <script src="js/store.js"></script>
   <script src="js/explorer.js"></script>
   <script src="js/lessons.js"></script>
+  <script src="js/safety.js"></script>
   <script src="js/simulator.js"></script>
   <script src="js/quiz.js"></script>
   <script src="js/dashboard.js"></script>

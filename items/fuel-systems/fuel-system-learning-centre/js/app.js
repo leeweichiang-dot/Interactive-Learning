@@ -11,7 +11,7 @@
     { id: "quantity", title: "Fuel Quantity Indication", icon: "📊", text: "See how probes become a gauge reading." },
     { id: "transfer", title: "Fuel Transfer", icon: "🔄", text: "Move fuel between tanks and keep balance." },
     { id: "refuel", title: "Refuelling and Defuelling", icon: "⛽", text: "Put the safe steps in order." },
-    { id: "hazards", title: "Fuel System Hazards", icon: "⚠️", text: "Know the dangers and how to control them." },
+    { id: "hazards", title: "Fuel System Safety", icon: "⚠️", text: "Six hazards, and scenarios to practise safe choices." },
     { id: "simulator", title: "Leak Troubleshooting", icon: "🔍", text: "Find a leak without taking risks." },
     { id: "quiz", title: "Knowledge Quiz", icon: "📝", text: "Check what you have learned." }
   ];
@@ -81,7 +81,7 @@
     { title: "Fuel Pumps", text: "How boost pumps and engine driven pumps move fuel to the engine.", icon: "⚙️", href: "#components?c=boost", steps: ["comp:boost", "comp:edp"] },
     { title: "Fuel Quantity Indication", text: "How probes and gauges tell the crew how much fuel is left.", icon: "📊", href: "#quantity", steps: ["quantity"] },
     { title: "Fuel Transfer", text: "Moving fuel between tanks to keep the aircraft balanced.", icon: "🔄", href: "#transfer", steps: ["transfer"] },
-    { title: "Refuelling & Defuelling", text: "The safe order of steps, and the hazards of working with fuel.", icon: "⛽", href: "#refuel", steps: ["refuel", "hazards"] },
+    { title: "Refuelling & Defuelling", text: "The safe order of steps, plus six fuel hazards and safety scenarios.", icon: "⛽", href: "#refuel", steps: ["refuel", "hazards"] },
     { title: "Troubleshooting", text: "Find the cause of a fuel leak without taking risks.", icon: "🔍", href: "#simulator", steps: ["simulator"] },
     { title: "Assessment", text: "A 12-question quiz to check what you have learned.", icon: "📝", href: "#quiz", steps: ["quiz"] }
   ];

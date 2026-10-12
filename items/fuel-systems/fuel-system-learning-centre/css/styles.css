@@ -440,3 +440,16 @@ tr.you td { background: var(--amber-soft); font-weight: 700; }
 .ov-item { width: 100%; display: flex; align-items: center; gap: .6rem; text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: .4rem .6rem; }
 .ov-item[aria-pressed="true"] { border-color: var(--amber); background: var(--amber-soft); }
 .ov-item-text b { display: block; font-size: .9rem; } .ov-item-text small { color: var(--muted); }
+
+/* Fuel Flow Explorer: aircraft diagram */
+.fx-svg .part .shape { transition: fill .25s, stroke .25s; }
+.fx-svg .part.seen .shape { fill: var(--fuel-soft); stroke: var(--fuel); }
+.fx-svg .part.active .shape { fill: var(--amber); stroke: var(--amber); }
+.fx-svg .part.active { filter: drop-shadow(0 0 6px var(--amber)); }
+.fx-svg .part.active .lbl { fill: #1a1200; }
+.fx-svg .part.shown .shape { stroke: var(--sky); stroke-width: 4; }
+.fx-svg .part.active.shown .shape { stroke: var(--amber); }
+.fx-svg .pipe.flow { stroke: var(--fuel); stroke-dasharray: 10 8; animation: txdash .7s linear infinite; }
+#page-explorer .ov-scroll { margin-bottom: 1rem; }
+#page-explorer .fx-svg { max-height: 460px; }
+.ov-svg .key .badge text { fill: #fff; }

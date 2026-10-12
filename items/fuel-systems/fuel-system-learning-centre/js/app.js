@@ -77,8 +77,8 @@
   // (or, for tanks and pumps, a Components filter) is opened.
   var ROADMAP = [
     { title: "Introduction to Aircraft Fuel Systems", text: "What a fuel system does, and how fuel flows from tank to engine.", icon: "✈️", href: "#overview", steps: ["overview", "explorer"] },
-    { title: "Fuel Tanks", text: "Where fuel is stored, and how vents and drains protect the tank.", icon: "🛢️", href: "#components?cat=Store", steps: ["cat:Store"] },
-    { title: "Fuel Pumps", text: "How boost and transfer pumps move fuel, and which parts control it.", icon: "⚙️", href: "#components?cat=Move", steps: ["cat:Move"] },
+    { title: "Fuel Tanks", text: "Where fuel is stored, and what a leaking tank looks like.", icon: "🛢️", href: "#components?c=tanks", steps: ["comp:tanks"] },
+    { title: "Fuel Pumps", text: "How boost pumps and engine driven pumps move fuel to the engine.", icon: "⚙️", href: "#components?c=boost", steps: ["comp:boost", "comp:edp"] },
     { title: "Fuel Quantity Indication", text: "How probes and gauges tell the crew how much fuel is left.", icon: "📊", href: "#quantity", steps: ["quantity"] },
     { title: "Fuel Transfer", text: "Moving fuel between tanks to keep the aircraft balanced.", icon: "🔄", href: "#transfer", steps: ["transfer"] },
     { title: "Refuelling & Defuelling", text: "The safe order of steps, and the hazards of working with fuel.", icon: "⛽", href: "#refuel", steps: ["refuel", "hazards"] },

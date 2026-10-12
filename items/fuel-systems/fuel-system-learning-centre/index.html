@@ -113,9 +113,15 @@
     <!-- 4. COMPONENTS -->
     <section class="page" id="page-components" aria-labelledby="h-components">
       <h2 id="h-components">Fuel System Components</h2>
-      <p class="lead">Every part has one clear job. Tap a card to see how it works and what maintenance checks it.</p>
-      <div class="filters" id="comp-filters" role="group" aria-label="Filter components"></div>
-      <div class="grid" id="comp-grid"></div>
+      <p class="lead">Eight parts make up the fuel system. Tap a card to open it, tap each box to reveal the facts, then answer the quick check.</p>
+      <div class="panel comp-progress">
+        <div class="meter"><span>Knowledge checks passed</span><div class="bar"><i id="comp-bar" style="width:0"></i></div><span id="comp-count">0 of 8</span></div>
+        <div class="row" style="margin-top:.6rem">
+          <button class="btn alt" id="comp-open-all">Open all cards</button>
+          <button class="btn alt" id="comp-close-all">Close all cards</button>
+        </div>
+      </div>
+      <div class="lesson-list" id="comp-list"></div>
       <div class="pager"></div>
     </section>
 

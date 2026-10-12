@@ -10,70 +10,237 @@
     return e;
   }
 
-  /* ---------- 4. Components ---------- */
+  /* ---------- 4. Components lesson ---------- */
+  // `image` is null for now, so a placeholder is shown. Put a picture in images/ and set e.g. image: "images/fuel-tank.jpg".
   var COMPONENTS = [
-    { name: "Fuel tank", icon: "🛢️", cat: "Store", what: "Holds the fuel. Many aircraft use the wing and body structure itself as a tank (an 'integral' tank).", how: "Baffles inside stop the fuel sloshing about when the aircraft moves.", maint: "Inspect for leaks, sealant damage, dirt and water. Tank entry has strict safety rules." },
-    { name: "Boost pump", icon: "⚙️", cat: "Move", what: "Pushes fuel toward the engine and keeps pressure in the lines.", how: "An electric motor spins an impeller inside the tank. The fuel around it cools the pump.", maint: "Never run a boost pump dry. Check pressure and electrical connections." },
-    { name: "Transfer pump", icon: "🔄", cat: "Move", what: "Moves fuel from one tank to another to keep the aircraft balanced.", how: "Switched on by the crew or the system when a tank level changes.", maint: "Check it starts and stops, and that no fuel is left behind." },
-    { name: "Fuel lines and couplings", icon: "➰", cat: "Move", what: "Pipes and joints that carry fuel around the aircraft.", how: "Flexible joints allow for wing movement and vibration.", maint: "Look for chafing, loose clamps, worn seals and drips at every joint." },
-    { name: "Shut-off valve", icon: "🚦", cat: "Control", what: "Opens or closes the fuel path to the engine.", how: "A motor or the crew moves it. It is used in emergencies such as fire.", maint: "Check full travel and that it seals fully when closed." },
-    { name: "Crossfeed valve", icon: "↔️", cat: "Control", what: "Lets one side's fuel feed the other side's engine or tank if something fails.", how: "Opened by the crew when needed.", maint: "Test open and closed positions and the position indicator." },
-    { name: "Fuel filter", icon: "🧹", cat: "Clean", what: "Stops dirt and rust from reaching the engine.", how: "Fuel passes through a fine mesh or paper element.", maint: "Change on schedule. Check the warning for a blocked filter." },
-    { name: "Water drain valve", icon: "💧", cat: "Clean", what: "Lets you drain water and dirt from the lowest point of a tank.", how: "Water is heavier than fuel and sinks, so it collects at the bottom.", maint: "Sample the drain and look for water or dirt. Check the valve closes properly." },
-    { name: "Vent system", icon: "🌬️", cat: "Safety", what: "Lets air in as fuel is used, and out as fuel is added or expands.", how: "Open pipes go from the tanks to the outside air.", maint: "Keep vents clear of ice, dirt and insects. A blocked vent can damage a tank." },
-    { name: "Quantity probes", icon: "📏", cat: "Measure", what: "Sensors that tell the system how much fuel is in each tank.", how: "They sense how much of their length is covered by fuel.", maint: "Check wiring, dirt and water on the probes, and test the gauge." },
-    { name: "Low-level warning sensor", icon: "⚠️", cat: "Measure", what: "Warns the crew when fuel is nearly gone.", how: "Switches a warning light on when its sensor is no longer covered by fuel.", maint: "Test the light and sensor as the manual says." },
-    { name: "Refuel coupling", icon: "🔌", cat: "Safety", what: "A single point to connect the hose for pressure refuelling.", how: "It only fits the correct nozzle, so wrong fuel cannot be added easily.", maint: "Check the cap and seals, and that the area is clean before connecting." }
+    { id: "tanks", name: "Fuel Tanks", icon: "🛢️", short: "Store the fuel", image: null, photo: "a wing fuel tank cut-away",
+      fn: "Store the fuel until it is needed. Many aircraft use the wing and body structure itself as a tank.",
+      loc: "In the wings and the body (fuselage). Some aircraft also carry extra tanks under the wings.",
+      why: "The tanks hold all the energy for the flight. Baffles inside stop the fuel from sloshing about when the aircraft turns or climbs.",
+      sym: ["Fuel smell near the tank", "Wet stains or drips under a panel", "Fuel quantity falling faster than normal", "Water or dirt in a fuel sample"],
+      maint: "Look for leaks and cracked sealant, drain a sample to check for water, and keep to the strict safety rules for tank entry.",
+      check: { q: "Which of these is a sign of a leaking fuel tank?", o: ["A wet fuel stain under a wing panel", "A clean, dry panel", "A bright cockpit light"], a: 0, why: "A wet stain with a fuel smell points to a tank leak, often at worn sealant." } },
+    { id: "boost", name: "Boost Pumps", icon: "⚙️", short: "Push fuel to the engine", image: null, photo: "a boost pump removed from a tank",
+      fn: "Push fuel out of the tank toward the engine and keep the pressure in the pipes steady.",
+      loc: "Inside the tank, near the bottom, so the pump is always covered in fuel.",
+      why: "At high altitude fuel can turn into vapour bubbles. Boost pumps keep the fuel under pressure so the engine always gets a solid flow. Two pumps give a back-up.",
+      sym: ["Low fuel pressure warning light", "Unusual pump noise", "Pump caution light stays on", "Engine surges if the pump has failed"],
+      maint: "Never run a boost pump dry: the fuel around it cools it. Test each pump on its own and check the electrical connectors.",
+      check: { q: "Why must a boost pump never run dry?", o: ["The fuel around it cools and protects it", "It would fill the cockpit with air", "It would change the fuel colour"], a: 0, why: "Fuel cools the pump motor. Running dry can overheat it and even cause a spark." } },
+    { id: "edp", name: "Engine Driven Pumps", icon: "🔩", short: "High-pressure pump on the engine", image: null, photo: "an engine-driven fuel pump on the gearbox",
+      fn: "Raise the fuel to the high pressure the engine needs. It is turned by the engine itself.",
+      loc: "Bolted to the engine accessory gearbox, on the side of the engine.",
+      why: "It keeps working even if the electric boost pumps fail, so it is a vital back-up. The engine cannot run properly without it.",
+      sym: ["Low fuel pressure at high power", "Hard starting", "Engine surges or loses power", "Fuel leak at the drive seal", "Metal pieces in the filter"],
+      maint: "Check for leaks at the drive shaft seal, compare fuel pressure with the limits, and look for metal in the filter. Change it as the manual says.",
+      check: { q: "What turns an engine driven pump?", o: ["The engine, through a gearbox", "The aircraft battery", "The pilot's hand"], a: 0, why: "The engine drives it through the accessory gearbox." } },
+    { id: "filters", name: "Fuel Filters", icon: "🧹", short: "Clean the fuel", image: null, photo: "a fuel filter and its element",
+      fn: "Catch dirt, rust and other small bits so only clean fuel reaches the engine.",
+      loc: "In the fuel line between the tanks and the engine, often near the engine.",
+      why: "Dirt can block tiny holes and damage the pump and the fuel control unit. A filter is cheap; an engine is not.",
+      sym: ["Falling fuel pressure or flow", "Blocked-filter warning", "Engine loses power", "Fuel leak at the filter seal after a change"],
+      maint: "Replace it on schedule, check the old element for metal or dirt, and fit the seals correctly.",
+      check: { q: "A fuel filter is blocked. What is most likely?", o: ["Fuel flow drops and the engine may lose power", "The fuel gets hotter", "The gauge reads full"], a: 0, why: "A blocked filter restricts the flow of fuel." } },
+    { id: "shutoff", name: "Fuel Shutoff Valves", icon: "🚦", short: "Open or stop the flow", image: null, photo: "a motorised fuel shutoff valve",
+      fn: "Open to let fuel flow, and close to stop it.",
+      loc: "In the fuel lines, near the tank outlets and where the pipes go toward the engine.",
+      why: "In a fire or a serious leak the crew can cut off the fuel quickly. Maintenance can also isolate one part of the system to work on it safely.",
+      sym: ["Fuel still flows when the valve is closed", "No fuel flows when the valve is open", "Valve slow to move", "Position light does not match the valve"],
+      maint: "Check that it moves fully open and fully closed, seals when closed, and that the motor, wiring and position indicator work.",
+      check: { q: "When would a crew close a fuel shutoff valve?", o: ["During an engine fire", "During normal cruise", "When the cockpit gets warm"], a: 0, why: "Stopping the fuel helps to stop a fire from feeding." } },
+    { id: "sensors", name: "Fuel Quantity Sensors", icon: "📏", short: "Sense how much fuel is there", image: null, photo: "fuel quantity probes inside a tank",
+      fn: "Sense how much fuel is in the tank. Many aircraft use probes that react to how much of their length is covered by fuel.",
+      loc: "Inside each tank, standing from the bottom to the top.",
+      why: "The gauge is only as good as its sensors. Wrong sensor signals mean the crew may not know how much fuel they really have.",
+      sym: ["Reading jumps about", "Reading stuck on zero or full", "Left and right tanks disagree", "Reading does not change when fuel is added"],
+      maint: "Check the probes for dirt, water or corrosion, check the wiring connectors, and test the system against a known fuel amount.",
+      check: { q: "A dirty or wet probe will most likely cause...", o: ["A wrong fuel reading", "A louder pump", "A blocked vent"], a: 0, why: "Dirt or water changes the signal the probe sends." } },
+    { id: "gauges", name: "Fuel Gauges", icon: "📊", short: "Show the crew the fuel", image: null, photo: "a cockpit fuel quantity indicator",
+      fn: "Show the crew how much fuel is in each tank, and give low-fuel warnings.",
+      loc: "In the cockpit, on the instrument panel or a display.",
+      why: "The crew uses the gauges to plan the flight and to know when to land. A wrong reading can be dangerous.",
+      sym: ["Needle stuck", "Reading flickers", "Different from the amount you expect", "Warning light does not work"],
+      maint: "Test the gauge as the manual says, compare it with a second source, and check the wiring and warning lights.",
+      check: { q: "You doubt a fuel gauge reading. What is the best action?", o: ["Check it against another source and report it", "Trust it anyway", "Ignore it"], a: 0, why: "A second source tells you whether the gauge or the fuel is wrong." } },
+    { id: "vent", name: "Fuel Vent System", icon: "🌬️", short: "Lets the tank breathe", image: null, photo: "a vent outlet on a wing tip",
+      fn: "Let air flow into the tank as fuel is used, and out as fuel is added or expands.",
+      loc: "Pipes run from the top of each tank to openings on the outside of the aircraft, often near the wing tips.",
+      why: "Without a vent the tank would have a low pressure and could be crushed, or have a high pressure and burst. It keeps the pressure equal to the outside air.",
+      sym: ["Fuel flow slows or stops", "A tank looks dented or swollen", "Fuel leaks out of the vent", "Fuel does not go into the tank during refuelling"],
+      maint: "Keep the vent openings clear of dirt, ice, insects and covers. Never block a vent, and remove vent covers before flight.",
+      check: { q: "What can a blocked vent cause?", o: ["Tank damage or fuel that will not flow", "A brighter fuel gauge", "A cooler engine"], a: 0, why: "The tank cannot breathe, so the pressure inside becomes wrong." } }
   ];
+  FL.componentIds = COMPONENTS.map(function (c) { return c.id; });
 
   FL.inits.components = function () {
-    var cats = ["All"].concat(COMPONENTS.map(function (c) { return c.cat; }).filter(function (c, i, a) { return a.indexOf(c) === i; }));
-    var filters = document.getElementById("comp-filters");
-    var grid = document.getElementById("comp-grid");
-    var current = "All";
+    var list = document.getElementById("comp-list");
+    var cards = {};
+    var firstTry = {}; // first answer to each check, reported once to the portal tracker
 
-    function draw() {
-      grid.textContent = "";
-      COMPONENTS.filter(function (c) { return current === "All" || c.cat === current; }).forEach(function (c) {
-        var card = el("button", "card comp");
-        card.setAttribute("aria-expanded", "false");
-        var h = el("h3");
-        h.appendChild(el("span", "icon", c.icon));
-        h.appendChild(document.createTextNode(c.name));
-        card.appendChild(h);
-        card.appendChild(el("span", "chip", c.cat));
-        card.appendChild(el("p", null, c.what));
-        card.appendChild(el("span", "hint", "Tap to learn more"));
-        var more = el("div", "more");
-        more.appendChild(el("p", null, "How it works: " + c.how));
-        more.appendChild(el("p", "maint", "Maintenance: " + c.maint));
-        card.appendChild(more);
-        card.addEventListener("click", function () {
-          card.setAttribute("aria-expanded", String(card.getAttribute("aria-expanded") !== "true"));
-        });
-        grid.appendChild(card);
-      });
+    function passed(id) { return !!FL.store.get().visited["check:" + id]; }
+
+    function refreshProgress() {
+      var n = COMPONENTS.filter(function (c) { return passed(c.id); }).length;
+      document.getElementById("comp-bar").style.width = (n / COMPONENTS.length * 100) + "%";
+      document.getElementById("comp-count").textContent = n + " of " + COMPONENTS.length;
     }
 
-    cats.forEach(function (c) {
-      var b = el("button", null, c);
-      b.setAttribute("aria-pressed", String(c === current));
-      b.addEventListener("click", function () {
-        current = c;
-        if (c !== "All") FL.store.visit("cat:" + c);
+    function setOpen(c, open) {
+      var card = cards[c.id];
+      card.head.setAttribute("aria-expanded", String(open));
+      card.body.hidden = !open;
+      if (open) {
+        FL.store.visit("comp:" + c.id);
         if (FL.refreshProgress) FL.refreshProgress();
-        filters.querySelectorAll("button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
-        draw();
+      }
+    }
+
+    function placeholder(c) {
+      var fig = el("figure", "lc-figure");
+      if (c.image) {
+        var img = el("img");
+        img.src = c.image;
+        img.alt = c.name;
+        fig.appendChild(img);
+      } else {
+        var ph = el("div", "img-ph");
+        ph.setAttribute("role", "img");
+        ph.setAttribute("aria-label", "Image placeholder: " + c.photo);
+        ph.appendChild(el("span", "ph-icon", c.icon));
+        ph.appendChild(el("span", null, "Image placeholder"));
+        fig.appendChild(ph);
+      }
+      fig.appendChild(el("figcaption", null, "Add a photo or diagram of " + c.photo + "."));
+      return fig;
+    }
+
+    function facts(c) {
+      var wrap = el("div", "facts");
+      var items = [
+        ["Function", c.fn], ["Location", c.loc], ["Why it is important", c.why],
+        ["Failure symptoms", c.sym], ["Maintenance concern", c.maint]
+      ];
+      items.forEach(function (it) {
+        var box = el("div", "fact");
+        var b = el("button", "fact-btn");
+        b.setAttribute("aria-expanded", "false");
+        b.appendChild(el("span", null, it[0]));
+        b.appendChild(el("span", "plus", "+"));
+        var txt = el("div", "fact-text");
+        txt.hidden = true;
+        if (Array.isArray(it[1])) {
+          var ul = el("ul");
+          it[1].forEach(function (x) { ul.appendChild(el("li", null, x)); });
+          txt.appendChild(ul);
+        } else txt.textContent = it[1];
+        b.addEventListener("click", function () {
+          var open = b.getAttribute("aria-expanded") !== "true";
+          b.setAttribute("aria-expanded", String(open));
+          b.lastChild.textContent = open ? "−" : "+";
+          txt.hidden = !open;
+        });
+        box.appendChild(b);
+        box.appendChild(txt);
+        wrap.appendChild(box);
       });
-      filters.appendChild(b);
+      return wrap;
+    }
+
+    function knowledgeCheck(c, card) {
+      var box = el("div", "check");
+      box.appendChild(el("h4", null, "Quick check"));
+      box.appendChild(el("p", null, c.check.q));
+      var opts = el("div", "choice-list");
+      var fb = el("div", "feedback");
+      fb.hidden = true;
+      fb.setAttribute("role", "status");
+      var retry = el("button", "btn alt", "Try again");
+      retry.hidden = true;
+
+      function reset() {
+        opts.querySelectorAll("button").forEach(function (b) { b.disabled = false; b.className = "choice"; });
+        fb.hidden = true;
+        retry.hidden = true;
+      }
+
+      c.check.o.forEach(function (text, i) {
+        var b = el("button", "choice", text);
+        b.addEventListener("click", function () {
+          var ok = i === c.check.a;
+          opts.querySelectorAll("button").forEach(function (x) { x.disabled = true; });
+          b.classList.add(ok ? "correct" : "incorrect");
+          fb.hidden = false;
+          fb.className = "feedback " + (ok ? "good" : "bad");
+          fb.textContent = (ok ? "Correct! " : "Not quite. ") + c.check.why;
+          if (firstTry[c.id] == null) {
+            firstTry[c.id] = { q: "Component check · " + c.name + ": " + c.check.q, topic: c.name, correct: ok };
+            reportAll();
+          }
+          if (ok) {
+            FL.store.visit("check:" + c.id);
+            card.state.textContent = "✓";
+            card.state.classList.add("ok");
+            refreshProgress();
+            if (FL.refreshProgress) FL.refreshProgress();
+          } else retry.hidden = false;
+        });
+        opts.appendChild(b);
+      });
+      retry.addEventListener("click", reset);
+      box.appendChild(opts);
+      box.appendChild(fb);
+      box.appendChild(retry);
+      return box;
+    }
+
+    // Once all eight checks have been tried, send the first-try results to the portal.
+    function reportAll() {
+      var ids = Object.keys(firstTry);
+      if (ids.length < COMPONENTS.length || !window.Tracker) return;
+      var answers = ids.map(function (k) { return firstTry[k]; });
+      Tracker.quizResult(answers.filter(function (a) { return a.correct; }).length, answers.length, answers);
+    }
+
+    COMPONENTS.forEach(function (c, i) {
+      var art = el("article", "lesson-card");
+      art.id = "comp-" + c.id;
+      var head = el("button", "lc-head");
+      head.setAttribute("aria-expanded", "false");
+      head.appendChild(el("span", "lc-num", String(i + 1)));
+      head.appendChild(el("span", "ico", c.icon));
+      var t = el("span", "lc-title");
+      t.appendChild(el("b", null, c.name));
+      t.appendChild(el("small", null, c.short));
+      head.appendChild(t);
+      var state = el("span", "lc-state", passed(c.id) ? "✓" : "▾");
+      if (passed(c.id)) state.classList.add("ok");
+      head.appendChild(state);
+      var body = el("div", "lc-body");
+      body.hidden = true;
+      var card = { head: head, body: body, state: state };
+      cards[c.id] = card;
+      body.appendChild(placeholder(c));
+      body.appendChild(el("p", "hint", "Tap each box to reveal it."));
+      body.appendChild(facts(c));
+      body.appendChild(knowledgeCheck(c, card));
+      head.addEventListener("click", function () { setOpen(c, head.getAttribute("aria-expanded") !== "true"); });
+      art.appendChild(head);
+      art.appendChild(body);
+      list.appendChild(art);
     });
-    draw();
-    // A roadmap link such as #components?cat=Store opens with that filter chosen.
+
+    document.getElementById("comp-open-all").addEventListener("click", function () { COMPONENTS.forEach(function (c) { setOpen(c, true); }); });
+    document.getElementById("comp-close-all").addEventListener("click", function () { COMPONENTS.forEach(function (c) { setOpen(c, false); }); });
+    refreshProgress();
+
+    // A roadmap link such as #components?c=boost opens that card.
     return {
       show: function () {
-        var want = FL.query && FL.query.cat;
-        if (!want) return;
-        filters.querySelectorAll("button").forEach(function (b) { if (b.textContent === want) b.click(); });
+        var want = FL.query && FL.query.c;
+        var c = COMPONENTS.filter(function (x) { return x.id === want; })[0];
+        if (!c) return;
+        setOpen(c, true);
+        cards[c.id].head.scrollIntoView();
       }
     };
   };

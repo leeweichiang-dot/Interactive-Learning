@@ -45,6 +45,8 @@
       stats.appendChild(stat(Math.round(seen / pages.length * 100) + "%", "Course completed (" + seen + " of " + pages.length + " sections)"));
       stats.appendChild(stat(pcts.length ? Math.max.apply(null, pcts) + "%" : "–", "Best quiz score"));
       stats.appendChild(stat(pcts.length ? pcts[pcts.length - 1] + "%" : "–", "Latest quiz score"));
+      var checks = (FL.componentIds || []).filter(function (id) { return d.visited["check:" + id]; }).length;
+      stats.appendChild(stat(checks + " of " + (FL.componentIds || []).length, "Component checks passed"));
       stats.appendChild(stat(String(simIds.length), "Leak scenarios tried (of 3)"));
       box.appendChild(stats);
 

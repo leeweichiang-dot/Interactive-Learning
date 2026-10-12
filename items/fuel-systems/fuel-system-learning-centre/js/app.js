@@ -174,8 +174,6 @@
     if (FL.inits[id] && !started[id]) {
       started[id] = true;
       handles[id] = FL.inits[id]() || {};
-    } else if (handles[id] && handles[id].show) {
-      // Dashboard re-reads saved data each time it is shown.
     }
     if (handles[id] && handles[id].show) handles[id].show();
     if (FL.learningPages.some(function (p) { return p.id === id; })) FL.store.visit(id);

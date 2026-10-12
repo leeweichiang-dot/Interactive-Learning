@@ -97,3 +97,10 @@ Each item loads the tracker in its `<head>` with its own ids:
 Add an entry to `modules` in `catalogue.js` (`id`, `code`, `title`, `description`) and create `items/<module-id>/`.
 Use `hidden: true` on a module to keep it off the home page (its module page and items still open by direct link).
 The `sample` module is hidden this way; keep its folder, since its items are the templates above.
+
+## Publishing
+
+The project is static, so GitHub Pages serves it as is (see `DEPLOYMENT.md`). A `.nojekyll` file is in the root.
+Before publishing run `node tools/check-links.js` (plain Node, no packages): it finds missing files, links that start
+with `/`, folder links, web addresses or network calls in the code, and catalogue mistakes. `tools/` and `.github/`
+are developer files; the site never loads them. Every page has an inline `rel="icon"` so hosts do not log a favicon 404.

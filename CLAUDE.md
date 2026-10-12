@@ -27,6 +27,10 @@ A portal where students browse and try a growing collection of small learning it
     scores from the `"<module title>: find the …"` question prefix. Its own login only shows when nobody is signed in
     to the portal; it uses `Tracker.signIn`/`signOut`, so both sign-ins stay in step. Keep module titles, question
     wording and keys in sync between its `app.js` and `dashboard.js`.
+  - Exception: `items/fuel-systems/fuel-system-learning-centre/` keeps its own section-visited marks, quiz history
+    and leak-simulator best scores in `localStorage` under `fuel-centre-progress-v1` (suffixed `:<trainee ID>` when
+    someone is signed in). It also reports the quiz to `Tracker.quizResult` and calls `Tracker.complete()` once all
+    nine learning sections have been visited. Its pages are sections of one `index.html`, switched by `#hash`.
   - A trainee shares progress by downloading a file from `progress.html` and handing it in (e.g. via the LMS).
   - `instructor.html` reads those files in the browser and keeps them in memory only: it never saves or uploads them.
   - Render names and other file content with `textContent`, never `innerHTML`.

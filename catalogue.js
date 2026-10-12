@@ -56,6 +56,11 @@ window.CATALOGUE = {
       id: "environmental-control",
       title: "Environmental Control Systems",
       description: "How the aircraft keeps the air in the cabin safe to breathe: pressurisation, air conditioning and the faults that can affect them, in plain English."
+    },
+    {
+      id: "fuel-systems",
+      title: "Aircraft Fuel Systems",
+      description: "How an aircraft stores, moves and measures its fuel, the hazards of working with fuel, and how to track down a leak, in plain English."
     }
   ],
 
@@ -115,6 +120,13 @@ window.CATALOGUE = {
       type: "lesson",
       title: "Cabin Pressurisation System",
       summary: "Follow the air through a labelled diagram, try a pressure simulation, investigate three faults and take a five-question competency check."
+    },
+    {
+      id: "fuel-system-learning-centre",
+      module: "fuel-systems",
+      type: "lesson",
+      title: "Aircraft Fuel System Learning Centre",
+      summary: "A beginner course in eleven short pages: a fuel flow explorer, component cards, gauge and transfer demos, a refuelling activity, a leak troubleshooting simulator, a quiz and a progress dashboard."
     }
   ]
 };

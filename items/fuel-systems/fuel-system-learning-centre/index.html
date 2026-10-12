@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Aircraft Fuel System Learning Centre</title>
+  <script src="../../../tracker.js" data-module="fuel-systems" data-item="fuel-system-learning-centre" data-type="lesson"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-bar">
+      <a class="brand" href="#home">
+        <span class="icon" aria-hidden="true">⛽</span>
+        <span>Aircraft Fuel System Learning Centre<small>Beginner course for maintenance trainees</small></span>
+      </a>
+      <a class="back" href="../../../module.html?m=fuel-systems">&larr; Module</a>
+      <button class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="nav">Menu</button>
+    </div>
+    <nav class="nav" id="nav" aria-label="Sections"></nav>
+  </header>
+
+  <main id="app">
+
+    <!-- 1. HOME -->
+    <section class="page" id="page-home" aria-labelledby="h-home">
+      <div class="hero">
+        <svg viewBox="0 0 400 220" aria-hidden="true">
+          <g class="cloud" fill="#fff" opacity=".5"><ellipse cx="80" cy="50" rx="45" ry="14"/><ellipse cx="330" cy="170" rx="55" ry="15"/></g>
+          <g class="plane" fill="#fff">
+            <path d="M40 110 L300 100 L370 108 L300 118 Z"/>
+            <path d="M170 104 L120 40 L145 40 L215 102 Z"/>
+            <path d="M170 114 L120 180 L145 180 L215 116 Z"/>
+            <path d="M60 106 L40 76 L58 76 L90 104 Z"/>
+          </g>
+        </svg>
+        <h1 id="h-home">Aircraft Fuel System Learning Centre</h1>
+        <p>No aircraft experience needed. Learn how an aircraft stores, moves and measures its fuel, how to stay safe around it, and how to find a leak.</p>
+        <div class="progress-bar" role="progressbar" aria-label="Course progress" aria-valuemin="0" aria-valuemax="100" id="home-bar"><i></i></div>
+        <p id="home-progress" style="font-size:.9rem;margin-bottom:1rem"></p>
+        <a class="btn amber" href="#overview" id="start-btn">Start learning</a>
+      </div>
+      <div class="goal"><b>Learning goal:</b> understand the <b>purpose</b>, <b>operation</b> and <b>maintenance importance</b> of an aircraft fuel system.</div>
+      <h2>Course sections</h2>
+      <div class="grid" id="home-cards"></div>
+      <p class="lead" style="font-size:.9rem">This is a general course. The pictures are simple teaching diagrams, not a real aircraft. For real work, always follow the approved technical manual and your supervisor's instructions.</p>
+    </section>
+
+    <!-- 2. OVERVIEW -->
+    <section class="page" id="page-overview" aria-labelledby="h-overview">
+      <h2 id="h-overview">Aircraft Fuel System Overview</h2>
+      <p class="lead">The fuel system is the part of the aircraft that holds fuel and delivers it to the engine, safely, in every flight condition.</p>
+      <div class="goal">After this page you can name the <b>five jobs</b> of a fuel system and explain why maintenance matters.</div>
+      <h3>The five jobs of a fuel system</h3>
+      <div class="journey">
+        <div class="step"><b>Store</b>Tanks hold the fuel, in the wings and body.</div>
+        <div class="step"><b>Supply</b>Pumps and pipes push fuel to the engine.</div>
+        <div class="step"><b>Transfer</b>Fuel moves between tanks to keep the aircraft balanced.</div>
+        <div class="step"><b>Vent</b>Air flows in as fuel leaves, so the tank is not crushed.</div>
+        <div class="step"><b>Measure</b>Probes and gauges tell the crew how much is left.</div>
+      </div>
+      <div class="grid">
+        <div class="card"><h3><span class="icon">🔥</span>Why fuel matters</h3><p>No fuel at the engine means no thrust. Even a short break in flow can stop the engine.</p></div>
+        <div class="card"><h3><span class="icon">⚖️</span>Why balance matters</h3><p>Fuel is heavy. If one wing carries much more than the other, the aircraft is harder to control.</p></div>
+        <div class="card"><h3><span class="icon">🔧</span>Why maintenance matters</h3><p>A small leak, a blocked filter or a wrong gauge reading can turn into a fire risk or an engine stop.</p></div>
+      </div>
+      <h3>Simple words to know</h3>
+      <dl class="terms">
+        <div><dt>Tank</dt><dd>A container (often part of the wing structure) that holds fuel.</dd></div>
+        <div><dt>Boost pump</dt><dd>A pump inside a tank that pushes fuel toward the engine.</dd></div>
+        <div><dt>Feed tank</dt><dd>A small tank that supplies the engine directly.</dd></div>
+        <div><dt>Vent</dt><dd>A small opening that lets air in and out of a tank.</dd></div>
+        <div><dt>Valve</dt><dd>A part that opens or closes to allow or stop flow.</dd></div>
+        <div><dt>Contamination</dt><dd>Anything that should not be in fuel, such as water or dirt.</dd></div>
+      </dl>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 3. FLOW EXPLORER -->
+    <section class="page" id="page-explorer" aria-labelledby="h-explorer">
+      <h2 id="h-explorer">Interactive Fuel Flow Explorer</h2>
+      <p class="lead">Tap any part in the diagram to learn about it. Then switch pumps and valves on and off to see what happens to the engine.</p>
+      <div class="diagram-wrap two">
+        <div class="panel">
+          <svg viewBox="0 0 800 440" role="img" aria-label="Top view of a simple aircraft showing fuel tanks, pumps, valve, filter and engine" id="fx-svg">
+            <path class="airframe" d="M400 20 C430 60 440 120 440 200 L440 385 L475 425 L325 425 L360 385 L360 200 C360 120 370 60 400 20Z"/>
+            <polygon class="airframe" points="360,170 80,300 80,335 360,275"/>
+            <polygon class="airframe" points="440,170 720,300 720,335 440,275"/>
+            <!-- pipes -->
+            <path class="s-line" d="M360 120 L400 120 L400 180" id="pipe-refuel"/>
+            <path class="s-line flow" d="M300 262 L372 236" id="pipe-L"/>
+            <path class="s-line flow" d="M500 262 L428 236" id="pipe-R"/>
+            <path class="s-line flow" d="M400 270 L400 340" id="pipe-main"/>
+            <!-- parts -->
+            <g class="part" data-part="refuel" tabindex="0" role="button" aria-label="Refuel point"><rect class="shape" x="318" y="104" width="44" height="32" rx="6"/><text x="340" y="124" text-anchor="middle">Fill</text></g>
+            <g class="part tank" data-part="tankL" tabindex="0" role="button" aria-label="Left wing tank"><polygon class="shape" points="345,188 140,292 140,316 345,260"/><text x="240" y="276" text-anchor="middle">Left wing tank</text></g>
+            <g class="part tank" data-part="tankR" tabindex="0" role="button" aria-label="Right wing tank"><polygon class="shape" points="455,188 660,292 660,316 455,260"/><text x="560" y="276" text-anchor="middle">Right wing tank</text></g>
+            <g class="part tank" data-part="feed" tabindex="0" role="button" aria-label="Feed tank"><rect class="shape" x="372" y="180" width="56" height="90" rx="8"/><text x="400" y="222" text-anchor="middle">Feed</text><text x="400" y="238" text-anchor="middle">tank</text></g>
+            <g class="part" data-part="pumpL" tabindex="0" role="button" aria-label="Left boost pump"><circle class="shape" cx="335" cy="250" r="14"/><text x="335" y="255" text-anchor="middle">L</text></g>
+            <g class="part" data-part="pumpR" tabindex="0" role="button" aria-label="Right boost pump"><circle class="shape" cx="465" cy="250" r="14"/><text x="465" y="255" text-anchor="middle">R</text></g>
+            <g class="part" data-part="valve" tabindex="0" role="button" aria-label="Shut-off valve"><polygon class="shape" points="400,281 414,293 400,305 386,293"/></g>
+            <g class="part" data-part="filter" tabindex="0" role="button" aria-label="Fuel filter"><rect class="shape" x="388" y="312" width="24" height="20" rx="4"/></g>
+            <g class="part" data-part="engine" tabindex="0" role="button" aria-label="Engine"><rect class="shape" x="360" y="340" width="80" height="55" rx="10"/><text x="400" y="373" text-anchor="middle">Engine</text></g>
+            <g class="part" data-part="vent" tabindex="0" role="button" aria-label="Vent outlet"><circle class="shape" cx="100" cy="318" r="10"/><text x="100" y="352" text-anchor="middle">Vent</text></g>
+            <text x="430" y="297" style="font-size:12px;fill:var(--muted)">Shut-off valve</text>
+            <text x="424" y="327" style="font-size:12px;fill:var(--muted)">Filter</text>
+            <text x="300" y="60" style="font-size:12px;fill:var(--muted)">Refuel point</text>
+          </svg>
+          <div class="status" id="fx-status" role="status" aria-live="polite"></div>
+        </div>
+        <div>
+          <div class="panel" style="margin-top:0">
+            <h3>Controls</h3>
+            <div class="toggles" id="fx-toggles"></div>
+          </div>
+          <div class="panel">
+            <h3 id="fx-title">Tap a part</h3>
+            <p id="fx-info">Choose any part of the diagram to read what it does.</p>
+            <p class="maint" id="fx-maint" hidden></p>
+          </div>
+          <div class="panel">
+            <h3>Follow the fuel</h3>
+            <ol class="steps-list" id="fx-steps"></ol>
+          </div>
+        </div>
+      </div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 4. COMPONENTS -->
+    <section class="page" id="page-components" aria-labelledby="h-components">
+      <h2 id="h-components">Fuel System Components</h2>
+      <p class="lead">Every part has one clear job. Tap a card to see how it works and what maintenance checks it.</p>
+      <div class="filters" id="comp-filters" role="group" aria-label="Filter components"></div>
+      <div class="grid" id="comp-grid"></div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 5. QUANTITY -->
+    <section class="page" id="page-quantity" aria-labelledby="h-quantity">
+      <h2 id="h-quantity">Fuel Quantity Indication System</h2>
+      <p class="lead">The crew cannot look inside the tank. Instead, <b>probes</b> in the tank sense how much of their length is covered by fuel, and a computer turns that into a gauge reading.</p>
+      <div class="goal">Fuel and air affect electricity differently. A probe senses this difference (this is called <b>capacitance</b>). More fuel around the probe gives a bigger signal.</div>
+      <div class="diagram-wrap two">
+        <div class="panel">
+          <svg viewBox="0 0 520 280" role="img" aria-label="Fuel tank with probes and a fuel gauge" id="q-svg">
+            <rect x="20" y="30" width="220" height="220" rx="14" fill="none" stroke="var(--muted)" stroke-width="4"/>
+            <clipPath id="q-clip"><rect x="22" y="32" width="216" height="216" rx="12"/></clipPath>
+            <rect id="q-fill" x="22" y="248" width="216" height="0" fill="var(--fuel)" opacity=".85" clip-path="url(#q-clip)"/>
+            <g stroke="var(--sky)" stroke-width="6" stroke-linecap="round">
+              <line x1="70" y1="45" x2="70" y2="240"/><line x1="130" y1="45" x2="130" y2="240"/><line x1="190" y1="45" x2="190" y2="240"/>
+            </g>
+            <text x="130" y="20" text-anchor="middle" style="font-size:13px;fill:var(--ink);font-weight:600">Tank with probes</text>
+            <path d="M240 140 C275 140 275 140 300 140" stroke="var(--muted)" stroke-width="3" fill="none" stroke-dasharray="6 5"/>
+            <g transform="translate(400 150)">
+              <path d="M-100 0 A100 100 0 0 1 100 0" fill="none" stroke="var(--line)" stroke-width="18"/>
+              <path d="M-100 0 A100 100 0 0 1 -70 -71" fill="none" stroke="var(--bad)" stroke-width="18"/>
+              <path d="M-70 -71 A100 100 0 0 1 -40 -92" fill="none" stroke="var(--amber)" stroke-width="18"/>
+              <text x="-100" y="22" text-anchor="middle" style="font-size:12px;fill:var(--muted)">E</text>
+              <text x="100" y="22" text-anchor="middle" style="font-size:12px;fill:var(--muted)">F</text>
+              <g id="q-needle" style="transition:transform .5s"><line x1="0" y1="0" x2="-85" y2="0" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/></g>
+              <circle r="9" fill="var(--ink)"/>
+              <text id="q-digital" y="60" text-anchor="middle" style="font-size:26px;font-weight:700;fill:var(--ink)">0 kg</text>
+              <text y="86" text-anchor="middle" style="font-size:12px;fill:var(--muted)">Gauge reading</text>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <div class="panel" style="margin-top:0">
+            <label for="q-range"><b>Fuel in the tank:</b> <span id="q-pct">50</span>%</label>
+            <input class="range" type="range" id="q-range" min="0" max="100" value="50">
+            <p>Probes covered by fuel: <b id="q-wet">0</b> of 3 (shown by how much of each probe is wet).</p>
+            <button class="switch" id="q-fault" aria-pressed="false"><span>Fault: gauge stuck (bad probe wiring)</span><span class="pill" id="q-fault-pill">Off</span></button>
+            <div class="status" id="q-status" role="status" aria-live="polite"></div>
+          </div>
+          <div class="panel"><h3>Why it matters for maintenance</h3>
+            <ul><li>Water or dirt on a probe gives a wrong reading.</li><li>A wrong low reading may cause an unneeded stop; a wrong high reading can cause fuel starvation.</li><li>Technicians test the system and compare it with a known fuel amount.</li></ul>
+          </div>
+        </div>
+      </div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 6. TRANSFER -->
+    <section class="page" id="page-transfer" aria-labelledby="h-transfer">
+      <h2 id="h-transfer">Fuel Transfer System</h2>
+      <p class="lead">Wing tanks are big, but the engine only drinks from the small feed tank. <b>Transfer</b> moves fuel from the wing tanks into the feed tank, and keeps left and right sides in balance.</p>
+      <div class="panel">
+        <div class="tank-row" id="t-tanks"></div>
+        <div class="row" style="margin-top:1rem" id="t-controls"></div>
+        <div class="status" id="t-status" role="status" aria-live="polite"></div>
+      </div>
+      <div class="grid">
+        <div class="card"><h3><span class="icon">🔄</span>Transfer</h3><p>Pumps or valves move fuel from one tank to another. Fuel can also flow by gravity.</p></div>
+        <div class="card"><h3><span class="icon">⚖️</span>Balance</h3><p>Use fuel from both wings evenly. A big difference is a control problem and a warning sign for a fault.</p></div>
+        <div class="card"><h3><span class="icon">🔧</span>Maintenance</h3><p>Check transfer valves open and close fully, and that pumps run without noise or low pressure.</p></div>
+      </div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 7. REFUEL -->
+    <section class="page" id="page-refuel" aria-labelledby="h-refuel">
+      <h2 id="h-refuel">Refuelling and Defuelling Process</h2>
+      <div class="warn"><b>Safety first.</b> This page shows the general idea only. In real work always follow the approved procedure for your aircraft and base.</div>
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-refuel" aria-selected="true">Refuelling</button>
+        <button role="tab" id="tab-defuel" aria-selected="false">Defuelling</button>
+      </div>
+      <div id="rf-refuel">
+        <p><b>Activity:</b> tap the steps in the correct order. The tank fills as you get them right.</p>
+        <div class="diagram-wrap two">
+          <ul class="order-list" id="rf-steps"></ul>
+          <div class="panel" style="margin-top:0">
+            <div class="tank-row"><div class="tank" style="width:130px"><div class="vessel"><div class="fill" id="rf-fill" style="height:0"></div><div class="pct" id="rf-pct">0%</div></div>Tank level</div></div>
+            <div class="feedback" id="rf-feedback" role="status" aria-live="polite" hidden></div>
+            <button class="btn alt" id="rf-reset" style="margin-top:.8rem">Start again</button>
+          </div>
+        </div>
+      </div>
+      <div id="rf-defuel" hidden>
+        <p>Defuelling means taking fuel <b>out</b> of the aircraft, for example before tank repair or when the aircraft is too heavy.</p>
+        <div class="grid">
+          <div class="card"><h3>Before</h3><ol class="plain"><li>Same safety checks as refuelling: area, extinguisher, no ignition sources.</li><li>Bond (earth) the aircraft and the bowser or tank.</li><li>Confirm where the fuel will go and that there is room.</li></ol></div>
+          <div class="card"><h3>During</h3><ol class="plain"><li>Connect the hose and open the correct valves.</li><li>Start the flow slowly and watch for leaks.</li><li>Watch the level so nothing overflows.</li></ol></div>
+          <div class="card"><h3>After</h3><ol class="plain"><li>Close valves, disconnect, cap the coupling.</li><li>Keep the fuel clean and labelled for re-use or disposal.</li><li>Remove the bonding wire last. Record the amount.</li></ol></div>
+        </div>
+        <div class="goal">Remember: fuel <b>fumes</b> are the danger, not just liquid. Spilled fuel is cleaned up at once.</div>
+      </div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 8. HAZARDS -->
+    <section class="page" id="page-hazards" aria-labelledby="h-hazards">
+      <h2 id="h-hazards">Fuel System Hazards</h2>
+      <p class="lead">Fuel is useful, but it can hurt people. Know the hazards and the simple rules that control them.</p>
+      <div class="grid" id="hz-grid"></div>
+      <h3>Quick check: safe or unsafe?</h3>
+      <div class="panel" id="hz-check"></div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 9. SIMULATOR -->
+    <section class="page" id="page-simulator" aria-labelledby="h-simulator">
+      <h2 id="h-simulator">Fuel Leak Troubleshooting Simulator</h2>
+      <p class="lead">You are the technician. Read the report, choose your actions, and decide the cause. Unsafe actions lose points.</p>
+      <div class="panel">
+        <h3>Leak size guide (teaching example)</h3>
+        <div class="table-wrap"><table>
+          <tr><th>Type</th><th>What you see</th><th>Typical action</th></tr>
+          <tr><td>Stain</td><td>Dry mark, no wet fuel</td><td>Clean, watch it</td></tr>
+          <tr><td>Seep</td><td>Damp, no drip</td><td>Record and repair soon</td></tr>
+          <tr><td>Heavy seep</td><td>Wet area, slow drip over time</td><td>Repair before flight</td></tr>
+          <tr><td>Running leak</td><td>Fuel flows or drips freely</td><td>Stop work, make safe, report at once</td></tr>
+        </table></div>
+        <p style="margin-top:.5rem;font-size:.85rem" class="lead">Real limits come from the aircraft manual.</p>
+      </div>
+      <div id="sim-pick" class="grid"></div>
+      <div id="sim-play" hidden></div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 10. QUIZ -->
+    <section class="page" id="page-quiz" aria-labelledby="h-quiz">
+      <h2 id="h-quiz">Knowledge Quiz</h2>
+      <div id="quiz-box"></div>
+      <div class="pager"></div>
+    </section>
+
+    <!-- 11. DASHBOARD -->
+    <section class="page" id="page-dashboard" aria-labelledby="h-dashboard">
+      <h2 id="h-dashboard">Student Progress Dashboard</h2>
+      <p class="lead">Your progress is saved only in this browser on this device. Nothing is sent anywhere.</p>
+      <div id="dash-box"></div>
+      <div class="pager"></div>
+    </section>
+
+  </main>
+  <footer>Teaching diagrams only. Always follow the approved aircraft manual and your supervisor.</footer>
+
+  <script src="js/store.js"></script>
+  <script src="js/explorer.js"></script>
+  <script src="js/lessons.js"></script>
+  <script src="js/simulator.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

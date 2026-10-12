@@ -140,6 +140,7 @@
       ] }
   ];
 
+  FL.safetyScenarios = SCENARIOS.map(function (s) { return { id: s.id, title: s.title }; });
   var TOTAL_STEPS = SCENARIOS.reduce(function (n, s) { return n + s.steps.length; }, 0);
 
   FL.inits.hazards = function () {

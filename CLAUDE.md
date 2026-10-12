@@ -31,6 +31,9 @@ A portal where students browse and try a growing collection of small learning it
     and leak-simulator best scores in `localStorage` under `fuel-centre-progress-v1` (suffixed `:<trainee ID>` when
     someone is signed in). It also reports the quiz to `Tracker.quizResult` and calls `Tracker.complete()` once all
     nine learning sections have been visited. Its pages are sections of one `index.html`, switched by `#hash`.
+    It also keeps time spent per section, simulator attempt counts, badges and scenario best scores there. Its
+    dashboard has an opt-in leaderboard that lists every trainee's data saved under that key prefix on the same
+    device (local only; names come from the portal profile and are rendered with `textContent`).
   - A trainee shares progress by downloading a file from `progress.html` and handing it in (e.g. via the LMS).
   - `instructor.html` reads those files in the browser and keeps them in memory only: it never saves or uploads them.
   - Render names and other file content with `textContent`, never `innerHTML`.

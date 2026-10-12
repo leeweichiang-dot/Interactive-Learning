@@ -86,6 +86,15 @@
     { title: "Assessment", text: "A 20-question assessment with four question types. Pass mark 80%.", icon: "📝", href: "#quiz", steps: ["quiz-done"] }
   ];
 
+  // Progress of each roadmap module (0-100) for the given saved data (default: the current trainee's).
+  FL.moduleProgress = function (d) {
+    d = d || FL.store.get();
+    return ROADMAP.map(function (m, i) {
+      var done = m.steps.filter(function (k) { return d.visited[k]; }).length;
+      return { n: i + 1, title: m.title, href: m.href, pct: Math.round(done / m.steps.length * 100) };
+    });
+  };
+
   function refreshRoadmap() {
     var d = FL.store.get();
     var nextFound = false;
@@ -174,6 +183,15 @@
     document.title = (id === "home" ? "" : ALL.filter(function (p) { return p.id === id; })[0].title + " · ") + "Aircraft Fuel System Learning Centre";
     window.scrollTo(0, 0);
   }
+
+  // Learning time: count 5-second slices while this tab is visible, against the page being read.
+  var lastTick = Date.now();
+  setInterval(function () {
+    var now = Date.now();
+    var secs = Math.min(10, (now - lastTick) / 1000);
+    lastTick = now;
+    if (document.visibilityState === "visible" && current) FL.store.addTime(current, Math.round(secs * 10) / 10);
+  }, 5000);
 
   buildNav();
   buildHome();

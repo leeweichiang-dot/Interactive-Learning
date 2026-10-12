@@ -50,6 +50,8 @@
     },
     setSim: function (id, score) {
       var d = load();
+      d.tries = d.tries || {};
+      d.tries["sim:" + id] = (d.tries["sim:" + id] || 0) + 1;
       if (d.sim[id] == null || score > d.sim[id]) d.sim[id] = score;
       save(d);
     },
@@ -64,8 +66,31 @@
     setSafety: function (id, score) {
       var d = load();
       d.safety = d.safety || {};
+      d.tries = d.tries || {};
+      d.tries["safety:" + id] = (d.tries["safety:" + id] || 0) + 1;
       if (d.safety[id] == null || score > d.safety[id]) d.safety[id] = score;
       save(d);
+    },
+    // Adds learning time (seconds) to a page and to the total.
+    addTime: function (page, secs) {
+      var d = load();
+      d.time = d.time || { total: 0, pages: {} };
+      d.time.total += secs;
+      d.time.pages[page] = (d.time.pages[page] || 0) + secs;
+      save(d);
+    },
+    // Every trainee's saved data on this device (for the optional leaderboard).
+    profiles: function () {
+      var out = [];
+      try {
+        for (var i = 0; i < localStorage.length; i++) {
+          var k = localStorage.key(i);
+          if (k !== BASE && k.indexOf(BASE + ":") !== 0) continue;
+          var d = JSON.parse(localStorage.getItem(k));
+          if (d && d.v === 1) out.push({ id: k === BASE ? "" : k.slice(BASE.length + 1), current: k === key(), data: d });
+        }
+      } catch (e) { /* storage blocked: no list */ }
+      return out;
     },
     reset: function () {
       memory = null;
